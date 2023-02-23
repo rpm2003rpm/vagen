@@ -25,4 +25,4 @@ Although usable, the current development status is beta. There are several thing
 * Modify the code so integer, float, and boolean values can be recognized without the need for an explicity declaration (ex. Real(1))
 * Modify the code so WaitUs and WaitSignal can be used inside While, If, Case, Repeat and For when these conditions are inside a sequence.
 * Implement the automatic generation of cadence equations for the markers.
-
+* Write a documentation for the module.
