@@ -2,8 +2,12 @@
 
 ## What is vagen?
 
-vagen is a verilogA test bench generator that can be used for verification of analog IPs in the context of VLSI design.
-It provides a wide range of basic models to deal with voltage sources, current sources, digital interface, clock and tests that requires a source measure unit model.
+vagen is a verilogA test bench generator that can be used for transient verification of complex analog IPs in the context of VLSI design.
+It provides a wide range of basic models with voltage sources, current sources, digital interface, clock, switches, and source measure units. 
+
+Mutiple sequences for different tests can be created and selected during simulation time with the parameter TEST_SEQ_PARAM. 
+
+
 
 ## How to run
 
