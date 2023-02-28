@@ -24,3 +24,4 @@ Although usable, the current development status is beta. There are several thing
 * Improve the test bench of the code vagen/tb.py.
 * Modify the code so WaitUs and WaitSignal can be used inside While, If, Case, Repeat and For when these conditions are inside a sequence.
 * Write a documentation.
+* the mark() method can't be called inside a If or Case otherwise the transitions in the MARK pin and the equations will be misaligned 
