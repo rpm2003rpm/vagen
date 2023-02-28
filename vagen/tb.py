@@ -54,7 +54,13 @@ class Marker():
         self.name = name
         self.markList = []
         self.var = var
-
+        
+    #---------------------------------------------------------------------------
+    # return the  name of the marker
+    #---------------------------------------------------------------------------
+    def getName(self):
+        return self.name
+        
     #---------------------------------------------------------------------------
     # mark a particular event by flipping the  internal variable
     # Parameters:
@@ -63,7 +69,7 @@ class Marker():
     def mark(self, name):
         checkType("name", name, str)
         self.markList.append(name)
-        return self.var.equal(~self.var)
+        return self.var.toggle()
 
     #---------------------------------------------------------------------------
     # Force the internal variable low. You shouldn't use because it will 
@@ -71,7 +77,7 @@ class Marker():
     # It was implemented for usage in specific power down conditions only.
     #---------------------------------------------------------------------------
     def low(self): 
-        return self.var.equal(Bool(0))
+        return self.var.eq(False)
 
     #---------------------------------------------------------------------------
     # Force the internal variable high. You shouldn't use because it will 
@@ -79,14 +85,18 @@ class Marker():
     # It was implemented for usage in specific power down conditions only.
     #---------------------------------------------------------------------------
     def high(self, name):
-        return self.var.equal(Bool(1))
+        return self.var.eq(True)
 
     #---------------------------------------------------------------------------
     # Return a list with the cadence equations for the marker     
     # Not implemented yet
     #---------------------------------------------------------------------------
-    def getCds(self):
-        pass
+    def getEqs(self):
+        ans = {}
+        for i in range(0, len(self.markList)):
+            ans[self.markList[i]] = 'cross(getData("/MARK" ?result "tran") ' +\
+                                    '0.5 {:d} "either" nil nil)'.format(i + 1)
+        return ans
         
 
 #-------------------------------------------------------------------------------
@@ -119,7 +129,7 @@ class WaitSignal(Cmd):
     #---------------------------------------------------------------------------        
     def getVA(self, padding):
         #TODO: Find a better way to fix this
-        raise Exception("You can't add WaitSignal inside command blocks!")
+        raise Exception("Wait can't outside se1 or inside If, For, While or Repeat")
 
 
 #-------------------------------------------------------------------------------
@@ -135,7 +145,7 @@ class WaitUs(Cmd):
     # delay - real expression holding the delay to be waited for
     #---------------------------------------------------------------------------
     def __init__(self, delay):
-        checkInstance("delay", delay, RealOp)
+        checkReal("delay", delay)
         self.delay = delay
         super(WaitUs, self).__init__("")
 
@@ -152,7 +162,7 @@ class WaitUs(Cmd):
     #---------------------------------------------------------------------------        
     def getVA(self, padding):
         #TODO: Find a better way to fix this
-        raise Exception("You can't add WaitUs inside command blocks!")
+        raise Exception("Wait can't outside se1 or inside If, For, While or Repeat")
 
 
 #-------------------------------------------------------------------------------
@@ -227,13 +237,14 @@ class Vdc(Electrical):
     def __init__(self, tb, name, value, rise, fall): 
         checkInstance("tb", tb, Tb)
         checkType("name", name, str)
-        checkInstance("value", value, RealOp)
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        value = parseReal("value", value)
+        rise = parseReal("rise", rise)
+        fall = parseReal("fall", fall)
         super(Vdc, self).__init__(name)
-        self.volt = tb.var(value)
-        self.rise = tb.var(rise)
-        self.fall = tb.var(fall)
+        prefix = name.replace("[", "_$").replace("]", "$")
+        self.volt = tb.var(value, prefix + "_$value$")
+        self.rise = tb.var(rise, prefix + "_$rise$")
+        self.fall = tb.var(fall, prefix + "_$fall$")
         tb.endAnalog(
             self.vCont(
                 transition(self.volt, Real(0), self.rise, self.fall)
@@ -247,11 +258,11 @@ class Vdc(Electrical):
     # fall - real expression holding the fall time for changes in the voltage
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         return CmdList(
-            self.rise.equal(rise),
-            self.fall.equal(fall)
+            self.rise.eq(rise),
+            self.fall.eq(fall)
         )
 
     #---------------------------------------------------------------------------
@@ -260,8 +271,8 @@ class Vdc(Electrical):
     # value - real expression holding the votlage.
     #---------------------------------------------------------------------------
     def applyV(self, value):
-        checkInstance("value", value, RealOp)
-        return self.volt.equal(value)
+        checkReal("value", value)
+        return self.volt.eq(value)
 
 
 #-------------------------------------------------------------------------------
@@ -284,8 +295,8 @@ class VdcBus(Bus):
     # fall - real expression holding the fall time
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         ans = CmdList()
         for pin in self:
             ans.append(pin.setRiseFall(rise, fall))
@@ -297,7 +308,7 @@ class VdcBus(Bus):
     # value - real expression holding the voltage
     #---------------------------------------------------------------------------
     def applyV(self, value):
-        checkInstance("value", value, RealOp)
+        checkReal("value", value)
         ans = CmdList()
         for pin in self:
             ans.append(pin.applyV(value))
@@ -322,13 +333,14 @@ class Idc(Electrical):
     def __init__(self, tb, name, value, rise, fall): 
         checkInstance("tb", tb, Tb)
         checkType("name", name, str)
-        checkInstance("value", value, RealOp)
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        value = parseReal("value", value)
+        rise = parseReal("rise", rise)
+        fall = parseReal("fall", fall)
         super(Idc, self).__init__(name)
-        self.cur  = tb.var(value)
-        self.rise = tb.var(rise)
-        self.fall = tb.var(fall)
+        prefix = name.replace("[", "_$").replace("]", "$")
+        self.cur = tb.var(value, prefix + "_$value$")
+        self.rise = tb.var(rise, prefix + "_$rise$")
+        self.fall = tb.var(fall, prefix + "_$fall$")
         tb.endAnalog(
             self.iCont(
                 transition(self.cur, Real(0), self.rise, self.fall)
@@ -342,11 +354,11 @@ class Idc(Electrical):
     # fall - real expression holding the fall time for changes in the current
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         return CmdList(
-            self.rise.equal(rise),
-            self.fall.equal(fall)
+            self.rise.eq(rise),
+            self.fall.eq(fall)
         )
 
     #---------------------------------------------------------------------------
@@ -355,8 +367,8 @@ class Idc(Electrical):
     # value - real expression holding the current
     #---------------------------------------------------------------------------
     def applyI(self, value):
-        checkInstance("value", value, RealOp)
-        return self.cur.equal(value)
+        checkReal("value", value)
+        return self.cur.eq(value)
 
 
 #-------------------------------------------------------------------------------
@@ -379,8 +391,8 @@ class IdcBus(Bus):
     # fall - real expression holding the fall time
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         ans = CmdList()
         for pin in self:
             ans.append(pin.setRiseFall(rise, fall))
@@ -392,7 +404,7 @@ class IdcBus(Bus):
     # value - real expression holding the current
     #---------------------------------------------------------------------------
     def applyI(self, value):
-        checkInstance("value", value, RealOp)
+        checkReal("value", value)
         ans = CmdList()
         for pin in self:
             ans.append(pin.applyI(value))
@@ -418,25 +430,26 @@ class Smu(Electrical):
     def __init__(self, tb, name, volt, minCur, maxCur, res): 
         checkInstance("tb", tb, Tb)
         checkType("name", name, str)
-        checkInstance("volt", volt, RealOp)
-        checkInstance("minCur", minCur, RealOp)
-        checkInstance("maxCur", maxCur, RealOp)
-        checkInstance("res", res, RealOp)
+        volt = parseReal("volt", volt)
+        minCur = parseReal("minCur", minCur)
+        maxCur = parseReal("maxCur", maxCur)
+        res = parseReal("res", res)
         super(Smu, self).__init__(name)
-        self.volt     = tb.var(volt)
-        self.maxCur   = tb.var(maxCur)
-        self.minCur   = tb.var(minCur)
-        self.res      = tb.var(res)
-        self.vDelay   = tb.var(Real(0))
-        self.iDelay   = tb.var(Real(0))
-        self.rDelay   = tb.var(Real(0))
-        self.riseFall = tb.var(Real(1e-6))
-        voltTran      = tb.var(Real(0)) 
-        maxCurTran    = tb.var(Real(0))
-        minCurTran    = tb.var(Real(0))
-        resTran       = tb.var(Real(0))
+        prefix = name.replace("[", "_$").replace("]", "$")
+        self.volt     = tb.var(volt, prefix + "_$volt$")
+        self.maxCur   = tb.var(maxCur, prefix + "_$maxCur")
+        self.minCur   = tb.var(minCur, prefix + "_$minCur$")
+        self.res      = tb.var(res, prefix + "_$res$")
+        self.vDelay   = tb.var(Real(0), prefix + "_$vDelay$")
+        self.iDelay   = tb.var(Real(0), prefix + "_$iDelay$")
+        self.rDelay   = tb.var(Real(0), prefix + "_$rDelay$")
+        self.riseFall = tb.var(Real(1e-6), prefix + "_$riseFall$")
+        voltTran      = tb.var(Real(0), prefix + "_$voltTran$") 
+        maxCurTran    = tb.var(Real(0), prefix + "_$maxCurTran$")
+        minCurTran    = tb.var(Real(0), prefix + "_$minCurTran$")
+        resTran       = tb.var(Real(0), prefix + "_$resTran$")
         tb.endAnalog(
-            voltTran.equal(
+            voltTran.eq(
                 transition(
                     self.volt, 
                     self.vDelay,
@@ -444,7 +457,7 @@ class Smu(Electrical):
                     self.riseFall
                 )
             ), 
-            maxCurTran.equal(
+            maxCurTran.eq(
                 transition(
                     self.maxCur, 
                     self.iDelay,
@@ -452,7 +465,7 @@ class Smu(Electrical):
                     self.riseFall
                 )
             ),
-            minCurTran.equal(
+            minCurTran.eq(
                 transition(
                     self.minCur, 
                     self.iDelay,
@@ -460,19 +473,19 @@ class Smu(Electrical):
                     self.riseFall
                 )
             ),
-            resTran.equal(
+            resTran.eq(
                 transition(
                     self.res, 
                     self.rDelay,
                     self.riseFall, 
                     self.riseFall)),
             self.iCont(
-                tanh(Real(50)*(self.v - voltTran))*
-                Real(0.5)*(maxCurTran - minCurTran) + 
-                Real(0.5)*(maxCurTran + minCurTran)
+                tanh(50*(self.v - voltTran))*
+                0.5*(maxCurTran - minCurTran) + 
+                0.5*(maxCurTran + minCurTran)
             ),
             self.iCont(self.v/resTran),
-            self.iCont(Real(1e-12)*ddt(self.v))
+            self.iCont(1e-12*ddt(self.v))
         ) 
     
     #---------------------------------------------------------------------------
@@ -483,17 +496,17 @@ class Smu(Electrical):
     # limit - real expression holding the current limit
     #---------------------------------------------------------------------------
     def applyV(self, value, limit):
-        checkInstance("value", value, RealOp)
-        checkInstance("limit", limit, RealOp)
+        checkReal("value", value)
+        checkReal("limit", limit)
         return CmdList(
-            self.volt.equal(value),
-            self.maxCur.equal(abs(limit)),
-            self.minCur.equal(-abs(limit)),
-            self.res.equal(Real(1e4)/(abs(limit) + Real(1e-9))),
-            self.vDelay.equal(Real(0)),
-            self.iDelay.equal(Real(1e-6)),
-            self.rDelay.equal(Real(1e-6)),
-            self.riseFall.equal(Real(1e-6))
+            self.volt.eq(value),
+            self.maxCur.eq(abs(limit)),
+            self.minCur.eq(-abs(limit)),
+            self.res.eq(1e4/(abs(limit) + 1e-9)),
+            self.vDelay.eq(0),
+            self.iDelay.eq(1e-6),
+            self.rDelay.eq(1e-6),
+            self.riseFall.eq(1e-6)
         )
 
     #---------------------------------------------------------------------------
@@ -506,17 +519,17 @@ class Smu(Electrical):
     # limit - real expression holding the voltage limit
     #---------------------------------------------------------------------------
     def applyI(self, value, limit):
-        checkInstance("value", value, RealOp)
-        checkInstance("limit", limit, RealOp)
+        checkReal("value", value)
+        checkReal("limit", limit)
         return CmdList(
-            self.volt.equal(limit),
-            self.maxCur.equal(Real(0.5)*(value + abs(value))),
-            self.minCur.equal(Real(0.5)*(value - abs(value))),
-            self.res.equal(Real(1e4)/(abs(value) + Real(1e-9))),
-            self.vDelay.equal(Real(1e-6)),
-            self.iDelay.equal(Real(0)),
-            self.rDelay.equal(Real(0)),
-            self.riseFall.equal(Real(1e-6))
+            self.volt.eq(limit),
+            self.maxCur.eq(0.5*(value + abs(value))),
+            self.minCur.eq(0.5*(value - abs(value))),
+            self.res.eq(1e4/(abs(value) + 1e-9)),
+            self.vDelay.eq(1e-6),
+            self.iDelay.eq(0),
+            self.rDelay.eq(0),
+            self.riseFall.eq(1e-6)
         )
 
     #---------------------------------------------------------------------------
@@ -525,16 +538,16 @@ class Smu(Electrical):
     # value - real expression holding the value of the resistor
     #---------------------------------------------------------------------------
     def applyR(self, value):
-        checkInstance("value", value, RealOp)
+        checkReal("value", value)
         return CmdList(
-            self.volt.equal(Real(0)),
-            self.maxCur.equal(Real(0)),
-            self.minCur.equal(Real(0)),
-            self.res.equal(value),
-            self.vDelay.equal(Real(1e-6)),
-            self.iDelay.equal(Real(0)),
-            self.rDelay.equal(Real(0)),
-            self.riseFall.equal(Real(1e-6))
+            self.volt.eq(0),
+            self.maxCur.eq(0),
+            self.minCur.eq(0),
+            self.res.eq(value),
+            self.vDelay.eq(1e-6),
+            self.iDelay.eq(0),
+            self.rDelay.eq(0),
+            self.riseFall.eq(1e-6)
         )
 
 
@@ -559,8 +572,8 @@ class SmuBus(Bus):
     # limit - real expression holding the voltage limit
     #---------------------------------------------------------------------------
     def applyI(self, value, limit):
-        checkInstance("value", value, RealOp)
-        checkInstance("limit", limit, RealOp)
+        checkReal("value", value)
+        checkReal("limit", limit)
         ans = CmdList()
         for pin in self:
             ans.append(pin.applyI(value, limit))
@@ -573,8 +586,8 @@ class SmuBus(Bus):
     # limit - real expression holding the current limit
     #---------------------------------------------------------------------------
     def applyV(self, value, limit):
-        checkInstance("value", value, RealOp)
-        checkInstance("limit", limit, RealOp)
+        checkReal("value", value)
+        checkReal("limit", limit)
         ans = CmdList()
         for pin in self:
             ans.append(pin.applyV(value, limit))
@@ -586,7 +599,7 @@ class SmuBus(Bus):
     # value - real expression holding the current
     #---------------------------------------------------------------------------
     def applyR(self, value):
-        checkInstance("value", value, RealOp)
+        checkReal("value", value)
         ans = CmdList()
         for pin in self:
             ans.append(pin.applyR(value))
@@ -617,21 +630,22 @@ class DigOut(Electrical):
     def __init__(self, tb, name, state, domain, inCap, serRes, rise, fall): 
         checkInstance("tb", tb, Tb)
         checkType("name", name, str)
-        checkInstance("state", state, BoolOp)
         checkInstance("domain", domain, Electrical)
-        checkInstance("serRes", serRes, RealOp)
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        state = parseBool("state", state)
+        serRes = parseReal("serRes", serRes)
+        rise = parseReal("rise", rise)
+        fall = parseReal("fall", fall)
         super(DigOut, self).__init__(name)
-        self.st = tb.var(state)
-        self.serRes = tb.var(serRes)
-        self.rise = tb.var(rise)
-        self.fall = tb.var(fall)
+        prefix = name.replace("[", "_$").replace("]", "$")
+        self.st = tb.var(state, prefix + "_$state$")
+        self.serRes = tb.var(serRes, prefix + "_$serRes$")
+        self.rise = tb.var(rise, prefix + "_$rise")
+        self.fall = tb.var(fall, prefix + "_$fall$")
         tb.endAnalog(
             self.vCont(
                 domain.v*transition(
-                    ternary(self.st, Real(1), Real(0)), 
-                    Real(0), 
+                    ternary(self.st, 1.0, 0.0), 
+                    0, 
                     self.rise, 
                     self.fall
                 )
@@ -646,11 +660,11 @@ class DigOut(Electrical):
     # fall - real expression holding the fall time
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         return CmdList(
-            self.rise.equal(rise),
-            self.fall.equal(fall)
+            self.rise.eq(rise),
+            self.fall.eq(fall)
         )
 
     #---------------------------------------------------------------------------
@@ -659,8 +673,8 @@ class DigOut(Electrical):
     # value - boolean expression representing the state to be written
     #---------------------------------------------------------------------------
     def write(self, value):
-        checkInstance("value", value, BoolOp)
-        return self.st.equal(value)
+        checkBool("value", value)
+        return self.st.eq(value)
 
 
 #-------------------------------------------------------------------------------
@@ -686,16 +700,17 @@ class DigIn(Electrical):
         checkInstance("tb", tb, Tb)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
-        checkInstance("inCap", inCap, RealOp)
+        inCap = parseReal("inCap", inCap)
         super(DigIn, self).__init__(name)
         self.domain = domain
-        self.inCap = tb.var(inCap)
+        prefix = name.replace("[", "_$").replace("]", "$")
+        self.inCap = tb.var(inCap, prefix + "_$inCap$")
         tb.endAnalog(
             self.iCont(ddt(self.v)*self.inCap)
         ) 
     
     def read(self):
-        return self.v > self.domain.v/Real(2)
+        return self.v > self.domain.v/2
 
 
 #-------------------------------------------------------------------------------
@@ -724,33 +739,34 @@ class DigInOut(DigIn, DigOut):
     def __init__(self, tb, name, state, domain, inCap, serRes, rise, fall): 
         checkInstance("tb", tb, Tb)
         checkType("name", name, str)
-        checkInstance("state", state, BoolOp)
         checkInstance("domain", domain, Electrical)
-        checkInstance("inCap", inCap, RealOp)
-        checkInstance("serRes", serRes, RealOp)
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        state = parseBool("state", state)
+        serRes = parseReal("serRes", serRes)
+        inCap = parseReal("inCap", inCap)        
+        rise = parseReal("rise", rise)
+        fall = parseReal("fall", fall)
         super(DigOut, self).__init__(name)
-        self.st = tb.var(state)
-        self.inCap = tb.var(inCap)
-        self.serRes = tb.var(serRes)
-        self.res = tb.var(serRes)
-        self.rise = tb.var(rise)
-        self.fall = tb.var(fall)
+        prefix = name.replace("[", "_$").replace("]", "$")
+        self.st = tb.var(state, prefix + "_$state$")
+        self.serRes = tb.var(serRes, prefix + "_$serRes$")
+        self.inCap = tb.var(inCap, prefix + "_$inCap$")
+        self.res = tb.var(serRes, prefix + "_$res$")
+        self.rise = tb.var(rise, prefix + "_$rise")
+        self.fall = tb.var(fall, prefix + "_$fall$")
         self.domain = domain
         pin = tb.electrical()
         conn = Branch(pin, self)
         tb.endAnalog(
             pin.vCont(
                 domain.v*transition(
-                    ternary(self.st, Real(1), Real(0)), 
-                    Real(0), 
+                    ternary(self.st, 1.0, 0.0), 
+                    0, 
                     self.rise, 
                     self.fall
                 )
             ),
             conn.vCont(
-                conn.i*transition(self.res, Real(0), self.rise, self.fall)
+                conn.i*transition(self.res, 0, self.rise, self.fall)
             ),
             self.iCont(ddt(self.v)*self.inCap)
         ) 
@@ -759,13 +775,13 @@ class DigInOut(DigIn, DigOut):
     # Set the pins at hiz in order to use the read function
     #---------------------------------------------------------------------------
     def hiZ(self):
-        return self.res.equal(Real(1e12))
+        return self.res.eq(1e12)
 
     #---------------------------------------------------------------------------
     # Set the pins to low impedance in order to use the write function
     #---------------------------------------------------------------------------
     def lowZ(self):
-        return self.res.equal(self.serRes)
+        return self.res.eq(self.serRes)
 
                
 #-------------------------------------------------------------------------------
@@ -788,8 +804,8 @@ class DigBusOut(Bus):
     # fall - real expression holding the fall time
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         ans = CmdList()
         for pin in self:
             ans.append(pin.setRiseFall(rise, fall))
@@ -801,11 +817,11 @@ class DigBusOut(Bus):
     # value - integer expression representing the value
     #---------------------------------------------------------------------------
     def write(self, value):
-        checkInstance("value", value, IntegerOp)
+        checkInteger("value", value)
         ans = CmdList()
         i = 1
         for pin in self:
-            ans.append(pin.write((value & Integer(i)).toBool()))
+            ans.append(pin.write(Bool(value & i)))
             i = i << 1
         return ans
 
@@ -828,10 +844,10 @@ class DigBusIn(Bus):
     # inputs to Unsigned Integer
     #---------------------------------------------------------------------------
     def read(self):
-        ans = self[0].read().toInteger()*Integer(1)
+        ans = Integer(self[0].read())
         i = 2
         for pin in self[(len(self)-1):1]:
-            ans = IntegerOp(str(ans) + "\n") + pin.read().toInteger()*Integer(i)
+            ans = ans + Integer(pin.read())*i
             i = i << 1
         return ans            
 
@@ -872,6 +888,8 @@ class DigBusInOut(DigBusIn, DigBusOut):
 # Switch between two nodes. 
 #-------------------------------------------------------------------------------
 class Sw():
+
+    swCount = 1
     
     #---------------------------------------------------------------------------
     # Constructor
@@ -889,12 +907,14 @@ class Sw():
         checkInstance("tb", tb, Tb)
         checkInstance("pin1", pin1, Electrical)
         checkInstance("pin2", pin2, Electrical)
-        checkInstance("cond", cond, RealOp)
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
-        self.cond = tb.var(cond)
-        self.rise = tb.var(rise)
-        self.fall = tb.var(fall)
+        cond = parseReal("cond", cond)
+        rise = parseReal("rise", rise)
+        fall = parseReal("fall", fall)
+        prefix = "sw" + str(self.swCount)
+        self.swCount = self.swCount + 1
+        self.cond = tb.var(cond, prefix + "_$cond$")
+        self.rise = tb.var(rise, prefix + "_$rise")
+        self.fall = tb.var(fall, prefix + "_$fall$")
         self.branch = Branch(pin1, pin2)
         tb.endAnalog(
             self.branch.iCont(
@@ -914,11 +934,11 @@ class Sw():
     # fall - real expression holding the fall time
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         return CmdList(
-            self.rise.equal(rise),
-            self.fall.equal(fall)
+            self.rise.eq(rise),
+            self.fall.eq(fall)
         )
 
     #---------------------------------------------------------------------------
@@ -927,13 +947,16 @@ class Sw():
     # cond - new value for the conductance
     #---------------------------------------------------------------------------
     def setCond(self, cond):
-        checkInstance("cond", cond, RealOp)
-        return self.cond.equal(cond)
+        checkReal("cond", cond)
+        return self.cond.eq(cond)
+
 
 #-------------------------------------------------------------------------------
 # Clock using a digital pin 
 #-------------------------------------------------------------------------------
 class Clock():
+    
+    clockCount = 1
     
     #---------------------------------------------------------------------------
     # Constructor
@@ -944,21 +967,23 @@ class Clock():
     def __init__(self, tb, pin):
         checkInstance("tb", tb, Tb)
         checkInstance("pin", pin, DigOut)
-        out = tb.var(pin.st)
-        self.isOn = tb.var(Bool(0))
-        self.halfPeriod = tb.var(Real(1000000))
-        self.time = tb.var(Real(1000000))
+        prefix = "clk" + str(self.clockCount)
+        self.clockCount = self.clockCount + 1
+        out = tb.var(Bool(str(pin.st)), prefix + "_$out$")
+        self.isOn = tb.var(Bool(0), prefix + "_$isOn$")
+        self.halfPeriod = tb.var(Real(1000000), prefix + "_$halfPeriod$")
+        self.time = tb.var(Real(1000000), prefix + "_$time$")
         self.at = CmdList(
-                      out.equal(~out),
+                      out.toggle(),
                       pin.write(out),
                       If(self.isOn | out)(
-                          self.time.equal(abstime + self.halfPeriod)
+                          self.time.eq(abstime + self.halfPeriod)
                       )
                   )
                
-        if isinstance(tb.timeTol, RealOp):
+        if isinstance(tb.timeTol, Real):
             tb.analog(
-                At(Timer(self.time, Real(0), tb.timeTol))(
+                At(Timer(self.time, 0, tb.timeTol))(
                     self.at
                 )
             )
@@ -973,18 +998,18 @@ class Clock():
     # Turn the clock generator on
     #---------------------------------------------------------------------------
     def on(self, frequency):
-        checkInstance("frequency", frequency, RealOp)
+        checkReal("frequency", frequency)
         return CmdList(
-                   self.halfPeriod.equal(Real(0.5)/frequency),
-                   self.isOn.equal(Bool(1)),
-                   self.time.equal(abstime + Real(1e-9))
+                   self.halfPeriod.eq(0.5/frequency),
+                   self.isOn.eq(True),
+                   self.time.eq(abstime + 1e-9)
                )
 
     #---------------------------------------------------------------------------
     # Turn the clock generator off
     #---------------------------------------------------------------------------
     def off(self):
-        return self.isOn.equal(Bool(0))
+        return self.isOn.eq(Bool(0))
 
 
 #-------------------------------------------------------------------------------
@@ -1023,26 +1048,22 @@ class Tb(Module):
                 self.dcCmdList
             ),
         )
-        if isinstance(self.timeTol, RealOp):
-            self.beginningAnalog(
-                At(Timer(self.time, Real(0), self.timeTol))(
-                    self.timerCase
-                )
-            )
-        elif isinstance(self.timeTol, type(None)):
+        if isinstance(self.timeTol, type(None)):
             self.beginningAnalog(
                 At(Timer(self.time))(
                     self.timerCase
                 )
             )
         else:
-            raise TypeError("timeTol must be RealOp or None") 
+            self.timeTol = parseReal("timeTol", timeTol)
+            self.beginningAnalog(
+                At(Timer(self.time, 0, self.timeTol))(
+                    self.timerCase
+                )
+            )
         self.endAnalog(
-            self.markStReal.equal(self.markSt), 
-            self.markerPin.vCont(transition(self.markStReal, \
-                                            Real(0), 
-                                            Real(1e-12), 
-                                            Real(1e-12)))
+            self.markStReal.eq(Real(self.markSt)), 
+            self.markerPin.vCont(transition(self.markStReal, 0, 1e-12, 1e-12))
         )
                     
     #---------------------------------------------------------------------------
@@ -1052,9 +1073,10 @@ class Tb(Module):
     # name - name of the variable
     # value - Initial value
     #---------------------------------------------------------------------------
-    def var(self, value = Integer(0), name = ""):
-        ans = super(Tb, self).var(value, name)           
-        self.dcCmdList.append(ans.equal(value))
+    def var(self, value = 0, name = ""):
+        value = parseNumber("value", value)
+        ans = super(Tb, self).var(type(value), name)           
+        self.dcCmdList.append(ans.eq(value))
         return ans
 
     #---------------------------------------------------------------------------
@@ -1091,18 +1113,18 @@ class Tb(Module):
             name = "", 
             width = 1, 
             direction = "internal", 
-            value = Integer(0),
-            inCap = Real(1e-12), 
-            serRes = Real(100), 
-            rise = Real(1e-12),
-            fall = Real(1e-12)):
+            value = 0,
+            inCap = 1e-12, 
+            serRes = 100, 
+            rise = 1e-12,
+            fall = 1e-12):
         #Check the inputs
         checkInstance("domain", domain, Electrical)
-        checkInstance("value", value, IntegerOp)
-        checkInstance("inCap", inCap, RealOp)
-        checkInstance("serRes", serRes, RealOp)
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        checkInteger("value", value)
+        checkReal("inCap", inCap)
+        checkReal("serRes", serRes)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         name = self.addPort(name, width, direction)
         if direction == "input":
             digType = DigIn
@@ -1117,7 +1139,7 @@ class Tb(Module):
         if width == 1:
             return digType(self, 
                            name, 
-                           value.toBool(), 
+                           Bool(value), 
                            domain, 
                            inCap, 
                            serRes, 
@@ -1130,7 +1152,7 @@ class Tb(Module):
             for i in range(0, width):
                 bus.append(digType(self, 
                                    name + "[" + str(i) + "]",
-                                   (value & Integer(j)).toBool(),
+                                   Bool(value & j),
                                    domain, 
                                    inCap, 
                                    serRes,
@@ -1153,9 +1175,9 @@ class Tb(Module):
     def sw(self, pin1, pin2, cond = Real(0), rise=Real(1e-6), fall=Real(1e-6)):
         checkInstance("pin1", pin1, Electrical)
         checkInstance("pin2", pin2, Electrical)
-        checkInstance("cond", cond, RealOp)
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+        checkReal("cond", cond)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         return Sw(self, pin1, pin2, cond, rise, fall)
         
     #---------------------------------------------------------------------------
@@ -1183,14 +1205,14 @@ class Tb(Module):
             name = "", 
             width = 1, 
             direction = "internal", 
-            volt = Real(0), 
-            minCur = Real(0), 
-            maxCur = Real(0), 
-            res = Real(1e12)): 
-        checkInstance("volt", volt, RealOp)
-        checkInstance("minCur", minCur, RealOp)
-        checkInstance("maxCur", maxCur, RealOp)
-        checkInstance("res", res, RealOp)
+            volt = 0, 
+            minCur = 0, 
+            maxCur = 0, 
+            res = 1e12): 
+        checkReal("volt", volt)
+        checkReal("minCur", minCur)
+        checkReal("maxCur", maxCur)
+        checkReal("res", res)
         name = self.addPort(name, width, direction)
         if width == 1:
             return  Smu(self, name, volt, minCur, maxCur, res)
@@ -1222,12 +1244,12 @@ class Tb(Module):
             name = "", 
             width = 1, 
             direction = "internal", 
-            value = Real(0),
-            rise = Real(0),
-            fall = Real(0)):
-        checkInstance("value", value, RealOp)
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+            value = 0,
+            rise = 0,
+            fall = 0):
+        checkReal("value", value)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         name = self.addPort(name, width, direction)
         if width == 1:
             return  Vdc(self, name, value, rise, fall)
@@ -1258,12 +1280,12 @@ class Tb(Module):
             name = "", 
             width = 1, 
             direction = "internal", 
-            value = Real(0),
-            rise = Real(0),
-            fall = Real(0)):
-        checkInstance("value", value, RealOp)
-        checkInstance("rise", rise, RealOp)
-        checkInstance("fall", fall, RealOp)
+            value = 0,
+            rise = 0,
+            fall = 0):
+        checkReal("value", value)
+        checkReal("rise", rise)
+        checkReal("fall", fall)
         name = self.addPort(name, width, direction)
         if width == 1:
             return  Idc(self, name, value, rise, fall)
@@ -1306,16 +1328,16 @@ class Tb(Module):
         for cmd in ans:
             #Found a WaitUs. Update timer event and go to next state
             if isinstance(cmd, WaitUs):
-                cmds.append(self.state.equal(self.state + Integer(1)))
-                cmds.append(self.time.equal(abstime + 
-                                            Real(1e-6)*cmd.getDelay()))
+                cmds.append(self.state.eq(self.state + Integer(1)))
+                cmds.append(self.time.eq(abstime + 
+                                            1e-6*cmd.getDelay()))
                 pCase.append((Integer(nState), cmds))
                 cmds = CmdList()
                 pCase = pTimerCase
                 nState = nState + 1
             #Found a WaitSignal. Update signal events and go to next state
             elif isinstance(cmd, WaitSignal):
-                cmds.append(self.state.equal(self.state + Integer(1)))
+                cmds.append(self.state.eq(self.state + Integer(1)))
                 pCase.append((Integer(nState), cmds))
                 cmds = CmdList()
                 evnt = cmd.getEvnt()
@@ -1358,11 +1380,33 @@ class Tb(Module):
         #Go to the next sequence
         self.nSeq = self.nSeq + 1
             
+            
     #---------------------------------------------------------------------------
-    # Return cds equations
+    # Return the equations in a format that can be imported by the maestro view
     #---------------------------------------------------------------------------
-    def getCDS(self):
-        return ""  
+    def getEqs(self):
+        ans = "Test,Name,Type,Output,Plot,Save,Spec\n"
+        for mark in self.markers:
+            eqs = mark.getEqs()
+            name = mark.getName()
+            for key in eqs.keys():
+                ans = ans + "{:s},{:s},expr,{:s},t,,\n".format(name, 
+                                                               name + "_" + key, 
+                                                               eqs[key])
+        return ans 
             
 
+    #---------------------------------------------------------------------------
+    # Return a ocean script that add equations to the opened session of adexl
+    #---------------------------------------------------------------------------
+    def getOcn(self):
+        ans = "session = axlGetWindowSession()\n"
+        for mark in self.markers:
+            eqs = mark.getEqs()
+            name = mark.getName()
+            for key in eqs.keys():
+                ans = ans + "axlAddOutputExpr(session " +\
+                      '"{:s}" "{:s}" ?expr "{:s}" ?plot t)\n'.format(name, 
+                      name + "_" + key, eqs[key].replace('"', '\\"'))
+        return ans 
 

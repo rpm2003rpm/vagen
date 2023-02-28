@@ -21,8 +21,6 @@ You can run an example of the verilogA test bench generator by typing the follow
 
 Although usable, the current development status is beta. There are several things that still need to be done:
 
-* Create testbenches for the code.
-* Modify the code so integer, float, and boolean values can be recognized without the need for an explicity declaration (ex. Real(1))
+* Improve the test bench of the code vagen/tb.py.
 * Modify the code so WaitUs and WaitSignal can be used inside While, If, Case, Repeat and For when these conditions are inside a sequence.
-* Implement the automatic generation of cadence equations for the markers.
-* Write a documentation for the module.
+* Write a documentation.
