@@ -997,18 +997,11 @@ class Clock():
                       )
                   )
                
-        if isinstance(tb.timeTol, Real):
-            tb.analog(
-                At(Timer(self.time, 0, tb.timeTol))(
-                    self.at
-                )
-            )
-        elif isinstance(tb.timeTol, type(None)):
-            tb.analog(
-                At(Timer(self.time))(
-                   self.at
-                )
-            )
+        tb.analog(
+           At(Timer(*([self.time] + tb.timeArgs)))(
+               self.at
+           )
+        )
 
     #---------------------------------------------------------------------------
     # Turn the clock generator on
@@ -1058,11 +1051,9 @@ class Tb(Module):
         self.testSeqCase = Case(self.testSeq)() 
         
         if not isinstance(timeTol, type(None)):
-            self.timeTol = parseReal("timeTol", timeTol)
-            timeArgs = [self.time, 0 , self.timeTol]
+            self.timeArgs = [0, parseReal("timeTol", timeTol)]
         else:
-            self.timeTol = None
-            timeArgs = [self.time]
+            self.timeArgs = []
             
         self.beginningAnalog(
             If(analysis("static"))(
@@ -1074,7 +1065,7 @@ class Tb(Module):
         )
         
         self.beginningAnalog(
-            At(Timer(self.time))(
+            At(Timer(*([self.time] + self.timeArgs)))(
                 If(self.eventId == 0)(
                     self.runSt.eq(True)
                 )
@@ -1372,16 +1363,23 @@ class Tb(Module):
             #Found a repeat loop
             elif isinstance(cmd, RepeatLoop):
                 temp = self.var()
+                cmds.append(temp.eq(0))
                 cmds.append(self.runSt.eq(True))
                 cmds.append(self.state.eq(nState + 1))
-                cmds.append(temp.eq(0))
                 pCase.append((nState, cmds))
                 nState = nState + 1
                 nStateTest = nState
                 nState = nState + 1
                 nStateLoop = nState
                 nState, cmds = self.seqNested(nState, pCase, cmd)
-                
+                pCase.append(
+                    (nState, 
+                        cmds,
+                        temp.inc(),
+                        self.runSt.eq(True),
+                        self.state.eq(nStateTest)
+                    )
+                )               
                 pCase.append(
                     (nStateTest,
                         self.runSt.eq(True),
@@ -1392,14 +1390,6 @@ class Tb(Module):
                         )
                     )
                 )  
-                pCase.append(
-                    (nState, 
-                        cmds,
-                        temp.inc(),
-                        self.runSt.eq(True),
-                        self.state.eq(nStateTest)
-                    )
-                )
                 nState = nState + 1  
                 cmds = CmdList()           
 
@@ -1413,39 +1403,13 @@ class Tb(Module):
                 nState = nState + 1
                 nStateLoop = nState
                 nState, cmds = self.seqNested(nState, pCase, cmd)
-                
-                pCase.append(
-                    (nStateTest,
-                        self.runSt.eq(True),
-                        If(cmd.getCond())(
-                            self.state.eq(nStateLoop),
-                        ).Else(
-                            self.state.eq(nState + 1)    
-                        )
-                    )
-                )  
                 pCase.append(
                     (nState, 
                         cmds,
                         self.runSt.eq(True),
                         self.state.eq(nStateTest)
                     )
-                )
-                nState = nState + 1  
-                cmds = CmdList()
-                
-            #Found a for loop
-            elif isinstance(cmd, ForLoop):
-                cmds.append(self.runSt.eq(True))
-                cmds.append(self.state.eq(nState + 1))
-                cmds.append(cmd.getStart())
-                pCase.append((nState, cmds))
-                nState = nState + 1
-                nStateTest = nState
-                nState = nState + 1
-                nStateLoop = nState
-                nState, cmds = self.seqNested(nState, pCase, cmd)
-                
+                )               
                 pCase.append(
                     (nStateTest,
                         self.runSt.eq(True),
@@ -1456,6 +1420,20 @@ class Tb(Module):
                         )
                     )
                 )  
+                nState = nState + 1  
+                cmds = CmdList()
+                
+            #Found a for loop
+            elif isinstance(cmd, ForLoop):
+                cmds.append(cmd.getStart())
+                cmds.append(self.runSt.eq(True))
+                cmds.append(self.state.eq(nState + 1))
+                pCase.append((nState, cmds))
+                nState = nState + 1
+                nStateTest = nState
+                nState = nState + 1
+                nStateLoop = nState
+                nState, cmds = self.seqNested(nState, pCase, cmd)
                 pCase.append(
                     (nState, 
                         cmds,
@@ -1463,7 +1441,17 @@ class Tb(Module):
                         self.runSt.eq(True),
                         self.state.eq(nStateTest)
                     )
-                )
+                )               
+                pCase.append(
+                    (nStateTest,
+                        self.runSt.eq(True),
+                        If(cmd.getCond())(
+                            self.state.eq(nStateLoop),
+                        ).Else(
+                            self.state.eq(nState + 1)    
+                        )
+                    )
+                )  
                 nState = nState + 1  
                 cmds = CmdList()
                 
@@ -1515,7 +1503,8 @@ class Tb(Module):
                                                        
             #Found a case
             elif isinstance(cmd, Mark):
-                raise Exception("You can't have conditional executed mark")
+                raise Exception("You can't have conditional executed mark" +
+                                "or marks inside command lists")
 
             #The commands doesn't require special handling. Add it to the list.
             else:
