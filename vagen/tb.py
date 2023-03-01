@@ -36,6 +36,22 @@ from vagen.veriloga import *
 
 
 #-------------------------------------------------------------------------------
+# Create a child class of command.
+# This class of commands are responsible for marking a specific event
+#-------------------------------------------------------------------------------
+class Mark(Cmd):
+
+    #---------------------------------------------------------------------------
+    # Return the VA verilog command
+    # Parameters:
+    # padding - dummy for consistency 
+    #---------------------------------------------------------------------------        
+    def getVA(self, padding):
+        #TODO: Find a better way to fix this
+        raise Exception("Mark can't be outside seq")
+
+
+#-------------------------------------------------------------------------------
 # Marker class. 
 # Responsible for flipping the state of one variable to mark events and 
 # generates cadance equations that return the time of the events
@@ -69,7 +85,7 @@ class Marker():
     def mark(self, name):
         checkType("name", name, str)
         self.markList.append(name)
-        return self.var.toggle()
+        return Mark(str(self.var.toggle()))
 
     #---------------------------------------------------------------------------
     # Force the internal variable low. You shouldn't use because it will 
@@ -77,7 +93,7 @@ class Marker():
     # It was implemented for usage in specific power down conditions only.
     #---------------------------------------------------------------------------
     def low(self): 
-        return self.var.eq(False)
+        return Mark(str(self.var.eq(False)))
 
     #---------------------------------------------------------------------------
     # Force the internal variable high. You shouldn't use because it will 
@@ -85,7 +101,7 @@ class Marker():
     # It was implemented for usage in specific power down conditions only.
     #---------------------------------------------------------------------------
     def high(self, name):
-        return self.var.eq(True)
+        return Mark(str(self.var.eq(True)))
 
     #---------------------------------------------------------------------------
     # Return a list with the cadence equations for the marker     
@@ -129,7 +145,7 @@ class WaitSignal(Cmd):
     #---------------------------------------------------------------------------        
     def getVA(self, padding):
         #TODO: Find a better way to fix this
-        raise Exception("Wait can't outside se1 or inside If, For, While or Repeat")
+        raise Exception("Wait can't be outside seq")
 
 
 #-------------------------------------------------------------------------------
@@ -162,7 +178,7 @@ class WaitUs(Cmd):
     #---------------------------------------------------------------------------        
     def getVA(self, padding):
         #TODO: Find a better way to fix this
-        raise Exception("Wait can't outside se1 or inside If, For, While or Repeat")
+        raise Exception("Wait can't outside seq")
 
 
 #-------------------------------------------------------------------------------
@@ -1033,13 +1049,21 @@ class Tb(Module):
         self.time       = self.var(Real(10e-9), "_$evntTime") 
         self.state      = self.var(Integer(0), "_$state") 
         self.markStReal = self.var(Real(0), "_$markStReal") 
-        self.markSt     = self.var(Bool(0), "_$markSt") 
-        self.markers    = []
+        self.markSt     = self.var(Bool(False), "_$markSt") 
+        self.runSt      = self.var(Bool(True), "_$runSt") 
+        self.eventId    = self.var(Integer(0), "_$eventId") 
         self.nSeq       = 1
-        self.tSeqList   = []
+        self.markers    = []
         self.evntList   = []
-        self.timerCase  = Case(self.testSeq)() 
-        self.timeTol = timeTol
+        self.testSeqCase = Case(self.testSeq)() 
+        
+        if not isinstance(timeTol, type(None)):
+            self.timeTol = parseReal("timeTol", timeTol)
+            timeArgs = [self.time, 0 , self.timeTol]
+        else:
+            self.timeTol = None
+            timeArgs = [self.time]
+            
         self.beginningAnalog(
             If(analysis("static"))(
                 self.dcCmdList
@@ -1048,19 +1072,19 @@ class Tb(Module):
                 self.dcCmdList
             ),
         )
-        if isinstance(self.timeTol, type(None)):
-            self.beginningAnalog(
-                At(Timer(self.time))(
-                    self.timerCase
+        
+        self.beginningAnalog(
+            At(Timer(self.time))(
+                If(self.eventId == 0)(
+                    self.runSt.eq(True)
                 )
             )
-        else:
-            self.timeTol = parseReal("timeTol", timeTol)
-            self.beginningAnalog(
-                At(Timer(self.time, 0, self.timeTol))(
-                    self.timerCase
-                )
-            )
+        )
+        
+        self.analog(
+            self.testSeqCase
+        )
+        
         self.endAnalog(
             self.markStReal.eq(Real(self.markSt)), 
             self.markerPin.vCont(transition(self.markStReal, 0, 1e-12, 1e-12))
@@ -1305,81 +1329,235 @@ class Tb(Module):
     #---------------------------------------------------------------------------
     # Sequence
     # Parameters:
-    # *cmds - variable number of commands
+    # cmds - command list
     #---------------------------------------------------------------------------
-    def seq(self, *cmds):
+    def seqNested(self, nState, pCase, cmdsIn):
+        cmdsIn = cmdsIn.flat()
+        cmds = CmdList()
+        for cmd in cmdsIn:
+        
+            #Found a WaitUs. Update timer event and go to next state
+            if isinstance(cmd, WaitUs):
+                cmds.append(self.eventId.eq(0))
+                cmds.append(self.state.eq(nState + 1))
+                cmds.append(self.time.eq(abstime + 1e-6*cmd.getDelay()))
+                pCase.append((nState, cmds))
+                nState = nState + 1
+                cmds = CmdList()
+                
+            #Found a WaitSignal. Update signal events and go to next state
+            elif isinstance(cmd, WaitSignal):
+                evnt = cmd.getEvnt()
+                #The was used before
+                if evnt in self.evntList:
+                    i = self.evntList.index(evnt)
+                    eventId = i + 1  
+                #Fist reference to this signal event
+                else:
+                    eventId = len(self.evntList)  + 1
+                    self.evntList.append(evnt)
+                    self.beginningAnalog(
+                        At(evnt)(
+                            If(eventId == self.eventId)(
+                                self.runSt.eq(True)
+                            )
+                        )
+                    )
+                cmds.append(self.eventId.eq(eventId))
+                cmds.append(self.state.eq(nState + 1))
+                pCase.append((nState, cmds))
+                nState = nState + 1
+                cmds = CmdList()
+                
+            #Found a repeat loop
+            elif isinstance(cmd, RepeatLoop):
+                temp = self.var()
+                cmds.append(self.runSt.eq(True))
+                cmds.append(self.state.eq(nState + 1))
+                cmds.append(temp.eq(0))
+                pCase.append((nState, cmds))
+                nState = nState + 1
+                nStateTest = nState
+                nState = nState + 1
+                nStateLoop = nState
+                nState, cmds = self.seqNested(nState, pCase, cmd)
+                
+                pCase.append(
+                    (nStateTest,
+                        self.runSt.eq(True),
+                        If(temp < cmd.getN())(
+                            self.state.eq(nStateLoop),
+                        ).Else(
+                            self.state.eq(nState + 1)    
+                        )
+                    )
+                )  
+                pCase.append(
+                    (nState, 
+                        cmds,
+                        temp.inc(),
+                        self.runSt.eq(True),
+                        self.state.eq(nStateTest)
+                    )
+                )
+                nState = nState + 1  
+                cmds = CmdList()           
+
+            #Found a While loop
+            elif isinstance(cmd, WhileLoop):
+                cmds.append(self.runSt.eq(True))
+                cmds.append(self.state.eq(nState + 1))
+                pCase.append((nState, cmds))
+                nState = nState + 1
+                nStateTest = nState
+                nState = nState + 1
+                nStateLoop = nState
+                nState, cmds = self.seqNested(nState, pCase, cmd)
+                
+                pCase.append(
+                    (nStateTest,
+                        self.runSt.eq(True),
+                        If(cmd.getCond())(
+                            self.state.eq(nStateLoop),
+                        ).Else(
+                            self.state.eq(nState + 1)    
+                        )
+                    )
+                )  
+                pCase.append(
+                    (nState, 
+                        cmds,
+                        self.runSt.eq(True),
+                        self.state.eq(nStateTest)
+                    )
+                )
+                nState = nState + 1  
+                cmds = CmdList()
+                
+            #Found a for loop
+            elif isinstance(cmd, ForLoop):
+                cmds.append(self.runSt.eq(True))
+                cmds.append(self.state.eq(nState + 1))
+                cmds.append(cmd.getStart())
+                pCase.append((nState, cmds))
+                nState = nState + 1
+                nStateTest = nState
+                nState = nState + 1
+                nStateLoop = nState
+                nState, cmds = self.seqNested(nState, pCase, cmd)
+                
+                pCase.append(
+                    (nStateTest,
+                        self.runSt.eq(True),
+                        If(cmd.getCond())(
+                            self.state.eq(nStateLoop),
+                        ).Else(
+                            self.state.eq(nState + 1)    
+                        )
+                    )
+                )  
+                pCase.append(
+                    (nState, 
+                        cmds,
+                        cmd.getInc(),
+                        self.runSt.eq(True),
+                        self.state.eq(nStateTest)
+                    )
+                )
+                nState = nState + 1  
+                cmds = CmdList()
+                
+            #Found a If
+            elif isinstance(cmd, Cond):
+                nStateTest = nState
+                nState = nState + 1
+                nStateTrue = nState
+                nState, cmdsEndTrue = self.seqNested(nState, 
+                                                     pCase, 
+                                                     cmd.getBlock(True))
+                nStateEndTrue = nState
+                nState = nState + 1
+                nStateFalse = nState                
+                nState, cmdsEndFalse = self.seqNested(nState, 
+                                                      pCase, 
+                                                      cmd.getBlock(False))
+                pCase.append(
+                    (nState, 
+                        cmdsEndFalse,
+                        self.runSt.eq(True),
+                        self.state.eq(nState + 1)
+                    )
+                )      
+                pCase.append(
+                    (nStateEndTrue, 
+                        cmdsEndTrue,
+                        self.runSt.eq(True),
+                        self.state.eq(nState + 1)
+                    )
+                )                    
+                pCase.append(
+                    (nStateTest,
+                        cmds,
+                        self.runSt.eq(True),
+                        If(cmd.getCond())(
+                            self.state.eq(nStateTrue),
+                        ).Else(
+                            self.state.eq(nStateFalse)    
+                        )
+                    )
+                )  
+                nState = nState + 1  
+                cmds = CmdList()
+                
+            #Found a case
+            elif isinstance(cmd, CaseClass):
+                raise Exception("You can't have a Case inside a seq")
+                                                       
+            #Found a case
+            elif isinstance(cmd, Mark):
+                raise Exception("You can't have conditional executed mark")
+
+            #The commands doesn't require special handling. Add it to the list.
+            else:
+                cmds.append(cmd)
+                
+        return nState, cmds
+
+    #---------------------------------------------------------------------------
+    # Sequence
+    # Parameters:
+    # *args - variable number of commands
+    #---------------------------------------------------------------------------
+    def seq(self, *args):
         nState = 0
-        ans = CmdList()
+        pCase = Case(self.state)()
+        self.testSeqCase.append(
+            (self.nSeq,
+                While(self.runSt)(
+                    self.runSt.eq(False),
+                    pCase
+                )
+            )
+        )
+        cmds = CmdList()
         i = 1
-        for cmd in cmds:
+        for cmd in args:
             assert isinstance(cmd, Cmd) and \
                    not isinstance(cmd, WaitAnalogEvent), "Command " + str(i) +\
                    " must be an instance of Cmd and can't be and instance of "+\
                    "WaitAnalogEvent"
             i = i + 1
-            ans.append(cmd)
-        ans = ans.flat()
-        pTimerCase = Case(self.state)()
-        self.timerCase.append((Integer(self.nSeq), pTimerCase))
-        pCase = pTimerCase
-        cmds = CmdList()
-        caseList = []
-        evntList = []
-        for cmd in ans:
-            #Found a WaitUs. Update timer event and go to next state
-            if isinstance(cmd, WaitUs):
-                cmds.append(self.state.eq(self.state + Integer(1)))
-                cmds.append(self.time.eq(abstime + 
-                                            1e-6*cmd.getDelay()))
-                pCase.append((Integer(nState), cmds))
-                cmds = CmdList()
-                pCase = pTimerCase
-                nState = nState + 1
-            #Found a WaitSignal. Update signal events and go to next state
-            elif isinstance(cmd, WaitSignal):
-                cmds.append(self.state.eq(self.state + Integer(1)))
-                pCase.append((Integer(nState), cmds))
-                cmds = CmdList()
-                evnt = cmd.getEvnt()
-                #The event was already used for this sequence
-                if evnt in evntList:
-                    i = evntList.index(evnt)
-                    pCase = caseList[i]
-                #The event wasn't used already in this sequence, but it
-                #has been used before in another sequence
-                elif evnt in self.evntList:
-                    i = self.evntList.index(evnt)
-                    tSeqCase = self.tSeqList[i]
-                    pCase = Case(self.state)()
-                    tSeqCase.append((Integer(self.nSeq), pCase))
-                    evntList.append(evnt)    
-                    caseList.append(pCase)    
-                #Fist reference to this signal event in all sequences
-                else:
-                    tSeqCase = Case(self.testSeq)()
-                    pCase = Case(self.state)()
-                    tSeqCase.append((Integer(self.nSeq), pCase))
-                    self.evntList.append(evnt)    
-                    self.tSeqList.append(tSeqCase)    
-                    evntList.append(evnt)    
-                    caseList.append(pCase)    
-                    self.beginningAnalog(
-                        At(evnt)(
-                            tSeqCase
-                        )
-                    )
-                nState = nState + 1
-            #Not a wait command. Add it to the list of commands for the current
-            #state
+            if isinstance(cmd, Mark):
+                cmds.append(Cmd(str(cmd)))
             else:
                 cmds.append(cmd)
+        nState, cmds = self.seqNested(nState, pCase, cmds)
         #Add a finish command
         cmds.append(Finish()) 
         #Add the last state 
         pCase.append((Integer(nState), cmds))
         #Go to the next sequence
         self.nSeq = self.nSeq + 1
-            
             
     #---------------------------------------------------------------------------
     # Return the equations in a format that can be imported by the maestro view

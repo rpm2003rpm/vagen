@@ -149,17 +149,8 @@ class TestTB(unittest.TestCase):
             vdc2.applyV(Real(2)),
             #Wait 100us
             WaitUs(Real(100)),
-            #If dig2 > 2 and dig2 is true write to dig3
-            If((dig1.read() > Integer(2)) & dig2.read())(
-                #set the rise and fall time of pin10[2:1]
-                dig3[2:1].setRiseFall(Real(1e-9), Real(1e-9)),
-                #Write 3 to pin10[2:1]. Only the bits from 2 to 1 are afected
-                dig3[2:1].write(Integer(3)),     
-            #Write to dig4 otherwise
-            ).Else(
-                #Write true to pin11
-                dig4.write(Bool(True))
-            ),
+            #Write true to pin11
+            dig4.write(Bool(True)),
             #Wait 100us
             WaitUs(Real(100)),
             #Configure both pin12[2:0] and pin13 as highz
@@ -258,6 +249,8 @@ real _$evntTime;
 integer _$state;
 real _$markStReal;
 integer _$markSt;
+integer _$runSt;
+integer _$eventId;
 integer _$1;
 real pin1_$0$_$volt$;
 real pin1_$0$_$maxCur;
@@ -392,6 +385,8 @@ analog begin
         _$state = 0;
         _$markStReal = 0.000000e+00;
         _$markSt = 0;
+        _$runSt = 1;
+        _$eventId = 0;
         _$1 = 9;
         pin1_$0$_$volt$ = 0.000000e+00;
         pin1_$0$_$maxCur = 0.000000e+00;
@@ -522,6 +517,8 @@ analog begin
         _$state = 0;
         _$markStReal = 0.000000e+00;
         _$markSt = 0;
+        _$runSt = 1;
+        _$eventId = 0;
         _$1 = 9;
         pin1_$0$_$volt$ = 0.000000e+00;
         pin1_$0$_$maxCur = 0.000000e+00;
@@ -648,8 +645,15 @@ analog begin
         clk1_$time$ = 1.000000e+06;
     end
     @( timer(_$evntTime) )
-        case( TEST_SEQ_PARAM )
-            1:
+        if( ( _$eventId ) == ( 0 ) )
+            _$runSt = 1;
+    @( cross(V(pin7) - 5.000000e-01, 0) )
+        if( ( _$eventId ) == ( 1 ) )
+            _$runSt = 1;
+    case( TEST_SEQ_PARAM )
+        1:
+            while( _$runSt ) begin
+                _$runSt = 0;
                 case( _$state )
                     0: begin
                         pin1_$0$_$volt$ = 2.000000e+00;
@@ -676,7 +680,8 @@ analog begin
                         pin1_$2$_$iDelay$ = 1.000000e-06;
                         pin1_$2$_$rDelay$ = 1.000000e-06;
                         pin1_$2$_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 1;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     1: begin
@@ -704,7 +709,8 @@ analog begin
                         pin1_$2$_$iDelay$ = 0.000000e+00;
                         pin1_$2$_$rDelay$ = 0.000000e+00;
                         pin1_$2$_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 2;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     2: begin
@@ -732,7 +738,8 @@ analog begin
                         pin1_$2$_$iDelay$ = 0.000000e+00;
                         pin1_$2$_$rDelay$ = 0.000000e+00;
                         pin1_$2$_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 3;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     3: begin
@@ -752,7 +759,8 @@ analog begin
                         pin1_$1$_$iDelay$ = 1.000000e-06;
                         pin1_$1$_$rDelay$ = 1.000000e-06;
                         pin1_$1$_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 4;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     4: begin
@@ -764,7 +772,8 @@ analog begin
                         pin2_$iDelay$ = 0.000000e+00;
                         pin2_$rDelay$ = 0.000000e+00;
                         pin2_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 5;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     5: begin
@@ -778,17 +787,20 @@ analog begin
                         pin3_$0$_$value$ = 2.000000e+00;
                         pin3_$1$_$value$ = 2.000000e+00;
                         pin3_$2$_$value$ = 2.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 6;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     6: begin
                         pin3_$1$_$value$ = 0.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 7;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     7: begin
                         pin4_$value$ = 2.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 8;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     8: begin
@@ -802,47 +814,47 @@ analog begin
                         pin5_$0$_$value$ = -1.000000e-02;
                         pin5_$1$_$value$ = -1.000000e-02;
                         pin5_$2$_$value$ = -1.000000e-02;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 9;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     9: begin
                         pin5_$1$_$value$ = 0.000000e+00;
                         pin5_$2$_$value$ = 0.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 10;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     10: begin
                         pin6_$value$ = -2.000000e-02;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 11;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     11: begin
                         _$markSt = !_$markSt;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 12;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     12:
                         $finish;
                 endcase
-            2:
+            end
+        2:
+            while( _$runSt ) begin
+                _$runSt = 0;
                 case( _$state )
                     0: begin
                         pin4_$value$ = 2.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 1;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     1: begin
-                        if( ( ( ( ( ( V(pin8[0]) ) > ( ( V(pin4) )/( 2.000000e+00 ) ) ? ( 1 ) : ( 0 ) ) + ( ( ( V(pin8[1]) ) > ( ( V(pin4) )/( 2.000000e+00 ) ) ? ( 1 ) : ( 0 ) )*( 2 ) ) ) + ( ( ( V(pin8[2]) ) > ( ( V(pin4) )/( 2.000000e+00 ) ) ? ( 1 ) : ( 0 ) )*( 4 ) ) ) > ( 2 ) ) && ( ( V(pin9) ) > ( ( V(pin4) )/( 2.000000e+00 ) ) ) ) begin
-                            pin10_$1$_$rise = 1.000000e-09;
-                            pin10_$1$_$fall$ = 1.000000e-09;
-                            pin10_$2$_$rise = 1.000000e-09;
-                            pin10_$2$_$fall$ = 1.000000e-09;
-                            pin10_$1$_$state$ = ( ( 3 ) & ( 1 ) ) != ( 0 );
-                            pin10_$2$_$state$ = ( ( 3 ) & ( 2 ) ) != ( 0 );
-                        end
-                        else
-                            pin11_$state$ = 1;
-                        _$state = ( _$state ) + ( 1 );
+                        pin11_$state$ = 1;
+                        _$eventId = 0;
+                        _$state = 2;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                     end
                     2: begin
@@ -850,16 +862,9 @@ analog begin
                         pin12_$1$_$res$ = 1.000000e+12;
                         pin12_$2$_$res$ = 1.000000e+12;
                         pin13_$res$ = 1.000000e+12;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 1;
+                        _$state = 3;
                     end
-                    4:
-                        $finish;
-                endcase
-        endcase
-    @( cross(V(pin7) - 5.000000e-01, 0) )
-        case( TEST_SEQ_PARAM )
-            2:
-                case( _$state )
                     3: begin
                         pin12_$0$_$res$ = pin12_$0$_$serRes$;
                         pin12_$1$_$res$ = pin12_$1$_$serRes$;
@@ -873,11 +878,15 @@ analog begin
                         clk1_$isOn$ = 1;
                         clk1_$time$ = ( $abstime ) + ( 1.000000e-09 );
                         sw1_$cond$ = 0.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 4;
                         _$evntTime = ( $abstime ) + ( ( 1.000000e-06 )*( 2.000000e+02 ) );
                     end
+                    4:
+                        $finish;
                 endcase
-        endcase
+            end
+    endcase
     @( timer(clk1_$time$) ) begin
         clk1_$out$ = !clk1_$out$;
         pin11_$state$ = clk1_$out$;
@@ -1066,17 +1075,8 @@ endmodule'''
             vdc2.applyV(2),
             #Wait 100us
             WaitUs(100),
-            #If dig2 > 2 and dig2 is true write to dig3
-            If((dig1.read() > 2) & dig2.read())(
-                #set the rise and fall time of pin10[2:1]
-                dig3[2:1].setRiseFall(1e-9, 1e-9),
-                #Write 3 to pin10[2:1]. Only the bits from 2 to 1 are afected
-                dig3[2:1].write(3),     
-            #Write to dig4 otherwise
-            ).Else(
-                #Write true to pin11
-                dig4.write(True)
-            ),
+            #Write true to pin11
+            dig4.write(True),
             #Wait 100us
             WaitUs(100),
             #Configure both pin12[2:0] and pin13 as highz
@@ -1176,6 +1176,8 @@ real _$evntTime;
 integer _$state;
 real _$markStReal;
 integer _$markSt;
+integer _$runSt;
+integer _$eventId;
 integer _$1;
 real pin1_$0$_$volt$;
 real pin1_$0$_$maxCur;
@@ -1310,6 +1312,8 @@ analog begin
         _$state = 0;
         _$markStReal = 0.000000e+00;
         _$markSt = 0;
+        _$runSt = 1;
+        _$eventId = 0;
         _$1 = 9;
         pin1_$0$_$volt$ = 0.000000e+00;
         pin1_$0$_$maxCur = 0.000000e+00;
@@ -1440,6 +1444,8 @@ analog begin
         _$state = 0;
         _$markStReal = 0.000000e+00;
         _$markSt = 0;
+        _$runSt = 1;
+        _$eventId = 0;
         _$1 = 9;
         pin1_$0$_$volt$ = 0.000000e+00;
         pin1_$0$_$maxCur = 0.000000e+00;
@@ -1566,8 +1572,15 @@ analog begin
         clk1_$time$ = 1.000000e+06;
     end
     @( timer(_$evntTime) )
-        case( TEST_SEQ_PARAM )
-            1:
+        if( ( _$eventId ) == ( 0 ) )
+            _$runSt = 1;
+    @( cross(V(pin7) - 5.000000e-01, 0) )
+        if( ( _$eventId ) == ( 1 ) )
+            _$runSt = 1;
+    case( TEST_SEQ_PARAM )
+        1:
+            while( _$runSt ) begin
+                _$runSt = 0;
                 case( _$state )
                     0: begin
                         pin1_$0$_$volt$ = 2.000000e+00;
@@ -1594,7 +1607,8 @@ analog begin
                         pin1_$2$_$iDelay$ = 1.000000e-06;
                         pin1_$2$_$rDelay$ = 1.000000e-06;
                         pin1_$2$_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 1;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     1: begin
@@ -1622,7 +1636,8 @@ analog begin
                         pin1_$2$_$iDelay$ = 0.000000e+00;
                         pin1_$2$_$rDelay$ = 0.000000e+00;
                         pin1_$2$_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 2;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     2: begin
@@ -1650,7 +1665,8 @@ analog begin
                         pin1_$2$_$iDelay$ = 0.000000e+00;
                         pin1_$2$_$rDelay$ = 0.000000e+00;
                         pin1_$2$_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 3;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     3: begin
@@ -1670,7 +1686,8 @@ analog begin
                         pin1_$1$_$iDelay$ = 1.000000e-06;
                         pin1_$1$_$rDelay$ = 1.000000e-06;
                         pin1_$1$_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 4;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     4: begin
@@ -1682,7 +1699,8 @@ analog begin
                         pin2_$iDelay$ = 0.000000e+00;
                         pin2_$rDelay$ = 0.000000e+00;
                         pin2_$riseFall$ = 1.000000e-06;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 5;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     5: begin
@@ -1696,17 +1714,20 @@ analog begin
                         pin3_$0$_$value$ = 2.000000e+00;
                         pin3_$1$_$value$ = 2.000000e+00;
                         pin3_$2$_$value$ = 2.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 6;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     6: begin
                         pin3_$1$_$value$ = 2.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 7;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     7: begin
                         pin4_$value$ = 2.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 8;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     8: begin
@@ -1720,47 +1741,47 @@ analog begin
                         pin5_$0$_$value$ = -1.000000e-02;
                         pin5_$1$_$value$ = -1.000000e-02;
                         pin5_$2$_$value$ = -1.000000e-02;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 9;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     9: begin
                         pin5_$1$_$value$ = 2.000000e+00;
                         pin5_$2$_$value$ = 2.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 10;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     10: begin
                         pin6_$value$ = -2.000000e-02;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 11;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     11: begin
                         _$markSt = !_$markSt;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 12;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     12:
                         $finish;
                 endcase
-            2:
+            end
+        2:
+            while( _$runSt ) begin
+                _$runSt = 0;
                 case( _$state )
                     0: begin
                         pin4_$value$ = 2.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 1;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     1: begin
-                        if( ( ( ( ( ( V(pin8[0]) ) > ( ( V(pin4) )/( 2.000000e+00 ) ) ? ( 1 ) : ( 0 ) ) + ( ( ( V(pin8[1]) ) > ( ( V(pin4) )/( 2.000000e+00 ) ) ? ( 1 ) : ( 0 ) )*( 2 ) ) ) + ( ( ( V(pin8[2]) ) > ( ( V(pin4) )/( 2.000000e+00 ) ) ? ( 1 ) : ( 0 ) )*( 4 ) ) ) > ( 2 ) ) && ( ( V(pin9) ) > ( ( V(pin4) )/( 2.000000e+00 ) ) ) ) begin
-                            pin10_$1$_$rise = 1.000000e-09;
-                            pin10_$1$_$fall$ = 1.000000e-09;
-                            pin10_$2$_$rise = 1.000000e-09;
-                            pin10_$2$_$fall$ = 1.000000e-09;
-                            pin10_$1$_$state$ = 1;
-                            pin10_$2$_$state$ = 1;
-                        end
-                        else
-                            pin11_$state$ = 1;
-                        _$state = ( _$state ) + ( 1 );
+                        pin11_$state$ = 1;
+                        _$eventId = 0;
+                        _$state = 2;
                         _$evntTime = ( $abstime ) + ( 1.000000e-04 );
                     end
                     2: begin
@@ -1768,16 +1789,9 @@ analog begin
                         pin12_$1$_$res$ = 1.000000e+12;
                         pin12_$2$_$res$ = 1.000000e+12;
                         pin13_$res$ = 1.000000e+12;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 1;
+                        _$state = 3;
                     end
-                    4:
-                        $finish;
-                endcase
-        endcase
-    @( cross(V(pin7) - 5.000000e-01, 0) )
-        case( TEST_SEQ_PARAM )
-            2:
-                case( _$state )
                     3: begin
                         pin12_$0$_$res$ = pin12_$0$_$serRes$;
                         pin12_$1$_$res$ = pin12_$1$_$serRes$;
@@ -1791,11 +1805,15 @@ analog begin
                         clk1_$isOn$ = 1;
                         clk1_$time$ = ( $abstime ) + ( 1.000000e-09 );
                         sw1_$cond$ = 0.000000e+00;
-                        _$state = ( _$state ) + ( 1 );
+                        _$eventId = 0;
+                        _$state = 4;
                         _$evntTime = ( $abstime ) + ( 2.000000e-04 );
                     end
+                    4:
+                        $finish;
                 endcase
-        endcase
+            end
+    endcase
     @( timer(clk1_$time$) ) begin
         clk1_$out$ = !clk1_$out$;
         pin11_$state$ = clk1_$out$;
@@ -1868,8 +1886,117 @@ analog begin
 end
 endmodule'''  
         self.assertEqual(mod.getVA()[323:], ref)    
-    
-                                                                                                                                                      
+ 
+    ############################################################################
+    # Constants
+    ############################################################################
+    def testRepeat(self):    
+        mod = Tb("tb")
+        #Create an integer variable that will be initialized to 9
+        var1 = mod.var(Integer(9))
+        #Create an electrical pin (No base model atached to it)
+        pin7 = mod.electrical("pin7", 1, direction = "inout")
+        #Create a cross at 0.5 event based on the voltage of pin7 for both edges
+        evnt1 = Cross(pin7.v, Real(0.5), "both")
+        mod.seq(
+            var1.eq(0),
+            var1.eq(1),
+            Repeat(10)(
+                var1.eq(2),
+                CmdList(
+                    var1.eq(3),
+                    var1.eq(4)
+                )
+            ),
+            var1.eq(5)
+        )
+        #print(mod.getVA())
+        mod = Tb("tb")
+        #Create an integer variable that will be initialized to 9
+        var1 = mod.var(Integer(9))
+        #Create an electrical pin (No base model atached to it)
+        pin7 = mod.electrical("pin7", 1, direction = "inout")
+        #Create a cross at 0.5 event based on the voltage of pin7 for both edges
+        evnt1 = Cross(pin7.v, Real(0.5), "both")
+        mod.seq(
+            var1.eq(0),
+            WaitUs(100),
+            var1.eq(1),
+            WaitUs(100),
+            Repeat(10)(
+                WaitUs(100),
+                var1.eq(2),
+                WaitUs(100),
+                CmdList(
+                    var1.eq(3),
+                    var1.eq(4)
+                ),
+                WaitUs(100),
+            ),
+            WaitUs(100),
+            var1.eq(5)
+        )
+        #print(mod.getVA())
+        mod = Tb("tb")
+        #Create an integer variable that will be initialized to 9
+        var1 = mod.var(Integer(9))
+        #Create an electrical pin (No base model atached to it)
+        pin7 = mod.electrical("pin7", 1, direction = "inout")
+        #Create a cross at 0.5 event based on the voltage of pin7 for both edges
+        evnt1 = Cross(pin7.v, Real(0.5), "both")
+        mod.seq(
+            var1.eq(0),
+            WaitUs(100),
+            var1.eq(1),
+            WaitSignal(evnt1 | evnt1),
+            Repeat(10)(
+                Repeat(11)(
+                    var1.eq(2),
+                    WaitSignal(evnt1),
+                ),
+                CmdList(
+                    var1.eq(3),
+                    var1.eq(4)
+                ),
+                WaitUs(100),
+                var1.eq(6)
+            ),
+            WaitUs(100),
+            var1.eq(5)
+        )
+        mod.seq(
+            var1.eq(0),
+            While(var1 > 10) (
+                var1.eq(2),
+                WaitUs(50),
+            ),
+            For(var1.eq(11), var1 < 11, var1.eq(var1 + 14))(
+                var1.eq(22),
+                WaitUs(50),
+            ) 
+        )
+        mod.seq(
+            var1.eq(0),
+            WaitUs(50),
+            If(var1 > 10)(
+                var1.eq(2),
+                WaitUs(40),
+                var1.eq(3),
+                WaitUs(33),
+                var1.eq(33)              
+            ).Else(
+                var1.eq(4),
+                WaitUs(44),
+                var1.eq(5),
+                WaitUs(22),
+                var1.eq(55)
+            ),
+            var1.eq(555),
+            WaitUs(50)
+        )
+                
+        #print(mod.getVA())
+                                                                                                                                                        
 if __name__ == '__main__':
     unittest.main()
     
