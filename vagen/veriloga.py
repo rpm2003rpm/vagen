@@ -578,6 +578,9 @@ class Integer():
         elif isinstance(value, Real):
             value = str(ceil(value)) 
         elif isinstance(value, Integer):
+            assert value > -2147483648 and value < 2147483647,                +\
+            "Can't convert " +str(value)+ " to integer, because it is outside"+\
+            " the range [-2147483648, 2147483647]" 
             value = str(value)
         elif type(value) != str:
             try:

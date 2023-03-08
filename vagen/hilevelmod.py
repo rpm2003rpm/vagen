@@ -250,18 +250,18 @@ class Vdc(Electrical):
     # rise - real expression holding the initial rise time
     # fall - real expression holding the initial fall time
     #---------------------------------------------------------------------------
-    def __init__(self, tb, name, value, rise, fall): 
-        checkInstance("tb", tb, Tb)
+    def __init__(self, hiLevelMod, name, value, rise, fall): 
+        checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         value = parseReal("value", value)
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
         super(Vdc, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$")
-        self.volt = tb.var(value, prefix + "_$value$")
-        self.rise = tb.var(rise, prefix + "_$rise$")
-        self.fall = tb.var(fall, prefix + "_$fall$")
-        tb.endAnalog(
+        self.volt = hiLevelMod.var(value, prefix + "_$value$")
+        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
+        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        hiLevelMod.endAnalog(
             self.vCont(
                 transition(self.volt, Real(0), self.rise, self.fall)
             )
@@ -346,18 +346,18 @@ class Idc(Electrical):
     # rise - real expression holding the initial rise time
     # fall - real expression holding the initial fall time
     #---------------------------------------------------------------------------
-    def __init__(self, tb, name, value, rise, fall): 
-        checkInstance("tb", tb, Tb)
+    def __init__(self, hiLevelMod, name, value, rise, fall): 
+        checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         value = parseReal("value", value)
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
         super(Idc, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$")
-        self.cur = tb.var(value, prefix + "_$value$")
-        self.rise = tb.var(rise, prefix + "_$rise$")
-        self.fall = tb.var(fall, prefix + "_$fall$")
-        tb.endAnalog(
+        self.cur = hiLevelMod.var(value, prefix + "_$value$")
+        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
+        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        hiLevelMod.endAnalog(
             self.iCont(
                 transition(self.cur, Real(0), self.rise, self.fall)
             )
@@ -443,8 +443,8 @@ class Smu(Electrical):
     # maxCur - real expression holding the inital maximum current
     # res - real expression holding the resitance
     #---------------------------------------------------------------------------
-    def __init__(self, tb, name, volt, minCur, maxCur, res): 
-        checkInstance("tb", tb, Tb)
+    def __init__(self, hiLevelMod, name, volt, minCur, maxCur, res): 
+        checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         volt = parseReal("volt", volt)
         minCur = parseReal("minCur", minCur)
@@ -452,19 +452,19 @@ class Smu(Electrical):
         res = parseReal("res", res)
         super(Smu, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$")
-        self.volt     = tb.var(volt, prefix + "_$volt$")
-        self.maxCur   = tb.var(maxCur, prefix + "_$maxCur")
-        self.minCur   = tb.var(minCur, prefix + "_$minCur$")
-        self.res      = tb.var(res, prefix + "_$res$")
-        self.vDelay   = tb.var(Real(0), prefix + "_$vDelay$")
-        self.iDelay   = tb.var(Real(0), prefix + "_$iDelay$")
-        self.rDelay   = tb.var(Real(0), prefix + "_$rDelay$")
-        self.riseFall = tb.var(Real(1e-6), prefix + "_$riseFall$")
-        voltTran      = tb.var(Real(0), prefix + "_$voltTran$") 
-        maxCurTran    = tb.var(Real(0), prefix + "_$maxCurTran$")
-        minCurTran    = tb.var(Real(0), prefix + "_$minCurTran$")
-        resTran       = tb.var(Real(0), prefix + "_$resTran$")
-        tb.endAnalog(
+        self.volt     = hiLevelMod.var(volt, prefix + "_$volt$")
+        self.maxCur   = hiLevelMod.var(maxCur, prefix + "_$maxCur")
+        self.minCur   = hiLevelMod.var(minCur, prefix + "_$minCur$")
+        self.res      = hiLevelMod.var(res, prefix + "_$res$")
+        self.vDelay   = hiLevelMod.var(Real(0), prefix + "_$vDelay$")
+        self.iDelay   = hiLevelMod.var(Real(0), prefix + "_$iDelay$")
+        self.rDelay   = hiLevelMod.var(Real(0), prefix + "_$rDelay$")
+        self.riseFall = hiLevelMod.var(Real(1e-6), prefix + "_$riseFall$")
+        voltTran      = hiLevelMod.var(Real(0), prefix + "_$voltTran$") 
+        maxCurTran    = hiLevelMod.var(Real(0), prefix + "_$maxCurTran$")
+        minCurTran    = hiLevelMod.var(Real(0), prefix + "_$minCurTran$")
+        resTran       = hiLevelMod.var(Real(0), prefix + "_$resTran$")
+        hiLevelMod.endAnalog(
             voltTran.eq(
                 transition(
                     self.volt, 
@@ -643,8 +643,8 @@ class DigOut(Electrical):
     # rise - real expression holding the initial rise time
     # fall - real expression holding the initial fall time
     #---------------------------------------------------------------------------
-    def __init__(self, tb, name, state, domain, inCap, serRes, rise, fall): 
-        checkInstance("tb", tb, Tb)
+    def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, rise, fall): 
+        checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
         state = parseBool("state", state)
@@ -653,11 +653,11 @@ class DigOut(Electrical):
         fall = parseReal("fall", fall)
         super(DigOut, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$")
-        self.st = tb.var(state, prefix + "_$state$")
-        self.serRes = tb.var(serRes, prefix + "_$serRes$")
-        self.rise = tb.var(rise, prefix + "_$rise")
-        self.fall = tb.var(fall, prefix + "_$fall$")
-        tb.endAnalog(
+        self.st = hiLevelMod.var(state, prefix + "_$state$")
+        self.serRes = hiLevelMod.var(serRes, prefix + "_$serRes$")
+        self.rise = hiLevelMod.var(rise, prefix + "_$rise")
+        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        hiLevelMod.endAnalog(
             self.vCont(
                 domain.v*transition(
                     ternary(self.st, 1.0, 0.0), 
@@ -712,16 +712,16 @@ class DigIn(Electrical):
     # rise - dummy parameter for consistency
     # fall - dummy parameter for consistency
     #---------------------------------------------------------------------------
-    def __init__(self, tb, name, state, domain, inCap, serRes, rise, fall): 
-        checkInstance("tb", tb, Tb)
+    def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, rise, fall): 
+        checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
         inCap = parseReal("inCap", inCap)
         super(DigIn, self).__init__(name)
         self.domain = domain
         prefix = name.replace("[", "_$").replace("]", "$")
-        self.inCap = tb.var(inCap, prefix + "_$inCap$")
-        tb.endAnalog(
+        self.inCap = hiLevelMod.var(inCap, prefix + "_$inCap$")
+        hiLevelMod.endAnalog(
             self.iCont(ddt(self.v)*self.inCap)
         ) 
     
@@ -752,8 +752,8 @@ class DigInOut(DigIn, DigOut):
     # rise - real expression holding the initial rise time
     # fall - real expression holding the initial fall time
     #---------------------------------------------------------------------------
-    def __init__(self, tb, name, state, domain, inCap, serRes, rise, fall): 
-        checkInstance("tb", tb, Tb)
+    def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, rise, fall): 
+        checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
         state = parseBool("state", state)
@@ -763,16 +763,16 @@ class DigInOut(DigIn, DigOut):
         fall = parseReal("fall", fall)
         super(DigOut, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$")
-        self.st = tb.var(state, prefix + "_$state$")
-        self.serRes = tb.var(serRes, prefix + "_$serRes$")
-        self.inCap = tb.var(inCap, prefix + "_$inCap$")
-        self.res = tb.var(serRes, prefix + "_$res$")
-        self.rise = tb.var(rise, prefix + "_$rise")
-        self.fall = tb.var(fall, prefix + "_$fall$")
+        self.st = hiLevelMod.var(state, prefix + "_$state$")
+        self.serRes = hiLevelMod.var(serRes, prefix + "_$serRes$")
+        self.inCap = hiLevelMod.var(inCap, prefix + "_$inCap$")
+        self.res = hiLevelMod.var(serRes, prefix + "_$res$")
+        self.rise = hiLevelMod.var(rise, prefix + "_$rise")
+        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
         self.domain = domain
-        pin = tb.electrical()
+        pin = hiLevelMod.electrical()
         conn = Branch(pin, self)
-        tb.endAnalog(
+        hiLevelMod.endAnalog(
             pin.vCont(
                 domain.v*transition(
                     ternary(self.st, 1.0, 0.0), 
@@ -834,6 +834,8 @@ class DigBusOut(Bus):
     #---------------------------------------------------------------------------
     def write(self, value):
         checkInteger("value", value)
+        assert len(self) <= 32 or not isinstance(value, Integer), \
+               "Can't write an instance of integer to a bus wider than 32 bit"
         ans = CmdList()
         i = 1
         for pin in self:
@@ -859,12 +861,20 @@ class DigBusIn(Bus):
     # Returns an Integer expression representing the convertion of binary 
     # inputs to Unsigned Integer
     #---------------------------------------------------------------------------
-    def read(self):
+    def read(self, signed = False):
+        assert len(self) <= 32, "Can't read a bus wider than 32 bit"
+        assert len(self) <= 31 or signed, \
+               "Can't read a bus wider than 31 bit as unsigned"
         ans = Integer(self[0].read())
         i = 2
-        for pin in self[(len(self)-1):1]:
-            ans = ans + Integer(pin.read())*i
+        for j in range(1, len(self) - 1):
+            ans = ans + Integer(self[j].read())*i
             i = i << 1
+        if len(self) > 1:
+            if signed:
+                ans = ans - Integer(self[len(self)-1].read())*i
+            else:
+                ans = ans + Integer(self[len(self)-1].read())*i
         return ans            
 
 
@@ -919,8 +929,8 @@ class Sw():
     # fall - Real expression representing the fall time for changes in the 
     #        conductance
     #---------------------------------------------------------------------------
-    def __init__(self, tb, pin1, pin2, cond, rise, fall):
-        checkInstance("tb", tb, Tb)
+    def __init__(self, hiLevelMod, pin1, pin2, cond, rise, fall):
+        checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkInstance("pin1", pin1, Electrical)
         checkInstance("pin2", pin2, Electrical)
         cond = parseReal("cond", cond)
@@ -928,11 +938,11 @@ class Sw():
         fall = parseReal("fall", fall)
         prefix = "sw" + str(self.swCount)
         self.swCount = self.swCount + 1
-        self.cond = tb.var(cond, prefix + "_$cond$")
-        self.rise = tb.var(rise, prefix + "_$rise")
-        self.fall = tb.var(fall, prefix + "_$fall$")
+        self.cond = hiLevelMod.var(cond, prefix + "_$cond$")
+        self.rise = hiLevelMod.var(rise, prefix + "_$rise")
+        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
         self.branch = Branch(pin1, pin2)
-        tb.endAnalog(
+        hiLevelMod.endAnalog(
             self.branch.iCont(
                 self.branch.v*transition(
                     self.cond, 
@@ -980,15 +990,15 @@ class Clock():
     # tb - test bench in which the model will be added
     # pin - digital output or inout pin
     #---------------------------------------------------------------------------
-    def __init__(self, tb, pin):
-        checkInstance("tb", tb, Tb)
+    def __init__(self, hiLevelMod, pin):
+        checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkInstance("pin", pin, DigOut)
         prefix = "clk" + str(self.clockCount)
         self.clockCount = self.clockCount + 1
-        out = tb.var(Bool(str(pin.st)), prefix + "_$out$")
-        self.isOn = tb.var(Bool(0), prefix + "_$isOn$")
-        self.halfPeriod = tb.var(Real(1000000), prefix + "_$halfPeriod$")
-        self.time = tb.var(Real(1000000), prefix + "_$time$")
+        out = hiLevelMod.var(Bool(str(pin.st)), prefix + "_$out$")
+        self.isOn = hiLevelMod.var(Bool(0), prefix + "_$isOn$")
+        self.halfPeriod = hiLevelMod.var(Real(1000000), prefix + "_$halfPeriod$")
+        self.time = hiLevelMod.var(Real(1000000), prefix + "_$time$")
         self.at = CmdList(
                       out.toggle(),
                       pin.write(out),
@@ -997,8 +1007,8 @@ class Clock():
                       )
                   )
                
-        tb.analog(
-           At(Timer(*([self.time] + tb.timeArgs)))(
+        hiLevelMod.analog(
+           At(Timer(*([self.time] + hiLevelMod.timeArgs)))(
                self.at
            )
         )
@@ -1026,7 +1036,7 @@ class Clock():
 # methods for dealing with digital bus, current sources, voltage sources, 
 # clocks and switches
 #-------------------------------------------------------------------------------
-class Tb(Module):
+class HiLevelMod(Module):
   
     #---------------------------------------------------------------------------
     # Constructor 
@@ -1035,21 +1045,22 @@ class Tb(Module):
     # timeTol - time tolerances for the timer
     #---------------------------------------------------------------------------
     def __init__(self, tbName, timeTol = None):
-        super(Tb, self).__init__(tbName)
+        super(HiLevelMod, self).__init__(tbName)
         self.dcCmdList  = CmdList() 
-        self.testSeq    = self.par(Integer(0), "TEST_SEQ_PARAM")
         self.markerPin  = self.electrical("MARK", direction = "output")
-        self.time       = self.var(Real(10e-9), "_$evntTime") 
-        self.state      = self.var(Integer(0), "_$state") 
         self.markStReal = self.var(Real(0), "_$markStReal") 
         self.markSt     = self.var(Bool(False), "_$markSt") 
-        self.runSt      = self.var(Bool(True), "_$runSt") 
-        self.eventId    = self.var(Integer(0), "_$eventId") 
-        self.nSeq       = 1
+        self.time       = None 
+        self.state      = None
+        self.runSt      = None
+        self.eventId    = None
+        self.evntList   = None
+        self.pEventList = []
+        self.evntListG  = []
         self.markers    = []
-        self.evntList   = []
-        self.testSeqCase = Case(self.testSeq)() 
-        
+        self.nSeq       = 1
+        self.testSeqs   = CmdList()       
+
         if not isinstance(timeTol, type(None)):
             self.timeArgs = [0, parseReal("timeTol", timeTol)]
         else:
@@ -1064,16 +1075,8 @@ class Tb(Module):
             ),
         )
         
-        self.beginningAnalog(
-            At(Timer(*([self.time] + self.timeArgs)))(
-                If(self.eventId == 0)(
-                    self.runSt.eq(True)
-                )
-            )
-        )
-        
         self.analog(
-            self.testSeqCase
+            self.testSeqs
         )
         
         self.endAnalog(
@@ -1090,7 +1093,7 @@ class Tb(Module):
     #---------------------------------------------------------------------------
     def var(self, value = 0, name = ""):
         value = parseNumber("value", value)
-        ans = super(Tb, self).var(type(value), name)           
+        ans = super(HiLevelMod, self).var(type(value), name)           
         self.dcCmdList.append(ans.eq(value))
         return ans
 
@@ -1322,7 +1325,7 @@ class Tb(Module):
     # Parameters:
     # cmds - command list
     #---------------------------------------------------------------------------
-    def seqNested(self, nState, pCase, cmdsIn):
+    def seqNested(self, cmdsIn):
         cmdsIn = cmdsIn.flat()
         cmds = CmdList()
         for cmd in cmdsIn:
@@ -1330,34 +1333,49 @@ class Tb(Module):
             #Found a WaitUs. Update timer event and go to next state
             if isinstance(cmd, WaitUs):
                 cmds.append(self.eventId.eq(0))
-                cmds.append(self.state.eq(nState + 1))
+                cmds.append(self.state.eq(self.nState + 1))
                 cmds.append(self.time.eq(abstime + 1e-6*cmd.getDelay()))
-                pCase.append((nState, cmds))
-                nState = nState + 1
+                self.pCase.append((self.nState, cmds))
+                self.nState = self.nState + 1
                 cmds = CmdList()
                 
             #Found a WaitSignal. Update signal events and go to next state
             elif isinstance(cmd, WaitSignal):
                 evnt = cmd.getEvnt()
-                #The was used before
+                #The event was used before
                 if evnt in self.evntList:
-                    i = self.evntList.index(evnt)
+                    i = self.evntListG.index(evnt)
                     eventId = i + 1  
-                #Fist reference to this signal event
-                else:
-                    eventId = len(self.evntList)  + 1
+                #Fist event was used before but not in the current sequence
+                elif evnt in self.evntListG:
                     self.evntList.append(evnt)
+                    i = self.evntListG.index(evnt)
+                    eventId = i + 1  
+                    self.pEventList[i].append(
+                        If(eventId == self.eventId)(
+                            self.runSt.eq(True)
+                        )
+                    )
+                #The event wasn't used in any sequence
+                else:
+                    eventId = len(self.evntListG) + 1
+                    self.evntList.append(evnt)
+                    self.evntListG.append(evnt)
+                    pEvntCmd = CmdList( 
+                        If(eventId == self.eventId)(
+                            self.runSt.eq(True)
+                        )
+                    )
+                    self.pEventList.append(pEvntCmd)
                     self.beginningAnalog(
                         At(evnt)(
-                            If(eventId == self.eventId)(
-                                self.runSt.eq(True)
-                            )
+                            pEvntCmd
                         )
                     )
                 cmds.append(self.eventId.eq(eventId))
-                cmds.append(self.state.eq(nState + 1))
-                pCase.append((nState, cmds))
-                nState = nState + 1
+                cmds.append(self.state.eq(self.nState + 1))
+                self.pCase.append((self.nState, cmds))
+                self.nState = self.nState + 1
                 cmds = CmdList()
                 
             #Found a repeat loop
@@ -1365,125 +1383,121 @@ class Tb(Module):
                 temp = self.var()
                 cmds.append(temp.eq(0))
                 cmds.append(self.runSt.eq(True))
-                cmds.append(self.state.eq(nState + 1))
-                pCase.append((nState, cmds))
-                nState = nState + 1
-                nStateTest = nState
-                nState = nState + 1
-                nStateLoop = nState
-                nState, cmds = self.seqNested(nState, pCase, cmd)
-                pCase.append(
-                    (nState, 
+                cmds.append(self.state.eq(self.nState + 1))
+                self.pCase.append((self.nState, cmds))
+                self.nState = self.nState + 1
+                nStateTest = self.nState
+                self.nState = self.nState + 1
+                nStateLoop = self.nState
+                cmds = self.seqNested(cmd)
+                self.pCase.append(
+                    (self.nState, 
                         cmds,
                         temp.inc(),
                         self.runSt.eq(True),
                         self.state.eq(nStateTest)
                     )
                 )               
-                pCase.append(
+                self.pCase.append(
                     (nStateTest,
                         self.runSt.eq(True),
                         If(temp < cmd.getN())(
                             self.state.eq(nStateLoop),
                         ).Else(
-                            self.state.eq(nState + 1)    
+                            self.state.eq(self.nState + 1)    
                         )
                     )
                 )  
-                nState = nState + 1  
+                self.nState = self.nState + 1  
                 cmds = CmdList()           
 
             #Found a While loop
             elif isinstance(cmd, WhileLoop):
                 cmds.append(self.runSt.eq(True))
-                cmds.append(self.state.eq(nState + 1))
-                pCase.append((nState, cmds))
-                nState = nState + 1
-                nStateTest = nState
-                nState = nState + 1
-                nStateLoop = nState
-                nState, cmds = self.seqNested(nState, pCase, cmd)
-                pCase.append(
-                    (nState, 
+                cmds.append(self.state.eq(self.nState + 1))
+                self.pCase.append((self.nState, cmds))
+                self.nState = self.nState + 1
+                nStateTest = self.nState
+                self.nState = self.nState + 1
+                nStateLoop = self.nState
+                cmds = self.seqNested(cmd)
+                self.pCase.append(
+                    (self.nState, 
                         cmds,
                         self.runSt.eq(True),
                         self.state.eq(nStateTest)
                     )
                 )               
-                pCase.append(
+                self.pCase.append(
                     (nStateTest,
                         self.runSt.eq(True),
                         If(cmd.getCond())(
                             self.state.eq(nStateLoop),
                         ).Else(
-                            self.state.eq(nState + 1)    
+                            self.state.eq(self.nState + 1)    
                         )
                     )
                 )  
-                nState = nState + 1  
+                self.nState = self.nState + 1  
                 cmds = CmdList()
                 
             #Found a for loop
             elif isinstance(cmd, ForLoop):
                 cmds.append(cmd.getStart())
                 cmds.append(self.runSt.eq(True))
-                cmds.append(self.state.eq(nState + 1))
-                pCase.append((nState, cmds))
-                nState = nState + 1
-                nStateTest = nState
-                nState = nState + 1
-                nStateLoop = nState
-                nState, cmds = self.seqNested(nState, pCase, cmd)
-                pCase.append(
-                    (nState, 
+                cmds.append(self.state.eq(self.nState + 1))
+                self.pCase.append((self.nState, cmds))
+                self.nState = self.nState + 1
+                nStateTest = self.nState
+                self.nState = self.nState + 1
+                nStateLoop = self.nState
+                cmds = self.seqNested(cmd)
+                self.pCase.append(
+                    (self.nState, 
                         cmds,
                         cmd.getInc(),
                         self.runSt.eq(True),
                         self.state.eq(nStateTest)
                     )
                 )               
-                pCase.append(
+                self.pCase.append(
                     (nStateTest,
                         self.runSt.eq(True),
                         If(cmd.getCond())(
                             self.state.eq(nStateLoop),
                         ).Else(
-                            self.state.eq(nState + 1)    
+                            self.state.eq(self.nState + 1)    
                         )
                     )
                 )  
-                nState = nState + 1  
+                self.nState = self.nState + 1  
                 cmds = CmdList()
                 
             #Found a If
             elif isinstance(cmd, Cond):
-                nStateTest = nState
-                nState = nState + 1
-                nStateTrue = nState
-                nState, cmdsEndTrue = self.seqNested(nState, 
-                                                     pCase, 
-                                                     cmd.getBlock(True))
-                nStateEndTrue = nState
-                nState = nState + 1
-                nStateFalse = nState                
-                nState, cmdsEndFalse = self.seqNested(nState, 
-                                                      pCase, 
-                                                      cmd.getBlock(False))
-                pCase.append(
-                    (nState, 
+                nStateTest = self.nState
+                self.nState = self.nState + 1
+                nStateTrue = self.nState
+                cmdsEndTrue = self.seqNested(cmd.getBlock(True))
+                nStateEndTrue = self.nState
+                self.nState = self.nState + 1
+                nStateFalse = self.nState                
+                cmdsEndFalse = self.seqNested(cmd.getBlock(False))
+                self.pCase.append(
+                    (self.nState, 
                         cmdsEndFalse,
                         self.runSt.eq(True),
-                        self.state.eq(nState + 1)
+                        self.state.eq(self.nState + 1)
                     )
                 )      
-                pCase.append(
+                self.pCase.append(
                     (nStateEndTrue, 
                         cmdsEndTrue,
                         self.runSt.eq(True),
-                        self.state.eq(nState + 1)
+                        self.state.eq(self.nState + 1)
                     )
                 )                    
-                pCase.append(
+                self.pCase.append(
                     (nStateTest,
                         cmds,
                         self.runSt.eq(True),
@@ -1494,7 +1508,7 @@ class Tb(Module):
                         )
                     )
                 )  
-                nState = nState + 1  
+                self.nState = self.nState + 1  
                 cmds = CmdList()
                 
             #Found a case
@@ -1510,43 +1524,58 @@ class Tb(Module):
             else:
                 cmds.append(cmd)
                 
-        return nState, cmds
+        return cmds
 
     #---------------------------------------------------------------------------
     # Sequence
     # Parameters:
     # *args - variable number of commands
     #---------------------------------------------------------------------------
-    def seq(self, *args):
-        nState = 0
-        pCase = Case(self.state)()
-        self.testSeqCase.append(
-            (self.nSeq,
-                While(self.runSt)(
-                    self.runSt.eq(False),
-                    pCase
+    def seq(self, cond):
+        def func(*args):
+            self.nState   = 0
+            self.time     = self.var(Real(1e6),  "_$evntTime_" + str(self.nSeq)) 
+            self.state    = self.var(Integer(0), "_$state_"    + str(self.nSeq)) 
+            self.runSt    = self.var(Bool(True), "_$runSt_"    + str(self.nSeq)) 
+            self.eventId  = self.var(Integer(0), "_$eventId_"  + str(self.nSeq)) 
+            self.pCase    = Case(self.state)()
+            self.cond     = cond
+            self.evntList = []
+            self.beginningAnalog(
+                At(Timer(*([self.time] + self.timeArgs)))(
+                    If(self.eventId == 0)(
+                        self.runSt.eq(True)
+                    )
                 )
             )
-        )
-        cmds = CmdList()
-        i = 1
-        for cmd in args:
-            assert isinstance(cmd, Cmd) and \
-                   not isinstance(cmd, WaitAnalogEvent), "Command " + str(i) +\
-                   " must be an instance of Cmd and can't be and instance of "+\
-                   "WaitAnalogEvent"
-            i = i + 1
-            if isinstance(cmd, Mark):
-                cmds.append(Cmd(str(cmd)))
-            else:
-                cmds.append(cmd)
-        nState, cmds = self.seqNested(nState, pCase, cmds)
-        #Add a finish command
-        cmds.append(Finish()) 
-        #Add the last state 
-        pCase.append((Integer(nState), cmds))
-        #Go to the next sequence
-        self.nSeq = self.nSeq + 1
+            self.testSeqs.append(
+                If(self.cond)(
+                    While(self.runSt)(
+                        self.runSt.eq(False),
+                        self.pCase
+                    )
+                )
+            )
+            cmds = CmdList()
+            i = 1
+            for cmd in args:
+                assert isinstance(cmd, Cmd) and \
+                       not isinstance(cmd, WaitAnalogEvent), "Command " +str(i)+\
+                       " must be an instance of Cmd and can't be and instance "+\
+                       "of WaitAnalogEvent"
+                i = i + 1
+                if isinstance(cmd, Mark):
+                    cmds.append(Cmd(str(cmd)))
+                else:
+                    cmds.append(cmd)
+            cmds = self.seqNested(cmds)
+            #Add a finish command
+            cmds.append(Finish()) 
+            #Add the last state 
+            self.pCase.append((Integer(self.nState), cmds))
+            #Go to the next sequence
+            self.nSeq = self.nSeq + 1
+        return func
             
     #---------------------------------------------------------------------------
     # Return the equations in a format that can be imported by the maestro view

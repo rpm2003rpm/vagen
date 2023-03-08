@@ -31,7 +31,7 @@
 #-------------------------------------------------------------------------------
 # Imports
 #-------------------------------------------------------------------------------
-from vagen.tb import Tb, Module, Branch, Cmd, CmdList, Electrical, \
+from vagen.hilevelmod import HiLevelMod, Module, Branch, Cmd, CmdList, Electrical, \
                      Real, Integer, Bool,\
                      RealVar, IntegerVar, Vdc, Smu, DigIn, DigOut, DigInOut, \
                      DigBusIn, DigBusOut, DigBusInOut, \

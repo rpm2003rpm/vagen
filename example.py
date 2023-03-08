@@ -31,9 +31,11 @@
 from vagen import *
 
 #Create a module     
-mod = Tb("tb")
+mod = HiLevelMod("tb")
 #Create an integer variable that will be initialized to 9
 var1 = mod.var(9)
+#Create a real parameter called TEST_SEQ_PARAM. Initial value is 0.
+tSeq = mod.par(0, "TEST_SEQ_PARAM")
 #Create a real parameter called parameter 1. Initial value is 0.
 par2 = mod.par(0.0, "parameter1")
 #Create a source measure unit bus
@@ -73,7 +75,7 @@ clk = mod.clock(dig4)
 #Create a marker for the first sequence. The MARK pin will be toggled at every mark.  
 marker = mod.marker("seq1")
 #First test sequence. This sequence will be run when TEST_SEQ_PARAM is equal to 1
-mod.seq(
+mod.seq(tSeq == 1)(
     #Apply 2V on pin1[2:0] current limited to 10mA
     smu1.applyV(2, 10e-3),
     #Wait 100us
@@ -134,7 +136,7 @@ mod.seq(
 #Create a marker for the second sequence. The MARK pin will be toggled at every mark.  
 marker = mod.marker("seq2")
 #Second test sequence. This sequence will be run when TEST_SEQ_PARAM is equal to 2
-mod.seq(
+mod.seq(tSeq == 2)(
     #Apply 2V to pin4 in order to rise the domain of the digital pins
     vdc2.applyV(2),
     #Wait 100us
