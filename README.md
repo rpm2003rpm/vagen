@@ -5,9 +5,6 @@
 vagen is a verilogA testbench generator that can be used for transient verification of complex analog IPs.
 It provides a wide range of basic models with voltage sources, current sources, digital interfaces, clocks, switches, and source measure units. 
 
-Mutiple sequences for different tests can be created and selected during simulation time with the parameter TEST_SEQ_PARAM. 
-
-
 
 ## How to run
 
