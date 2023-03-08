@@ -18,5 +18,5 @@ You can run an example of the verilogA test bench generator by typing the follow
 
 Although usable, the current development status is beta. There are several things that still need to be done:
 
-* Improve the test bench of the code vagen/tb.py.
+* Improve the test bench of the code vagen/hilevelmod.py.
 * Write a documentation.
