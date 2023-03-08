@@ -42,13 +42,33 @@ from vagen.veriloga import *
 class Mark(Cmd):
 
     #---------------------------------------------------------------------------
-    # Return the VA verilog command
+    # Construtor
     # Parameters:
-    # padding - dummy for consistency 
+    # cmd - command
+    #---------------------------------------------------------------------------
+    def __init__(self, cmd):
+        checkInstance("cmd", cmd, Cmd)
+        self.cmd = cmd
+
+    #---------------------------------------------------------------------------
+    # return the command
+    #---------------------------------------------------------------------------
+    def getCmd(self):
+        return self.cmd
+
+    #---------------------------------------------------------------------------
+    # Dummy method
+    #---------------------------------------------------------------------------        
+    def __str__(self):
+        #TODO: Find a better way to fix this
+        raise Exception("Wait can't be outside seq")
+
+    #---------------------------------------------------------------------------
+    # Dummy method
     #---------------------------------------------------------------------------        
     def getVA(self, padding):
         #TODO: Find a better way to fix this
-        raise Exception("Mark can't be outside seq")
+        raise Exception("Wait can't be outside seq")
 
 
 #-------------------------------------------------------------------------------
@@ -85,7 +105,7 @@ class Marker():
     def mark(self, name):
         checkType("name", name, str)
         self.markList.append(name)
-        return Mark(str(self.var.toggle()))
+        return Mark(self.var.toggle())
 
     #---------------------------------------------------------------------------
     # Force the internal variable low. You shouldn't use because it will 
@@ -93,7 +113,7 @@ class Marker():
     # It was implemented for usage in specific power down conditions only.
     #---------------------------------------------------------------------------
     def low(self): 
-        return Mark(str(self.var.eq(False)))
+        return Mark(self.var.eq(False))
 
     #---------------------------------------------------------------------------
     # Force the internal variable high. You shouldn't use because it will 
@@ -101,7 +121,7 @@ class Marker():
     # It was implemented for usage in specific power down conditions only.
     #---------------------------------------------------------------------------
     def high(self, name):
-        return Mark(str(self.var.eq(True)))
+        return Mark(self.var.eq(True))
 
     #---------------------------------------------------------------------------
     # Return a list with the cadence equations for the marker     
@@ -139,9 +159,14 @@ class WaitSignal(Cmd):
         return self.evnt
         
     #---------------------------------------------------------------------------
-    # Return the VA verilog command
-    # Parameters:
-    # padding - dummy for consistency 
+    # Dummy method
+    #---------------------------------------------------------------------------        
+    def __str__(self):
+        #TODO: Find a better way to fix this
+        raise Exception("Wait can't be outside seq")
+
+    #---------------------------------------------------------------------------
+    # Dummy method
     #---------------------------------------------------------------------------        
     def getVA(self, padding):
         #TODO: Find a better way to fix this
@@ -172,13 +197,18 @@ class WaitUs(Cmd):
         return self.delay
         
     #---------------------------------------------------------------------------
-    # Return the VA verilog command
-    # Parameters:
-    # padding - dummy for consistency 
+    # Dummy method
+    #---------------------------------------------------------------------------        
+    def __str__(self):
+        #TODO: Find a better way to fix this
+        raise Exception("Wait can't be outside seq")
+
+    #---------------------------------------------------------------------------
+    # Dummy method
     #---------------------------------------------------------------------------        
     def getVA(self, padding):
         #TODO: Find a better way to fix this
-        raise Exception("Wait can't outside seq")
+        raise Exception("Wait can't be outside seq")
 
 
 #-------------------------------------------------------------------------------
@@ -1565,14 +1595,15 @@ class HiLevelMod(Module):
                        "of WaitAnalogEvent"
                 i = i + 1
                 if isinstance(cmd, Mark):
-                    cmds.append(Cmd(str(cmd)))
+                    cmds.append(cmd.getCmd())
                 else:
                     cmds.append(cmd)
             cmds = self.seqNested(cmds)
             #Add a finish command
-            cmds.append(Finish()) 
+            #cmds.append(Finish()) 
             #Add the last state 
-            self.pCase.append((Integer(self.nState), cmds))
+            if len(cmds) > 0:
+                self.pCase.append((Integer(self.nState), cmds))
             #Go to the next sequence
             self.nSeq = self.nSeq + 1
         return func

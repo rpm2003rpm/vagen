@@ -131,7 +131,9 @@ mod.seq(tSeq == 1)(
     #Mark the end of the idc test by toggling the MARK pin
     marker.mark("END_IDC_TEST"),
     #Wait 100us
-    WaitUs(100)
+    WaitUs(100),
+    #Finish simulation
+    Finish()
 )
 #Create a marker for the second sequence. The MARK pin will be toggled at every mark.  
 marker = mod.marker("seq2")
@@ -171,7 +173,9 @@ mod.seq(tSeq == 2)(
     #Set the conductance of the switch to 0
     sw.setCond(0),
     #Wait 100us
-    WaitUs(200)            
+    WaitUs(200),            
+    #Finish simulation
+    Finish()
 )
 #Save veriloga file
 file = open('veriloga.va', 'w')

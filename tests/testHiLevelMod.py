@@ -141,7 +141,8 @@ class TestHiLevelMod(unittest.TestCase):
             #Mark the end of the idc test by toggling the MARK pin
             marker.mark("END_IDC_TEST"),
             #Wait 100us
-            WaitUs(Real(100))
+            WaitUs(Real(100)),
+            Finish()
         )
         #Create a marker for the second sequence. The MARK pin will be toggled at every mark.  
         marker = mod.marker("seq2")
@@ -172,7 +173,8 @@ class TestHiLevelMod(unittest.TestCase):
             #Set the conductance of the switch to 0
             sw.setCond(Real(0)),
             #Wait 100us
-            WaitUs(Real(200))            
+            WaitUs(Real(200)),            
+            Finish()
         )         
         ref = '''`include "constants.vams"
 `include "disciplines.vams"
@@ -1083,7 +1085,8 @@ endmodule'''
             #Mark the end of the idc test by toggling the MARK pin
             marker.mark("END_IDC_TEST"),
             #Wait 100us
-            WaitUs(100)
+            WaitUs(100),
+            Finish()
         )
         #Create a marker for the second sequence. The MARK pin will be toggled at every mark.  
         marker = mod.marker("seq2")
@@ -1114,7 +1117,8 @@ endmodule'''
             #Set the conductance of the switch to 0
             sw.setCond(0),
             #Wait 100us
-            WaitUs(200)            
+            WaitUs(200),            
+            Finish()
         )
    
         ref = '''`include "constants.vams"
