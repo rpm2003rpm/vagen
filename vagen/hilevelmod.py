@@ -61,14 +61,14 @@ class Mark(Cmd):
     #---------------------------------------------------------------------------        
     def __str__(self):
         #TODO: Find a better way to fix this
-        raise Exception("Wait can't be outside seq")
+        raise Exception("Mark doesn't have string representation")
 
     #---------------------------------------------------------------------------
     # Dummy method
     #---------------------------------------------------------------------------        
     def getVA(self, padding):
         #TODO: Find a better way to fix this
-        raise Exception("Wait can't be outside seq")
+        raise Exception("Mark can't be outside seq")
 
 
 #-------------------------------------------------------------------------------
@@ -81,15 +81,23 @@ class Marker():
     #---------------------------------------------------------------------------
     # Construtor
     # Parameters:
+    # hiLeveMod - Hi level model in which the model will be added
     # name - name of the marker
-    # var - Boolen variable to be fliped at the events
+    # riseFall - rise and fall times of the marker pin
     #---------------------------------------------------------------------------
-    def __init__(self, name, var):
+    def __init__(self, hiLevelMod, name, riseFall):
+        checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
-        checkInstance("var", var, BoolVar)
+        riseFall = parseReal("riseFall", riseFall)
         self.name = name
         self.markList = []
-        self.var = var
+        self.markerPin  = hiLevelMod.electrical("MARK_" + name, \
+                                               direction = "output")
+        self.markSt     = hiLevelMod.var(Bool(False), "_$markSt_" + name)         
+        hiLevelMod.endAnalog(
+            self.markerPin.vCont(transition(Real(self.markSt), 0, riseFall, 
+                                                                  riseFall))
+        )
         
     #---------------------------------------------------------------------------
     # return the  name of the marker
@@ -105,7 +113,7 @@ class Marker():
     def mark(self, name):
         checkType("name", name, str)
         self.markList.append(name)
-        return Mark(self.var.toggle())
+        return Mark(self.markSt.toggle())
 
     #---------------------------------------------------------------------------
     # Force the internal variable low. You shouldn't use because it will 
@@ -113,7 +121,7 @@ class Marker():
     # It was implemented for usage in specific power down conditions only.
     #---------------------------------------------------------------------------
     def low(self): 
-        return Mark(self.var.eq(False))
+        return Mark(self.markSt.eq(False))
 
     #---------------------------------------------------------------------------
     # Force the internal variable high. You shouldn't use because it will 
@@ -121,7 +129,7 @@ class Marker():
     # It was implemented for usage in specific power down conditions only.
     #---------------------------------------------------------------------------
     def high(self, name):
-        return Mark(self.var.eq(True))
+        return Mark(self.markSt.eq(True))
 
     #---------------------------------------------------------------------------
     # Return a list with the cadence equations for the marker     
@@ -130,8 +138,9 @@ class Marker():
     def getEqs(self):
         ans = {}
         for i in range(0, len(self.markList)):
-            ans[self.markList[i]] = 'cross(getData("/MARK" ?result "tran") ' +\
-                                    '0.5 {:d} "either" nil nil)'.format(i + 1)
+            ans[self.markList[i]] = 'cross(getData("/MARK_' + self.name + '" '+\
+                                    '?result "tran") 0.5 ' +\
+                                    '{:d} "either" nil nil)'.format(i + 1)
         return ans
         
 
@@ -163,7 +172,7 @@ class WaitSignal(Cmd):
     #---------------------------------------------------------------------------        
     def __str__(self):
         #TODO: Find a better way to fix this
-        raise Exception("Wait can't be outside seq")
+        raise Exception("Wait doesn't have string representation")
 
     #---------------------------------------------------------------------------
     # Dummy method
@@ -201,7 +210,7 @@ class WaitUs(Cmd):
     #---------------------------------------------------------------------------        
     def __str__(self):
         #TODO: Find a better way to fix this
-        raise Exception("Wait can't be outside seq")
+        raise Exception("Wait doesn't have string representation")
 
     #---------------------------------------------------------------------------
     # Dummy method
@@ -274,7 +283,7 @@ class Vdc(Electrical):
     #---------------------------------------------------------------------------
     # Construtor
     # Parameters:
-    # tb - test bench in which the model will be added
+    # hiLeveMod - Hi level model in which the model will be added
     # name - name of the voltage source electrical pin
     # value - real expression holding the inital voltage
     # rise - real expression holding the initial rise time
@@ -370,7 +379,7 @@ class Idc(Electrical):
     #---------------------------------------------------------------------------
     # Construtor
     # Parameters:
-    # tb - test bench in which the model will be added
+    # hiLeveMod - Hi level model in which the model will be added
     # name - name of the current source electrical pin
     # value - real expression holding the inital current
     # rise - real expression holding the initial rise time
@@ -466,7 +475,7 @@ class Smu(Electrical):
     #---------------------------------------------------------------------------
     # Construtor
     # Parameters:
-    # tb - test bench in which the model will be added
+    # hiLeveMod - Hi level model in which the model will be added
     # name - name of the current source electrical pin
     # volt - real expression holding the inital voltage
     # minCur - real expression holding the inital minimum current
@@ -661,7 +670,7 @@ class DigOut(Electrical):
     #---------------------------------------------------------------------------
     # Construtor
     # Parameters:
-    # tb - test bench in which the model will be added
+    # hiLeveMod - Hi level model in which the model will be added
     # name - name of the electrical pin
     # state - boolean expression holding the intial state of the digital pin
     # domain - electrical pin. The voltage across the domain will be equal
@@ -730,7 +739,7 @@ class DigOut(Electrical):
 class DigIn(Electrical):
     
     #---------------------------------------------------------------------------
-    # tb - test bench in which the model will be added
+    # hiLeveMod - Hi level model in which the model will be added
     # name - name of the electrical pin
     # state - dummy parameter for consistency
     # domain - electrical pin. The voltage across the domain will be equal
@@ -768,7 +777,7 @@ class DigInOut(DigIn, DigOut):
     #---------------------------------------------------------------------------
     # Construtor
     # Parameters:
-    # tb - test bench in which the model will be added
+    # hiLeveMod - Hi level model in which the model will be added
     # name - name of the electrical pin
     # state - boolean expression holding the intial state of the digital pin
     # domain - electrical pin. The voltage across the domain will be equal
@@ -950,7 +959,7 @@ class Sw():
     #---------------------------------------------------------------------------
     # Constructor
     # Parameters:
-    # tb - test bench in which the model will be added
+    # hiLeveMod - Hi level model in which the model will be added
     # pin1 - first node
     # pin2 - second node
     # cond - Real expression representing the initial switch conductance
@@ -1017,7 +1026,7 @@ class Clock():
     #---------------------------------------------------------------------------
     # Constructor
     # Parameters:
-    # tb - test bench in which the model will be added
+    # hiLeveMod - Hi level model in which the model will be added
     # pin - digital output or inout pin
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, pin):
@@ -1076,10 +1085,7 @@ class HiLevelMod(Module):
     #---------------------------------------------------------------------------
     def __init__(self, tbName, timeTol = None):
         super(HiLevelMod, self).__init__(tbName)
-        self.dcCmdList  = CmdList() 
-        self.markerPin  = self.electrical("MARK", direction = "output")
-        self.markStReal = self.var(Real(0), "_$markStReal") 
-        self.markSt     = self.var(Bool(False), "_$markSt") 
+        self.dcCmdList  = CmdList()
         self.time       = None 
         self.state      = None
         self.runSt      = None
@@ -1089,13 +1095,14 @@ class HiLevelMod(Module):
         self.evntListG  = []
         self.markers    = []
         self.nSeq       = 1
-        self.testSeqs   = CmdList()       
+        self.testSeqs   = CmdList()    
+        self.var()   
 
         if not isinstance(timeTol, type(None)):
             self.timeArgs = [0, parseReal("timeTol", timeTol)]
         else:
             self.timeArgs = []
-            
+          
         self.beginningAnalog(
             If(analysis("static"))(
                 self.dcCmdList
@@ -1107,11 +1114,6 @@ class HiLevelMod(Module):
         
         self.analog(
             self.testSeqs
-        )
-        
-        self.endAnalog(
-            self.markStReal.eq(Real(self.markSt)), 
-            self.markerPin.vCont(transition(self.markStReal, 0, 1e-12, 1e-12))
         )
                     
     #---------------------------------------------------------------------------
@@ -1131,9 +1133,10 @@ class HiLevelMod(Module):
     # Return a marker object
     # Parameters: 
     # name - name of the marker
+    # riseFall - rise and fall times of the marker pin. Default is 10ps
     #---------------------------------------------------------------------------
-    def marker(self, name):
-        markerObj = Marker(name, self.markSt)
+    def marker(self, name, riseFall = 10e-9):
+        markerObj = Marker(self, name, riseFall)
         self.markers.append(markerObj)
         return markerObj
         
@@ -1240,7 +1243,7 @@ class HiLevelMod(Module):
     #---------------------------------------------------------------------------
     # Return a smu object or a list of smu objects if width > 0
     # Parameters:
-    # tb - test bench in which the model will be added
+    # hiLeveMod - Hi level model in which the model will be added
     # name - name of the current source electrical pin
     # width - if width is greather than 1, It returns a list
     # direction - it can be internal, input, output, or inout
@@ -1588,6 +1591,7 @@ class HiLevelMod(Module):
             )
             cmds = CmdList()
             i = 1
+            assert len(args) > 0, "Sequence can be empty"
             for cmd in args:
                 assert isinstance(cmd, Cmd) and \
                        not isinstance(cmd, WaitAnalogEvent), "Command " +str(i)+\

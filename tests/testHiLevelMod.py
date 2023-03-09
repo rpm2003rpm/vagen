@@ -182,8 +182,7 @@ class TestHiLevelMod(unittest.TestCase):
 /******************************************************************************
  *                             Module declaration                             * 
  ******************************************************************************/
-module tb(MARK,
-          pin1,
+module tb(pin1,
           pin2,
           pin3,
           pin4,
@@ -196,12 +195,13 @@ module tb(MARK,
           pin11,
           pin12,
           pin13,
-          pin14);
+          pin14,
+          MARK_seq1,
+          MARK_seq2);
 
 /******************************************************************************
  *                                   Ports                                    * 
  ******************************************************************************/
-output MARK;
 inout [2:0] pin1;
 inout pin2;
 output [2:0] pin3;
@@ -216,11 +216,12 @@ output pin11;
 inout [2:0] pin12;
 inout pin13;
 inout pin14;
+output MARK_seq1;
+output MARK_seq2;
 
 /******************************************************************************
  *                                 Disciplines                                * 
  ******************************************************************************/
-electrical MARK;
 electrical [2:0] pin1;
 electrical pin2;
 electrical [2:0] pin3;
@@ -233,12 +234,14 @@ electrical pin9;
 electrical [2:0] pin10;
 electrical pin11;
 electrical [2:0] pin12;
-electrical _$2;
 electrical _$3;
 electrical _$4;
-electrical pin13;
 electrical _$5;
+electrical pin13;
+electrical _$6;
 electrical pin14;
+electrical MARK_seq1;
+electrical MARK_seq2;
 
 /******************************************************************************
  *                                 Parameters                                 * 
@@ -249,9 +252,8 @@ parameter real parameter1 = 0.000000e+00;
 /******************************************************************************
  *                                 Variables                                  * 
  ******************************************************************************/
-real _$markStReal;
-integer _$markSt;
 integer _$1;
+integer _$2;
 real pin1_$0$_$volt$;
 real pin1_$0$_$maxCur;
 real pin1_$0$_$minCur$;
@@ -375,10 +377,12 @@ integer clk1_$out$;
 integer clk1_$isOn$;
 real clk1_$halfPeriod$;
 real clk1_$time$;
+integer _$markSt_seq1;
 real _$evntTime_1;
 integer _$state_1;
 integer _$runSt_1;
 integer _$eventId_1;
+integer _$markSt_seq2;
 real _$evntTime_2;
 integer _$state_2;
 integer _$runSt_2;
@@ -389,9 +393,8 @@ integer _$eventId_2;
  ******************************************************************************/
 analog begin
     if( analysis("static") ) begin
-        _$markStReal = 0.000000e+00;
-        _$markSt = 0;
-        _$1 = 9;
+        _$1 = 0;
+        _$2 = 9;
         pin1_$0$_$volt$ = 0.000000e+00;
         pin1_$0$_$maxCur = 0.000000e+00;
         pin1_$0$_$minCur$ = 0.000000e+00;
@@ -515,19 +518,20 @@ analog begin
         clk1_$isOn$ = 0;
         clk1_$halfPeriod$ = 1.000000e+06;
         clk1_$time$ = 1.000000e+06;
+        _$markSt_seq1 = 0;
         _$evntTime_1 = 1.000000e+06;
         _$state_1 = 0;
         _$runSt_1 = 1;
         _$eventId_1 = 0;
+        _$markSt_seq2 = 0;
         _$evntTime_2 = 1.000000e+06;
         _$state_2 = 0;
         _$runSt_2 = 1;
         _$eventId_2 = 0;
     end
     @( initial_step("tran") ) begin
-        _$markStReal = 0.000000e+00;
-        _$markSt = 0;
-        _$1 = 9;
+        _$1 = 0;
+        _$2 = 9;
         pin1_$0$_$volt$ = 0.000000e+00;
         pin1_$0$_$maxCur = 0.000000e+00;
         pin1_$0$_$minCur$ = 0.000000e+00;
@@ -651,10 +655,12 @@ analog begin
         clk1_$isOn$ = 0;
         clk1_$halfPeriod$ = 1.000000e+06;
         clk1_$time$ = 1.000000e+06;
+        _$markSt_seq1 = 0;
         _$evntTime_1 = 1.000000e+06;
         _$state_1 = 0;
         _$runSt_1 = 1;
         _$eventId_1 = 0;
+        _$markSt_seq2 = 0;
         _$evntTime_2 = 1.000000e+06;
         _$state_2 = 0;
         _$runSt_2 = 1;
@@ -795,7 +801,7 @@ analog begin
                     _$evntTime_1 = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                 end
                 5: begin
-                    _$markSt = !_$markSt;
+                    _$markSt_seq1 = !_$markSt_seq1;
                     pin3_$0$_$rise$ = 3.000000e-05;
                     pin3_$0$_$fall$ = 3.000000e-05;
                     pin3_$1$_$rise$ = 3.000000e-05;
@@ -822,7 +828,7 @@ analog begin
                     _$evntTime_1 = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                 end
                 8: begin
-                    _$markSt = !_$markSt;
+                    _$markSt_seq1 = !_$markSt_seq1;
                     pin5_$0$_$rise$ = 5.000000e-05;
                     pin5_$0$_$fall$ = 5.000000e-05;
                     pin5_$1$_$rise$ = 5.000000e-05;
@@ -850,7 +856,7 @@ analog begin
                     _$evntTime_1 = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
                 end
                 11: begin
-                    _$markSt = !_$markSt;
+                    _$markSt_seq1 = !_$markSt_seq1;
                     _$eventId_1 = 0;
                     _$state_1 = 12;
                     _$evntTime_1 = ( $abstime ) + ( ( 1.000000e-06 )*( 1.000000e+02 ) );
@@ -910,8 +916,6 @@ analog begin
         if( ( clk1_$isOn$ ) || ( clk1_$out$ ) )
             clk1_$time$ = ( $abstime ) + ( clk1_$halfPeriod$ );
     end
-    _$markStReal = _$markSt ? ( 1.0 ) : ( 0.0 );
-    V(MARK) <+ transition(_$markStReal, 0.000000e+00, 1.000000e-12, 1.000000e-12);
     pin1_$0$_$voltTran$ = transition(pin1_$0$_$volt$, pin1_$0$_$vDelay$, pin1_$0$_$riseFall$, pin1_$0$_$riseFall$);
     pin1_$0$_$maxCurTran$ = transition(pin1_$0$_$maxCur, pin1_$0$_$iDelay$, pin1_$0$_$riseFall$, pin1_$0$_$riseFall$);
     pin1_$0$_$minCurTran$ = transition(pin1_$0$_$minCur$, pin1_$0$_$iDelay$, pin1_$0$_$riseFall$, pin1_$0$_$riseFall$);
@@ -960,21 +964,24 @@ analog begin
     V(pin10[2]) <+ ( I(pin10[2]) )*( pin10_$2$_$serRes$ );
     V(pin11) <+ ( V(pin4) )*( transition(pin11_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin11_$rise, pin11_$fall$) );
     V(pin11) <+ ( I(pin11) )*( pin11_$serRes$ );
-    V(_$2) <+ ( V(pin4) )*( transition(pin12_$0$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$0$_$rise, pin12_$0$_$fall$) );
-    V(_$2, pin12[0]) <+ ( I(_$2, pin12[0]) )*( transition(pin12_$0$_$res$, 0.000000e+00, pin12_$0$_$rise, pin12_$0$_$fall$) );
+    V(_$3) <+ ( V(pin4) )*( transition(pin12_$0$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$0$_$rise, pin12_$0$_$fall$) );
+    V(_$3, pin12[0]) <+ ( I(_$3, pin12[0]) )*( transition(pin12_$0$_$res$, 0.000000e+00, pin12_$0$_$rise, pin12_$0$_$fall$) );
     I(pin12[0]) <+ ( ddt(V(pin12[0])) )*( pin12_$0$_$inCap$ );
-    V(_$3) <+ ( V(pin4) )*( transition(pin12_$1$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$1$_$rise, pin12_$1$_$fall$) );
-    V(_$3, pin12[1]) <+ ( I(_$3, pin12[1]) )*( transition(pin12_$1$_$res$, 0.000000e+00, pin12_$1$_$rise, pin12_$1$_$fall$) );
+    V(_$4) <+ ( V(pin4) )*( transition(pin12_$1$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$1$_$rise, pin12_$1$_$fall$) );
+    V(_$4, pin12[1]) <+ ( I(_$4, pin12[1]) )*( transition(pin12_$1$_$res$, 0.000000e+00, pin12_$1$_$rise, pin12_$1$_$fall$) );
     I(pin12[1]) <+ ( ddt(V(pin12[1])) )*( pin12_$1$_$inCap$ );
-    V(_$4) <+ ( V(pin4) )*( transition(pin12_$2$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$2$_$rise, pin12_$2$_$fall$) );
-    V(_$4, pin12[2]) <+ ( I(_$4, pin12[2]) )*( transition(pin12_$2$_$res$, 0.000000e+00, pin12_$2$_$rise, pin12_$2$_$fall$) );
+    V(_$5) <+ ( V(pin4) )*( transition(pin12_$2$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$2$_$rise, pin12_$2$_$fall$) );
+    V(_$5, pin12[2]) <+ ( I(_$5, pin12[2]) )*( transition(pin12_$2$_$res$, 0.000000e+00, pin12_$2$_$rise, pin12_$2$_$fall$) );
     I(pin12[2]) <+ ( ddt(V(pin12[2])) )*( pin12_$2$_$inCap$ );
-    V(_$5) <+ ( V(pin4) )*( transition(pin13_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin13_$rise, pin13_$fall$) );
-    V(_$5, pin13) <+ ( I(_$5, pin13) )*( transition(pin13_$res$, 0.000000e+00, pin13_$rise, pin13_$fall$) );
+    V(_$6) <+ ( V(pin4) )*( transition(pin13_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin13_$rise, pin13_$fall$) );
+    V(_$6, pin13) <+ ( I(_$6, pin13) )*( transition(pin13_$res$, 0.000000e+00, pin13_$rise, pin13_$fall$) );
     I(pin13) <+ ( ddt(V(pin13)) )*( pin13_$inCap$ );
     I(pin7, pin14) <+ ( V(pin7, pin14) )*( transition(sw1_$cond$, 0.000000e+00, sw1_$rise, sw1_$fall$) );
+    V(MARK_seq1) <+ transition(_$markSt_seq1 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-08, 1.000000e-08);
+    V(MARK_seq2) <+ transition(_$markSt_seq2 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-08, 1.000000e-08);
 end
 endmodule'''
+        self.maxDiff = None
         self.assertEqual(mod.getVA()[323:], ref)
         #print(mod.getVA())
          
@@ -1127,8 +1134,7 @@ endmodule'''
 /******************************************************************************
  *                             Module declaration                             * 
  ******************************************************************************/
-module tb(MARK,
-          pin1,
+module tb(pin1,
           pin2,
           pin3,
           pin4,
@@ -1141,12 +1147,13 @@ module tb(MARK,
           pin11,
           pin12,
           pin13,
-          pin14);
+          pin14,
+          MARK_seq1,
+          MARK_seq2);
 
 /******************************************************************************
  *                                   Ports                                    * 
  ******************************************************************************/
-output MARK;
 inout [2:0] pin1;
 inout pin2;
 output [2:0] pin3;
@@ -1161,11 +1168,12 @@ output pin11;
 inout [2:0] pin12;
 inout pin13;
 inout pin14;
+output MARK_seq1;
+output MARK_seq2;
 
 /******************************************************************************
  *                                 Disciplines                                * 
  ******************************************************************************/
-electrical MARK;
 electrical [2:0] pin1;
 electrical pin2;
 electrical [2:0] pin3;
@@ -1178,12 +1186,14 @@ electrical pin9;
 electrical [2:0] pin10;
 electrical pin11;
 electrical [2:0] pin12;
-electrical _$2;
 electrical _$3;
 electrical _$4;
-electrical pin13;
 electrical _$5;
+electrical pin13;
+electrical _$6;
 electrical pin14;
+electrical MARK_seq1;
+electrical MARK_seq2;
 
 /******************************************************************************
  *                                 Parameters                                 * 
@@ -1194,9 +1204,8 @@ parameter real parameter1 = 0.000000e+00;
 /******************************************************************************
  *                                 Variables                                  * 
  ******************************************************************************/
-real _$markStReal;
-integer _$markSt;
 integer _$1;
+integer _$2;
 real pin1_$0$_$volt$;
 real pin1_$0$_$maxCur;
 real pin1_$0$_$minCur$;
@@ -1320,10 +1329,12 @@ integer clk1_$out$;
 integer clk1_$isOn$;
 real clk1_$halfPeriod$;
 real clk1_$time$;
+integer _$markSt_seq1;
 real _$evntTime_1;
 integer _$state_1;
 integer _$runSt_1;
 integer _$eventId_1;
+integer _$markSt_seq2;
 real _$evntTime_2;
 integer _$state_2;
 integer _$runSt_2;
@@ -1334,9 +1345,8 @@ integer _$eventId_2;
  ******************************************************************************/
 analog begin
     if( analysis("static") ) begin
-        _$markStReal = 0.000000e+00;
-        _$markSt = 0;
-        _$1 = 9;
+        _$1 = 0;
+        _$2 = 9;
         pin1_$0$_$volt$ = 0.000000e+00;
         pin1_$0$_$maxCur = 0.000000e+00;
         pin1_$0$_$minCur$ = 0.000000e+00;
@@ -1460,19 +1470,20 @@ analog begin
         clk1_$isOn$ = 0;
         clk1_$halfPeriod$ = 1.000000e+06;
         clk1_$time$ = 1.000000e+06;
+        _$markSt_seq1 = 0;
         _$evntTime_1 = 1.000000e+06;
         _$state_1 = 0;
         _$runSt_1 = 1;
         _$eventId_1 = 0;
+        _$markSt_seq2 = 0;
         _$evntTime_2 = 1.000000e+06;
         _$state_2 = 0;
         _$runSt_2 = 1;
         _$eventId_2 = 0;
     end
     @( initial_step("tran") ) begin
-        _$markStReal = 0.000000e+00;
-        _$markSt = 0;
-        _$1 = 9;
+        _$1 = 0;
+        _$2 = 9;
         pin1_$0$_$volt$ = 0.000000e+00;
         pin1_$0$_$maxCur = 0.000000e+00;
         pin1_$0$_$minCur$ = 0.000000e+00;
@@ -1596,10 +1607,12 @@ analog begin
         clk1_$isOn$ = 0;
         clk1_$halfPeriod$ = 1.000000e+06;
         clk1_$time$ = 1.000000e+06;
+        _$markSt_seq1 = 0;
         _$evntTime_1 = 1.000000e+06;
         _$state_1 = 0;
         _$runSt_1 = 1;
         _$eventId_1 = 0;
+        _$markSt_seq2 = 0;
         _$evntTime_2 = 1.000000e+06;
         _$state_2 = 0;
         _$runSt_2 = 1;
@@ -1740,7 +1753,7 @@ analog begin
                     _$evntTime_1 = ( $abstime ) + ( 1.000000e-04 );
                 end
                 5: begin
-                    _$markSt = !_$markSt;
+                    _$markSt_seq1 = !_$markSt_seq1;
                     pin3_$0$_$rise$ = 3.000000e-05;
                     pin3_$0$_$fall$ = 3.000000e-05;
                     pin3_$1$_$rise$ = 3.000000e-05;
@@ -1767,7 +1780,7 @@ analog begin
                     _$evntTime_1 = ( $abstime ) + ( 1.000000e-04 );
                 end
                 8: begin
-                    _$markSt = !_$markSt;
+                    _$markSt_seq1 = !_$markSt_seq1;
                     pin5_$0$_$rise$ = 5.000000e-05;
                     pin5_$0$_$fall$ = 5.000000e-05;
                     pin5_$1$_$rise$ = 5.000000e-05;
@@ -1795,7 +1808,7 @@ analog begin
                     _$evntTime_1 = ( $abstime ) + ( 1.000000e-04 );
                 end
                 11: begin
-                    _$markSt = !_$markSt;
+                    _$markSt_seq1 = !_$markSt_seq1;
                     _$eventId_1 = 0;
                     _$state_1 = 12;
                     _$evntTime_1 = ( $abstime ) + ( 1.000000e-04 );
@@ -1855,8 +1868,6 @@ analog begin
         if( ( clk1_$isOn$ ) || ( clk1_$out$ ) )
             clk1_$time$ = ( $abstime ) + ( clk1_$halfPeriod$ );
     end
-    _$markStReal = _$markSt ? ( 1.0 ) : ( 0.0 );
-    V(MARK) <+ transition(_$markStReal, 0.000000e+00, 1.000000e-12, 1.000000e-12);
     pin1_$0$_$voltTran$ = transition(pin1_$0$_$volt$, pin1_$0$_$vDelay$, pin1_$0$_$riseFall$, pin1_$0$_$riseFall$);
     pin1_$0$_$maxCurTran$ = transition(pin1_$0$_$maxCur, pin1_$0$_$iDelay$, pin1_$0$_$riseFall$, pin1_$0$_$riseFall$);
     pin1_$0$_$minCurTran$ = transition(pin1_$0$_$minCur$, pin1_$0$_$iDelay$, pin1_$0$_$riseFall$, pin1_$0$_$riseFall$);
@@ -1905,22 +1916,25 @@ analog begin
     V(pin10[2]) <+ ( I(pin10[2]) )*( pin10_$2$_$serRes$ );
     V(pin11) <+ ( V(pin4) )*( transition(pin11_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin11_$rise, pin11_$fall$) );
     V(pin11) <+ ( I(pin11) )*( pin11_$serRes$ );
-    V(_$2) <+ ( V(pin4) )*( transition(pin12_$0$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$0$_$rise, pin12_$0$_$fall$) );
-    V(_$2, pin12[0]) <+ ( I(_$2, pin12[0]) )*( transition(pin12_$0$_$res$, 0.000000e+00, pin12_$0$_$rise, pin12_$0$_$fall$) );
+    V(_$3) <+ ( V(pin4) )*( transition(pin12_$0$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$0$_$rise, pin12_$0$_$fall$) );
+    V(_$3, pin12[0]) <+ ( I(_$3, pin12[0]) )*( transition(pin12_$0$_$res$, 0.000000e+00, pin12_$0$_$rise, pin12_$0$_$fall$) );
     I(pin12[0]) <+ ( ddt(V(pin12[0])) )*( pin12_$0$_$inCap$ );
-    V(_$3) <+ ( V(pin4) )*( transition(pin12_$1$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$1$_$rise, pin12_$1$_$fall$) );
-    V(_$3, pin12[1]) <+ ( I(_$3, pin12[1]) )*( transition(pin12_$1$_$res$, 0.000000e+00, pin12_$1$_$rise, pin12_$1$_$fall$) );
+    V(_$4) <+ ( V(pin4) )*( transition(pin12_$1$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$1$_$rise, pin12_$1$_$fall$) );
+    V(_$4, pin12[1]) <+ ( I(_$4, pin12[1]) )*( transition(pin12_$1$_$res$, 0.000000e+00, pin12_$1$_$rise, pin12_$1$_$fall$) );
     I(pin12[1]) <+ ( ddt(V(pin12[1])) )*( pin12_$1$_$inCap$ );
-    V(_$4) <+ ( V(pin4) )*( transition(pin12_$2$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$2$_$rise, pin12_$2$_$fall$) );
-    V(_$4, pin12[2]) <+ ( I(_$4, pin12[2]) )*( transition(pin12_$2$_$res$, 0.000000e+00, pin12_$2$_$rise, pin12_$2$_$fall$) );
+    V(_$5) <+ ( V(pin4) )*( transition(pin12_$2$_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin12_$2$_$rise, pin12_$2$_$fall$) );
+    V(_$5, pin12[2]) <+ ( I(_$5, pin12[2]) )*( transition(pin12_$2$_$res$, 0.000000e+00, pin12_$2$_$rise, pin12_$2$_$fall$) );
     I(pin12[2]) <+ ( ddt(V(pin12[2])) )*( pin12_$2$_$inCap$ );
-    V(_$5) <+ ( V(pin4) )*( transition(pin13_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin13_$rise, pin13_$fall$) );
-    V(_$5, pin13) <+ ( I(_$5, pin13) )*( transition(pin13_$res$, 0.000000e+00, pin13_$rise, pin13_$fall$) );
+    V(_$6) <+ ( V(pin4) )*( transition(pin13_$state$ ? ( 1.000000e+00 ) : ( 0.000000e+00 ), 0.000000e+00, pin13_$rise, pin13_$fall$) );
+    V(_$6, pin13) <+ ( I(_$6, pin13) )*( transition(pin13_$res$, 0.000000e+00, pin13_$rise, pin13_$fall$) );
     I(pin13) <+ ( ddt(V(pin13)) )*( pin13_$inCap$ );
     I(pin7, pin14) <+ ( V(pin7, pin14) )*( transition(sw1_$cond$, 0.000000e+00, sw1_$rise, sw1_$fall$) );
+    V(MARK_seq1) <+ transition(_$markSt_seq1 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-08, 1.000000e-08);
+    V(MARK_seq2) <+ transition(_$markSt_seq2 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-08, 1.000000e-08);
 end
 endmodule'''  
         #print(mod.getVA())
+        self.maxDiff = None
         self.assertEqual(mod.getVA()[323:], ref)    
  
     ############################################################################

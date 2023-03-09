@@ -34,9 +34,9 @@ from vagen import *
 mod = HiLevelMod("tb")
 #Create an integer variable that will be initialized to 9
 var1 = mod.var(9)
-#Create a real parameter called TEST_SEQ_PARAM. Initial value is 0.
+#Create an integer parameter called TEST_SEQ_PARAM. Initial value is 0.
 tSeq = mod.par(0, "TEST_SEQ_PARAM")
-#Create a real parameter called parameter 1. Initial value is 0.
+#Create a real parameter called parameter 1. Initial value is 0.0.
 par2 = mod.par(0.0, "parameter1")
 #Create a source measure unit bus
 smu1 = mod.smu("pin1", 3, direction = "inout")
