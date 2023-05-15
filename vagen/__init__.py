@@ -1,10 +1,22 @@
-## @package __init__
+## @package vagen
+#  VerilogA generator
+#
+
+##
+#  @mainpage  VAGEN - VerilogA generator
+#
+#  @section description_main Description
+#  vagen is a verilogA  generator that can be used for  transient verification
+#  and modeling of complex analog IPs. It provides a   wide range   of   basic 
+#  models with voltage sources, current sources,  digital  interfaces, clocks, 
+#  switches, and source measure units that you  can  use  to  build your model 
+#  upon.
+#
+#  @section license_main License
 #     
 #  @author  Rodrigo Pedroso Mendes
 #  @version V1.0
 #  @date    14/02/23 13:37:31
-#
-#  #LICENSE# 
 #    
 #  Copyright (c) 2023 Rodrigo Pedroso Mendes
 #

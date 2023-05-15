@@ -519,14 +519,14 @@ analog begin
         clk1_$halfPeriod$ = 1.000000e+06;
         clk1_$time$ = 1.000000e+06;
         _$markSt_seq1 = 0;
-        _$evntTime_1 = 1.000000e+06;
+        _$evntTime_1 = 1.000000e-09;
         _$state_1 = 0;
-        _$runSt_1 = 1;
+        _$runSt_1 = 0;
         _$eventId_1 = 0;
         _$markSt_seq2 = 0;
-        _$evntTime_2 = 1.000000e+06;
+        _$evntTime_2 = 1.000000e-09;
         _$state_2 = 0;
-        _$runSt_2 = 1;
+        _$runSt_2 = 0;
         _$eventId_2 = 0;
     end
     @( initial_step("tran") ) begin
@@ -656,14 +656,14 @@ analog begin
         clk1_$halfPeriod$ = 1.000000e+06;
         clk1_$time$ = 1.000000e+06;
         _$markSt_seq1 = 0;
-        _$evntTime_1 = 1.000000e+06;
+        _$evntTime_1 = 1.000000e-09;
         _$state_1 = 0;
-        _$runSt_1 = 1;
+        _$runSt_1 = 0;
         _$eventId_1 = 0;
         _$markSt_seq2 = 0;
-        _$evntTime_2 = 1.000000e+06;
+        _$evntTime_2 = 1.000000e-09;
         _$state_2 = 0;
-        _$runSt_2 = 1;
+        _$runSt_2 = 0;
         _$eventId_2 = 0;
     end
     @( timer(_$evntTime_1) )
@@ -977,8 +977,8 @@ analog begin
     V(_$6, pin13) <+ ( I(_$6, pin13) )*( transition(pin13_$res$, 0.000000e+00, pin13_$rise, pin13_$fall$) );
     I(pin13) <+ ( ddt(V(pin13)) )*( pin13_$inCap$ );
     I(pin7, pin14) <+ ( V(pin7, pin14) )*( transition(sw1_$cond$, 0.000000e+00, sw1_$rise, sw1_$fall$) );
-    V(MARK_seq1) <+ transition(_$markSt_seq1 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-08, 1.000000e-08);
-    V(MARK_seq2) <+ transition(_$markSt_seq2 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-08, 1.000000e-08);
+    V(MARK_seq1) <+ transition(_$markSt_seq1 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-10, 1.000000e-10);
+    V(MARK_seq2) <+ transition(_$markSt_seq2 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-10, 1.000000e-10);
 end
 endmodule'''
         self.maxDiff = None
@@ -1471,14 +1471,14 @@ analog begin
         clk1_$halfPeriod$ = 1.000000e+06;
         clk1_$time$ = 1.000000e+06;
         _$markSt_seq1 = 0;
-        _$evntTime_1 = 1.000000e+06;
+        _$evntTime_1 = 1.000000e-09;
         _$state_1 = 0;
-        _$runSt_1 = 1;
+        _$runSt_1 = 0;
         _$eventId_1 = 0;
         _$markSt_seq2 = 0;
-        _$evntTime_2 = 1.000000e+06;
+        _$evntTime_2 = 1.000000e-09;
         _$state_2 = 0;
-        _$runSt_2 = 1;
+        _$runSt_2 = 0;
         _$eventId_2 = 0;
     end
     @( initial_step("tran") ) begin
@@ -1608,14 +1608,14 @@ analog begin
         clk1_$halfPeriod$ = 1.000000e+06;
         clk1_$time$ = 1.000000e+06;
         _$markSt_seq1 = 0;
-        _$evntTime_1 = 1.000000e+06;
+        _$evntTime_1 = 1.000000e-09;
         _$state_1 = 0;
-        _$runSt_1 = 1;
+        _$runSt_1 = 0;
         _$eventId_1 = 0;
         _$markSt_seq2 = 0;
-        _$evntTime_2 = 1.000000e+06;
+        _$evntTime_2 = 1.000000e-09;
         _$state_2 = 0;
-        _$runSt_2 = 1;
+        _$runSt_2 = 0;
         _$eventId_2 = 0;
     end
     @( timer(_$evntTime_1) )
@@ -1929,8 +1929,8 @@ analog begin
     V(_$6, pin13) <+ ( I(_$6, pin13) )*( transition(pin13_$res$, 0.000000e+00, pin13_$rise, pin13_$fall$) );
     I(pin13) <+ ( ddt(V(pin13)) )*( pin13_$inCap$ );
     I(pin7, pin14) <+ ( V(pin7, pin14) )*( transition(sw1_$cond$, 0.000000e+00, sw1_$rise, sw1_$fall$) );
-    V(MARK_seq1) <+ transition(_$markSt_seq1 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-08, 1.000000e-08);
-    V(MARK_seq2) <+ transition(_$markSt_seq2 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-08, 1.000000e-08);
+    V(MARK_seq1) <+ transition(_$markSt_seq1 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-10, 1.000000e-10);
+    V(MARK_seq2) <+ transition(_$markSt_seq2 ? ( 1.0 ) : ( 0.0 ), 0.000000e+00, 1.000000e-10, 1.000000e-10);
 end
 endmodule'''  
         #print(mod.getVA())

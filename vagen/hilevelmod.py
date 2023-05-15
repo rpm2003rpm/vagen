@@ -1,11 +1,11 @@
-## @package tbveriloga
-#  Test benches in veriloga
+## @file hilevelmod.py
+#  Hi level modeling.
 #   
+#  @section license_main License
+#
 #  @author  Rodrigo Pedroso Mendes
 #  @version V1.0
 #  @date    14/02/23 13:37:31
-#
-#  #LICENSE# 
 #    
 #  Copyright (c) 2023 Rodrigo Pedroso Mendes
 #
@@ -36,35 +36,52 @@ from vagen.veriloga import *
 
 
 #-------------------------------------------------------------------------------
-# Create a child class of command.
-# This class of commands are responsible for marking a specific event
+## Mark command class
+#
+#  This class of commands are responsible for storing the command thar marks
+#  an specific event
+#
 #-------------------------------------------------------------------------------
 class Mark(Cmd):
 
     #---------------------------------------------------------------------------
-    # Construtor
-    # Parameters:
-    # cmd - command
+    ## Construtor
+    #
+    #  @param self The object pointer.
+    #  @param cmd Command to be added to the marker.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, cmd):
         checkInstance("cmd", cmd, Cmd)
         self.cmd = cmd
 
     #---------------------------------------------------------------------------
-    # return the command
+    ## Return the command
+    #
+    #  @param self The object pointer.
+    #  @return Command passed to the constructor.
+    #
     #---------------------------------------------------------------------------
     def getCmd(self):
         return self.cmd
 
     #---------------------------------------------------------------------------
-    # Dummy method
+    ## Dummy method.
+    #  Raise exception when runned.
+    #
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------        
     def __str__(self):
         #TODO: Find a better way to fix this
         raise Exception("Mark doesn't have string representation")
 
     #---------------------------------------------------------------------------
-    # Dummy method
+    ## Dummy method.
+    #  Raise exception when runned.
+    #
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------        
     def getVA(self, padding):
         #TODO: Find a better way to fix this
@@ -72,18 +89,22 @@ class Mark(Cmd):
 
 
 #-------------------------------------------------------------------------------
-# Marker class. 
-# Responsible for flipping the state of one variable to mark events and 
-# generates cadance equations that return the time of the events
+## Marker class. 
+#
+#  Responsible for flipping the state of one variable to mark events and 
+#  generates cadence equations that calculate the time of the events
+#
 #-------------------------------------------------------------------------------
 class Marker():
 
     #---------------------------------------------------------------------------
-    # Construtor
-    # Parameters:
-    # hiLeveMod - Hi level model in which the model will be added
-    # name - name of the marker
-    # riseFall - rise and fall times of the marker pin
+    ## Construtor.
+    # 
+    # @param self The object pointer.
+    # @param hiLeveMod  Hi level model in which the analog command will be added
+    # @param name Name of the marker.
+    # @param riseFall Rise and fall times of the marker pin.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, riseFall):
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
@@ -100,15 +121,22 @@ class Marker():
         )
         
     #---------------------------------------------------------------------------
-    # return the  name of the marker
+    ## Return the  name of the Marker.
+    # 
+    #  @param self The object pointer.
+    #  @return Name of the Marker.
+    #
     #---------------------------------------------------------------------------
     def getName(self):
         return self.name
         
     #---------------------------------------------------------------------------
-    # mark a particular event by flipping the  internal variable
-    # Parameters:
-    # name - name of the event
+    ## Mark a particular event by flipping the internal variable.
+    # 
+    #  @param self The object pointer.
+    #  @param name Name of the event.
+    #  @return The Mark command.
+    #
     #---------------------------------------------------------------------------
     def mark(self, name):
         checkType("name", name, str)
@@ -116,24 +144,39 @@ class Marker():
         return Mark(self.markSt.toggle())
 
     #---------------------------------------------------------------------------
-    # Force the internal variable low. You shouldn't use because it will 
-    # break the synchronism between the cadence equations and the events. 
-    # It was implemented for usage in specific power down conditions only.
+    ## Force the internal variable low. 
+    #
+    #  You shouldn't use because it will break the synchronism between the 
+    #  cadence equations and the events. 
+    #  It was implemented for usage in specific power down conditions only.
+    # 
+    #  @param self The object pointer.
+    #  @return The Mark command.
+    #
     #---------------------------------------------------------------------------
     def low(self): 
         return Mark(self.markSt.eq(False))
 
     #---------------------------------------------------------------------------
-    # Force the internal variable high. You shouldn't use because it will 
-    # break the synchronism between the cadence equations and the events. 
-    # It was implemented for usage in specific power down conditions only.
+    ## Force the internal variable high. 
+    #
+    #  You shouldn't use because it will break the synchronism between the 
+    #  cadence equations and the events. 
+    #  It was implemented for usage in specific power down conditions only.
+    # 
+    #  @param self The object pointer.
+    #  @return The Mark command.
+    #
     #---------------------------------------------------------------------------
-    def high(self, name):
+    def high(self):
         return Mark(self.markSt.eq(True))
 
     #---------------------------------------------------------------------------
-    # Return a list with the cadence equations for the marker     
-    # Not implemented yet
+    ## Return a dictionay with the cadence equations for the marker     
+    # 
+    #  @param self The object pointer.
+    #  @return The dictionary with the cadence equations.
+    #
     #---------------------------------------------------------------------------
     def getEqs(self):
         ans = {}
@@ -145,16 +188,20 @@ class Marker():
         
 
 #-------------------------------------------------------------------------------
-# Create a child class of command.
-# This class of commands are responsible for wating a specific signal before
-# going to next state of the test sequence state machine 
+## WaitSignal command class
+# 
+#  This class of commands are responsible for wating a specific Event before
+#  allowing a test sequence to continue 
+#
 #-------------------------------------------------------------------------------
 class WaitSignal(Cmd):
 
     #---------------------------------------------------------------------------
-    # Construtor
-    # Parameters:
-    # evnt - event to be waited for
+    ## Construtor.
+    # 
+    #  @param self The object pointer.
+    #  @param evnt Event to be waited for.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, evnt):
         checkInstance("evnt", evnt, Event)
@@ -162,37 +209,53 @@ class WaitSignal(Cmd):
         super(WaitSignal, self).__init__("")
 
     #---------------------------------------------------------------------------
-    # return the event that triggers the next state
+    ## Return the event that triggers the next state.
+    #
+    #  @param self The object pointer.
+    #  @return Event passed to the constructor.
+    #
     #---------------------------------------------------------------------------
     def getEvnt(self):
         return self.evnt
         
     #---------------------------------------------------------------------------
-    # Dummy method
-    #---------------------------------------------------------------------------        
+    ## Dummy method.
+    #  Raise exception when runned.
+    #
+    #  @param self The object pointer.
+    #
+    #---------------------------------------------------------------------------         
     def __str__(self):
         #TODO: Find a better way to fix this
         raise Exception("Wait doesn't have string representation")
 
     #---------------------------------------------------------------------------
-    # Dummy method
-    #---------------------------------------------------------------------------        
+    ## Dummy method.
+    #  Raise exception when runned.
+    #
+    #  @param self The object pointer.
+    #
+    #---------------------------------------------------------------------------      
     def getVA(self, padding):
         #TODO: Find a better way to fix this
         raise Exception("Wait can't be outside seq")
 
 
 #-------------------------------------------------------------------------------
-# Create a child class of command.
-# This class of commands are responsible for wating a delay before
-# going to next state of the test sequence state machine 
+## WaitUs command class.
+# 
+#  This class of commands are responsible for wating a specific delay before
+#  allowing a test sequence to continue.
+#
 #-------------------------------------------------------------------------------
 class WaitUs(Cmd):
 
     #---------------------------------------------------------------------------
-    # Construtor
-    # Parameters:
-    # delay - real expression holding the delay to be waited for
+    ## Construtor.
+    # 
+    #  @param self The object pointer.
+    #  @param delay Delay to be waited for.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, delay):
         checkReal("delay", delay)
@@ -200,38 +263,54 @@ class WaitUs(Cmd):
         super(WaitUs, self).__init__("")
 
     #---------------------------------------------------------------------------
-    # return the delay expression
+    ## Return the delay that triggers the next state.
+    #
+    #  @param self The object pointer.
+    #  @return Delay passed to the constructor.
+    #
     #---------------------------------------------------------------------------
     def getDelay(self):
         return self.delay
         
     #---------------------------------------------------------------------------
-    # Dummy method
-    #---------------------------------------------------------------------------        
+    ## Dummy method.
+    #  Raise exception when runned.
+    #
+    #  @param self The object pointer.
+    #
+    #---------------------------------------------------------------------------       
     def __str__(self):
         #TODO: Find a better way to fix this
         raise Exception("Wait doesn't have string representation")
 
     #---------------------------------------------------------------------------
-    # Dummy method
-    #---------------------------------------------------------------------------        
+    ## Dummy method.
+    #  Raise exception when runned.
+    #
+    #  @param self The object pointer.
+    #
+    #---------------------------------------------------------------------------      
     def getVA(self, padding):
         #TODO: Find a better way to fix this
         raise Exception("Wait can't be outside seq")
 
 
 #-------------------------------------------------------------------------------
-# DigBus. Child of a list. It implements aditional methods to deal with
-# read and write operations to a bus. It also overrides the slice method, so
-# it works similar to a slice of a bus in verilog
+## Bus class. Child of a list. 
+#  It implements aditional methods to deal with read and write operations to 
+#  a bus. It also overrides the slice method, so it works similar to a slice 
+#  of a bus in verilog.
+#
 #-------------------------------------------------------------------------------
 class Bus(list):
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # digType - type of the digital pin
-    # digBusType - type of the bus
+    ## Constructor
+    #
+    #  @param self The object pointer.
+    #  @param Type Type of the bus elements
+    #  @param busType Type of the bus
+    #
     #---------------------------------------------------------------------------
     def __init__(self, Type, busType):
         super(Bus, self).__init__()
@@ -239,9 +318,12 @@ class Bus(list):
         self.busType = busType
     
     #---------------------------------------------------------------------------
-    # slice override
-    # Parameters:
-    # key - key can be an slice or index
+    ## Slice override.
+    #  Override the slice operator, so it will be in the format  [msb:lsb:step]
+    #  @param self The object pointer.
+    #  @param key Key can be an slice or index
+    #  @return Another bus or an element.
+    #
     #---------------------------------------------------------------------------
     def __getitem__(self, key):
         if isinstance(key, slice):
@@ -265,9 +347,10 @@ class Bus(list):
         return super(Bus, self).__getitem__(key)
 
     #---------------------------------------------------------------------------
-    # Append override
-    # Parameters:
-    # item - item to be appended to the bus
+    ## Append override
+    #  @param self The object pointer.
+    #  @param item Item to be appended to the bus
+    #
     #---------------------------------------------------------------------------
     def append(self, item):
         checkInstance("item", item, self.Type)
@@ -275,19 +358,22 @@ class Bus(list):
         
         
 #-------------------------------------------------------------------------------
-# VDC class. Child of Electrical implementing aditional features in order to 
-# work as a voltage source.
+## Vdc class. 
+#  Child of Electrical implementing aditional features in order to work as a 
+#  voltage source.
+#
 #-------------------------------------------------------------------------------
 class Vdc(Electrical):
     
     #---------------------------------------------------------------------------
-    # Construtor
-    # Parameters:
-    # hiLeveMod - Hi level model in which the model will be added
-    # name - name of the voltage source electrical pin
-    # value - real expression holding the inital voltage
-    # rise - real expression holding the initial rise time
-    # fall - real expression holding the initial fall time
+    ## Construtor.
+    #  @param self The object pointer.
+    #  @param hiLeveMod Hi level model in which the analog command will be added.
+    #  @param name Name of the voltage source electrical pin.
+    #  @param value Real expression holding the inital voltage.
+    #  @param rise Real expression holding the initial rise time.
+    #  @param fall Real expression holding the initial fall time.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, value, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
@@ -307,10 +393,14 @@ class Vdc(Electrical):
         ) 
     
     #---------------------------------------------------------------------------
-    # Set the rise and the fall times for changes in the voltage
-    # Parameters:
-    # rise - real expression holding the rise time for changes in the voltage
-    # fall - real expression holding the fall time for changes in the voltage
+    ## Set the rise and the fall times for changes in the voltage.
+    #  @param self The object pointer.
+    #  @param rise Real expression holding the rise time for changes in the 
+    #         voltage.
+    #  @param fall Real expression holding the fall time for changes in the 
+    #         voltage.
+    #  @return The commands to change the rise and fall times.
+    #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         checkReal("rise", rise)
@@ -321,9 +411,11 @@ class Vdc(Electrical):
         )
 
     #---------------------------------------------------------------------------
-    # Change the value of the voltage source
-    # Parameters:
-    # value - real expression holding the votlage.
+    ## Change the value of the voltage source.
+    #  @param self The object pointer.
+    #  @param value Real expression holding the voltage.
+    #  @return The commands to change the voltage.
+    #  
     #---------------------------------------------------------------------------
     def applyV(self, value):
         checkReal("value", value)
@@ -331,23 +423,31 @@ class Vdc(Electrical):
 
 
 #-------------------------------------------------------------------------------
-# VdcBus. Child of a list. It implements aditional methods to deal with
-# read and write operations to a bus. It also overrides the slice method, so
-# it works similar to a slice of a bus in verilog
+## VdcBus class. Child of a list. 
+#  It implements aditional methods to deal with read and write operations to 
+#  a bus. It also overrides the slice method, so it works similar to a slice 
+#  of a bus in verilog.
+#
 #-------------------------------------------------------------------------------
 class VdcBus(Bus):
 
     #---------------------------------------------------------------------------
-    # Constructor
+    ## Constructor.
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------
     def __init__(self):
         super(VdcBus, self).__init__(Vdc, VdcBus)
         
     #---------------------------------------------------------------------------
-    # Set the rise and the fall times for all pins in the Bus
-    # Parameters:
-    # rise - real expression holding the rise time
-    # fall - real expression holding the fall time
+    ## Set the rise and the fall times for changes in the voltage.
+    #  @param self The object pointer.
+    #  @param rise Real expression holding the rise time for changes in the 
+    #         voltage.
+    #  @param fall Real expression holding the fall time for changes in the 
+    #         voltage.
+    #  @return The commands to change the rise and fall times.
+    #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         checkReal("rise", rise)
@@ -358,9 +458,11 @@ class VdcBus(Bus):
         return ans
 
     #---------------------------------------------------------------------------
-    # Change the value of the voltage source for the entire bus
-    # Parameters:
-    # value - real expression holding the voltage
+    ## Change the value of the voltage source.
+    #  @param self The object pointer.
+    #  @param value Real expression holding the voltage.
+    #  @return The commands to change the voltage.
+    #  
     #---------------------------------------------------------------------------
     def applyV(self, value):
         checkReal("value", value)
@@ -371,19 +473,22 @@ class VdcBus(Bus):
         
         
 #-------------------------------------------------------------------------------
-# IDC class. Child of Electrical implementing aditional features in order to 
-# work as a current source.
+## Idc class. 
+#  Child of Electrical implementing aditional features in order to work as a 
+#  current source.
+#
 #-------------------------------------------------------------------------------
 class Idc(Electrical):
     
     #---------------------------------------------------------------------------
-    # Construtor
-    # Parameters:
-    # hiLeveMod - Hi level model in which the model will be added
-    # name - name of the current source electrical pin
-    # value - real expression holding the inital current
-    # rise - real expression holding the initial rise time
-    # fall - real expression holding the initial fall time
+    ## Construtor.
+    #  @param self The object pointer.
+    #  @param hiLeveMod Hi level model in which the analog command will be added.
+    #  @param name Name of the current source electrical pin.
+    #  @param value Real expression holding the inital voltage.
+    #  @param rise Real expression holding the initial rise time.
+    #  @param fall Real expression holding the initial fall time.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, value, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
@@ -403,10 +508,14 @@ class Idc(Electrical):
         ) 
     
     #---------------------------------------------------------------------------
-    # Set the rise and the fall times for changes in the current
-    # Parameters:
-    # rise - real expression holding the rise time for changes in the current
-    # fall - real expression holding the fall time for changes in the current
+    ## Set the rise and the fall times for changes in the voltage.
+    #  @param self The object pointer.
+    #  @param rise Real expression holding the rise time for changes in the 
+    #         current.
+    #  @param fall Real expression holding the fall time for changes in the 
+    #         current.
+    #  @return The commands to change the rise and fall times.
+    #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         checkReal("rise", rise)
@@ -417,9 +526,11 @@ class Idc(Electrical):
         )
 
     #---------------------------------------------------------------------------
-    # Change the value of the current source
-    # Parameters:
-    # value - real expression holding the current
+    ## Change the value of the current source.
+    #  @param self The object pointer.
+    #  @param value Teal expression holding the current.
+    #  @return The commands to change the current.
+    #  
     #---------------------------------------------------------------------------
     def applyI(self, value):
         checkReal("value", value)
@@ -427,23 +538,31 @@ class Idc(Electrical):
 
 
 #-------------------------------------------------------------------------------
-# IdcBus. Child of a list. It implements aditional methods to deal with
-# read and write operations to a bus. It also overrides the slice method, so
-# it works similar to a slice of a bus in verilog
+## IdcBus class. Child of a list. 
+#  It implements aditional methods to deal with read and write operations to 
+#  a bus. It also overrides the slice method, so it works similar to a slice 
+#  of a bus in verilog.
+#
 #-------------------------------------------------------------------------------
 class IdcBus(Bus):
 
     #---------------------------------------------------------------------------
-    # Constructor
+    ## Constructor.
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------
     def __init__(self):
         super(IdcBus, self).__init__(Idc, IdcBus)
         
     #---------------------------------------------------------------------------
-    # Set the rise and the fall times for all pins in the Bus
-    # Parameters:
-    # rise - real expression holding the rise time
-    # fall - real expression holding the fall time
+    ## Set the rise and the fall times for changes in the voltage.
+    #  @param self The object pointer.
+    #  @param rise Real expression holding the rise time for changes in the 
+    #         current.
+    #  @param fall Real expression holding the fall time for changes in the 
+    #         current.
+    #  @return The commands to change the rise and fall times.
+    #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         checkReal("rise", rise)
@@ -454,9 +573,11 @@ class IdcBus(Bus):
         return ans
 
     #---------------------------------------------------------------------------
-    # Change the value of the current source for the entire bus
-    # Parameters:
-    # value - real expression holding the current
+    ## Change the value of the current source.
+    #  @param self The object pointer.
+    #  @param value Real expression holding the current.
+    #  @return The commands to change the current.
+    #  
     #---------------------------------------------------------------------------
     def applyI(self, value):
         checkReal("value", value)
@@ -467,20 +588,22 @@ class IdcBus(Bus):
         
 
 #-------------------------------------------------------------------------------
-# SMU class. Child of Electrical implementing aditional features in order to 
-# work as a Source Measure Unit
+## Smu class. Child of Electrical implementing aditional features in order to 
+#  work as a Source Measure Unit
+#
 #-------------------------------------------------------------------------------
 class Smu(Electrical):
-    
+
     #---------------------------------------------------------------------------
-    # Construtor
-    # Parameters:
-    # hiLeveMod - Hi level model in which the model will be added
-    # name - name of the current source electrical pin
-    # volt - real expression holding the inital voltage
-    # minCur - real expression holding the inital minimum current
-    # maxCur - real expression holding the inital maximum current
-    # res - real expression holding the resitance
+    ## Construtor.
+    #  @param self The object pointer.
+    #  @param hiLeveMod Hi level model in which the analog command will be added.
+    #  @param name Name of the smu electrical pin.
+    #  @param volt Real expression holding the inital voltage.
+    #  @param minCur Real expression holding the inital minimum current.
+    #  @param maxCur Real expression holding the inital maximum current.
+    #  @param res Real expression holding the resitance.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, volt, minCur, maxCur, res): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
@@ -544,11 +667,13 @@ class Smu(Electrical):
         ) 
     
     #---------------------------------------------------------------------------
-    # Configure the smu as current limited voltage source and apply the desired
-    # voltage.
-    # Parameters:
-    # value - real expression holding the voltage to be applied
-    # limit - real expression holding the current limit
+    ## Configure the smu as current limited voltage source and apply the desired
+    #  voltage.
+    #  @param self The object pointer.
+    #  @param value Real expression holding the voltage to be applied.
+    #  @param limit Real expression holding the current limit.
+    #  @return The commands to configure the Smu in voltage mode.
+    #
     #---------------------------------------------------------------------------
     def applyV(self, value, limit):
         checkReal("value", value)
@@ -565,13 +690,15 @@ class Smu(Electrical):
         )
 
     #---------------------------------------------------------------------------
-    # Configure the smu as voltage limited current source and apply the desired
+    ## Configure the smu as voltage limited current source and apply the desired
     # current. Positive currents are sink current sources. The limit corresponds 
     # to the uppper voltage when value < 0 and to the lower voltage when value > 
     # 0.
-    # Parameters:
-    # value - real expression holding the current to be applied
-    # limit - real expression holding the voltage limit
+    #  @param self The object pointer.
+    #  @param value Real expression holding the current to be applied.
+    #  @param limit Real expression holding the voltage limit.
+    #  @return The commands to configure the Smu in current mode.
+    # 
     #---------------------------------------------------------------------------
     def applyI(self, value, limit):
         checkReal("value", value)
@@ -588,9 +715,11 @@ class Smu(Electrical):
         )
 
     #---------------------------------------------------------------------------
-    # Configure the resistive load.
-    # Parameters:
-    # value - real expression holding the value of the resistor
+    ## Configure the resistive load.
+    #  @param self The object pointer.
+    #  @param value Real expression holding the value of the resistor.
+    #  @return The commands to configure the Smu in resistance mode.
+    # 
     #---------------------------------------------------------------------------
     def applyR(self, value):
         checkReal("value", value)
@@ -607,24 +736,33 @@ class Smu(Electrical):
 
 
 #-------------------------------------------------------------------------------
-# SmuBus. Child of a list. It implements aditional methods to deal with
-# read and write operations to a bus. It also overrides the slice method, so
-# it works similar to a slice of a bus in verilog
+## SmuBus class. Child of a list. 
+#  It implements aditional methods to deal with read and write operations to 
+#  a bus. It also overrides the slice method, so it works similar to a slice 
+#  of a bus in verilog.
+#
 #-------------------------------------------------------------------------------
 class SmuBus(Bus):
 
     #---------------------------------------------------------------------------
-    # Constructor
+    ## Constructor
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------
     def __init__(self):
         super(SmuBus, self).__init__(Smu, SmuBus)
       
 
     #---------------------------------------------------------------------------
-    # Change the value of the current source for the entire bus
-    # Parameters:
-    # value - real expression holding the current to be applied
-    # limit - real expression holding the voltage limit
+    ## Configure the smu as voltage limited current source and apply the desired
+    # current. Positive currents are sink current sources. The limit corresponds 
+    # to the uppper voltage when value < 0 and to the lower voltage when value > 
+    # 0.
+    #  @param self The object pointer.
+    #  @param value Real expression holding the current to be applied.
+    #  @param limit Real expression holding the voltage limit.
+    #  @return The commands to configure the Smu in current mode.
+    # 
     #---------------------------------------------------------------------------
     def applyI(self, value, limit):
         checkReal("value", value)
@@ -635,10 +773,13 @@ class SmuBus(Bus):
         return ans
         
     #---------------------------------------------------------------------------
-    # Change the value of the current source for the entire bus
-    # Parameters:
-    # value - real expression holding the voltage to be applied
-    # limit - real expression holding the current limit
+    ## Configure the smu as current limited voltage source and apply the desired
+    #  voltage.
+    #  @param self The object pointer.
+    #  @param value Real expression holding the voltage to be applied.
+    #  @param limit Real expression holding the current limit.
+    #  @return The commands to configure the Smu in voltage mode.
+    #
     #---------------------------------------------------------------------------
     def applyV(self, value, limit):
         checkReal("value", value)
@@ -649,9 +790,11 @@ class SmuBus(Bus):
         return ans
         
     #---------------------------------------------------------------------------
-    # Change the value of the current source for the entire bus
-    # Parameters:
-    # value - real expression holding the current
+    ## Configure the resistive load.
+    #  @param self The object pointer.
+    #  @param value Real expression holding the value of the resistor.
+    #  @return The commands to configure the Smu in resistance mode.
+    # 
     #---------------------------------------------------------------------------
     def applyR(self, value):
         checkReal("value", value)
@@ -662,25 +805,28 @@ class SmuBus(Bus):
          
                 
 #-------------------------------------------------------------------------------
-# DigOut class. Child of Electrical implementing aditional features in order to 
-# work as a digital output pin
+## DigOut class. Child of Electrical implementing aditional features in order to 
+#  work as a digital output pin.
+#
 #-------------------------------------------------------------------------------
 class DigOut(Electrical):
     
     #---------------------------------------------------------------------------
-    # Construtor
-    # Parameters:
-    # hiLeveMod - Hi level model in which the model will be added
-    # name - name of the electrical pin
-    # state - boolean expression holding the intial state of the digital pin
-    # domain - electrical pin. The voltage across the domain will be equal
-    #          the voltage in the digial pins when the logical state is 1.
-    # inCap - dummy parameter for consistency  
-    # serRes - real expression holding the value of the series resistance. This
-    #       value will be set at the beggining of the simulation and can't be
-    #       changed afterwards
-    # rise - real expression holding the initial rise time
-    # fall - real expression holding the initial fall time
+    ## Construtor
+    #  @param self The object pointer
+    #  @param hiLeveMod Hi level model in which the analog command will be added.
+    #  @param name Name of the electrical pin.
+    #  @param state Boolean expression holding the intial state of the digital 
+    #         pin.
+    #  @param domain electrical pin. The voltage across the digial pins will be
+    #         equal to the domain when the logical state is 1.
+    #  @param inCap Dummy parameter for consistency.  
+    #  @param serRes Real expression holding the value of the series resistance.
+    #         This value will be set at the beggining of the simulation and 
+    #         can't be changed afterwards.
+    #  @param rise Real expression holding the initial rise time.
+    #  @param fall Real expression holding the initial fall time.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
@@ -709,10 +855,12 @@ class DigOut(Electrical):
         ) 
    
     #---------------------------------------------------------------------------
-    # Set the rise and the fall times of the digital output pin
-    # Parameters:
-    # rise - real expression holding the rise time
-    # fall - real expression holding the fall time
+    ## Set the rise and the fall times of the digital output pin.
+    #  @param self The object pointer.
+    #  @param Rise Real expression holding the rise time.
+    #  @param Fall Real expression holding the fall time.
+    #  @return The commands to change the rise and fall times.
+    #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         checkReal("rise", rise)
@@ -723,9 +871,11 @@ class DigOut(Electrical):
         )
 
     #---------------------------------------------------------------------------
-    # Write a state to the digital output
-    # Parameters:
-    # value - boolean expression representing the state to be written
+    ## Write a state to the digital output.
+    #  @param self The object pointer.
+    #  @param value Boolean expression representing the state to be written.
+    #  @return The commands to change the stare of a digital pin.
+    #
     #---------------------------------------------------------------------------
     def write(self, value):
         checkBool("value", value)
@@ -733,23 +883,27 @@ class DigOut(Electrical):
 
 
 #-------------------------------------------------------------------------------
-# DigIn class. Child of Electrical implementing aditional features in order to 
-# work as a digital input pin
+## DigIn class. Child of Electrical implementing aditional features in order to 
+#  work as a digital input pin
+#
 #-------------------------------------------------------------------------------
 class DigIn(Electrical):
     
     #---------------------------------------------------------------------------
-    # hiLeveMod - Hi level model in which the model will be added
-    # name - name of the electrical pin
-    # state - dummy parameter for consistency
-    # domain - electrical pin. The voltage across the domain will be equal
-    #          the voltage in the digial pins when the logical state is 1.
-    # inCap - real expression holding the value of the input capacitance. This
-    #       value will be set at the beggining of the simulation and can't be
-    #       changed afterwards
-    # serRes - dummy parameter for consistency
-    # rise - dummy parameter for consistency
-    # fall - dummy parameter for consistency
+    ## Constructor
+    #  @param self The object pointer.
+    #  @param hiLeveMod Hi level model in which the analog command will be added.
+    #  @param name Name of the electrical pin.
+    #  @param state Dummy parameter for consistency.
+    #  @param domain Electrical pin. The voltage across the domain will be equal
+    #         the voltage in the digial pins when the logical state is 1.
+    #  @param inCap Real expression holding the value of the input capacitance. 
+    #         This value will be set at the beggining of the simulation and can't 
+    #         be changed afterwards.
+    #  @param serRes Dummy parameter for consistency.
+    #  @param rise Dummy parameter for consistency.
+    #  @param fall Dummy parameter for consistency.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
@@ -763,33 +917,42 @@ class DigIn(Electrical):
         hiLevelMod.endAnalog(
             self.iCont(ddt(self.v)*self.inCap)
         ) 
-    
+ 
+    #---------------------------------------------------------------------------
+    ## Read a state from the digital input.
+    #  @param self The object pointer.
+    #  @return The commands to read the stare of a digital pin.
+    #
+    #---------------------------------------------------------------------------   
     def read(self):
         return self.v > self.domain.v/2
 
 
 #-------------------------------------------------------------------------------
-# DigInOut class. Child of Electrical implementing aditional features in order to 
-# work as a digital input/output pin
+## DigInOut class. Child of Electrical implementing aditional features in order 
+#  to work as a digital input/output pin
+#
 #-------------------------------------------------------------------------------
 class DigInOut(DigIn, DigOut):
     
     #---------------------------------------------------------------------------
-    # Construtor
-    # Parameters:
-    # hiLeveMod - Hi level model in which the model will be added
-    # name - name of the electrical pin
-    # state - boolean expression holding the intial state of the digital pin
-    # domain - electrical pin. The voltage across the domain will be equal
-    #          the voltage in the digial pins when the logical state is 1.
-    # inCap - real expression holding the value of the input capacitance. This
-    #       value will be set at the beggining of the simulation and can't be
-    #       changed afterwards
-    # serRes - real expression holding the value of the series resistance. This
-    #       value will be set at the beggining of the simulation and can't be
-    #       changed afterwards
-    # rise - real expression holding the initial rise time
-    # fall - real expression holding the initial fall time
+    ## Construtor
+    #  @param self The object pointer.
+    #  @param hiLeveMod Hi level model in which the analog command will be added.
+    #  @param name Name of the electrical pin.
+    #  @param state Boolean expression holding the intial state of the digital 
+    #         pin.
+    #  @param domain electrical pin. The voltage across the digial pins will be
+    #         equal to the domain when the logical state is 1.
+    #  @param inCap Real expression holding the value of the input capacitance. 
+    #         This value will be set at the beggining of the simulation and can't 
+    #         be changed afterwards.
+    #  @param serRes Real expression holding the value of the series resistance.
+    #         This value will be set at the beggining of the simulation and 
+    #         can't be changed afterwards.
+    #  @param rise Real expression holding the initial rise time.
+    #  @param fall Real expression holding the initial fall time.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
@@ -827,36 +990,47 @@ class DigInOut(DigIn, DigOut):
         ) 
 
     #---------------------------------------------------------------------------
-    # Set the pins at hiz in order to use the read function
+    ## Set the pin at hiz in order to use the read function.
+    #  @param self The object pointer.
+    #  @return The commands to change the inOut pin to hiZ (input).
+    #
     #---------------------------------------------------------------------------
     def hiZ(self):
         return self.res.eq(1e12)
 
     #---------------------------------------------------------------------------
-    # Set the pins to low impedance in order to use the write function
+    ## Set the pin to low impedance in order to use the write function
+    #  @param self The object pointer.
+    #  @return The commands to change the inOut pin to lowZ (output).
+    #
     #---------------------------------------------------------------------------
     def lowZ(self):
         return self.res.eq(self.serRes)
 
                
 #-------------------------------------------------------------------------------
-# DigBuOut. Child of a list. It implements aditional methods to deal with
-# read and write operations to a bus. It also overrides the slice method, so
-# it works similar to a slice of a bus in verilog
+## DigBusOut class. Child of a list. It implements aditional methods to deal with
+#  read and write operations to a bus. It also overrides the slice method, so
+#  it works similar to a slice of a bus in verilog
+#
 #-------------------------------------------------------------------------------
 class DigBusOut(Bus):
 
     #---------------------------------------------------------------------------
-    # Constructor
+    ## Constructor
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------
     def __init__(self):
         super(DigBusOut, self).__init__(DigOut, DigBusOut)
         
     #---------------------------------------------------------------------------
-    # Set the rise and the fall times for all pins in the Bus
-    # Parameters:
-    # rise - real expression holding the rise time
-    # fall - real expression holding the fall time
+    ## Set the rise and the fall times of all digital output pin.
+    #  @param self The object pointer.
+    #  @param Rise Real expression holding the rise time.
+    #  @param Fall Real expression holding the fall time.
+    #  @return The commands to change the rise and fall times.
+    #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         checkReal("rise", rise)
@@ -867,9 +1041,11 @@ class DigBusOut(Bus):
         return ans
 
     #---------------------------------------------------------------------------
-    # Convert the value to binary and write it to the bus
-    # Parameters:
-    # value - integer expression representing the value
+    ## Write a binary to the digital output bus.
+    #  @param self The object pointer.
+    #  @param value Integer expression representing the value to be written.
+    #  @return The commands to write to a digital bus.
+    #
     #---------------------------------------------------------------------------
     def write(self, value):
         checkInteger("value", value)
@@ -884,22 +1060,28 @@ class DigBusOut(Bus):
 
 
 #-------------------------------------------------------------------------------
-# DigBuIn. Child of a list. It implements aditional methods to deal with
-# read and write operations to a bus. It also overrides the slice method, so
-# it works similar to a slice of a bus in verilog
+## DigBusIn class. Child of a list. It implements aditional methods to deal with
+#  read and write operations to a bus. It also overrides the slice method, so
+#  it works similar to a slice of a bus in verilog
+#
 #-------------------------------------------------------------------------------
 class DigBusIn(Bus):
 
     #---------------------------------------------------------------------------
-    # Constructor
+    ## Constructor
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------
     def __init__(self):  
         super(DigBusIn, self).__init__(DigIn, DigBusIn)
             
     #---------------------------------------------------------------------------
-    # Returns an Integer expression representing the convertion of binary 
-    # inputs to Unsigned Integer
-    #---------------------------------------------------------------------------
+    ## Read a binary from the digital input bus.
+    #  @param self The object pointer.
+    #  @param signed Read as signed if True and unsigned otherwise.
+    #  @return The commands to read a digital bus as binary.
+    #
+    #---------------------------------------------------------------------------   
     def read(self, signed = False):
         assert len(self) <= 32, "Can't read a bus wider than 32 bit"
         assert len(self) <= 31 or signed, \
@@ -918,20 +1100,26 @@ class DigBusIn(Bus):
 
 
 #-------------------------------------------------------------------------------
-# DigBuInOut. Child of a list. It implements aditional methods to deal with
-# read and write operations to a bus. It also overrides the slice method, so
-# it works similar to a slice of a bus in verilog
+## DigBusInOut class. Child of a list. It implements aditional methods to deal 
+#  with read and write operations to a bus. It also overrides the slice method, 
+#  so it works similar to a slice of a bus in verilog
+#
 #-------------------------------------------------------------------------------
 class DigBusInOut(DigBusIn, DigBusOut):
  
     #---------------------------------------------------------------------------
-    # Constructor
+    ## Constructor
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------
     def __init__(self):   
         super(DigBusOut, self).__init__(DigInOut, DigBusInOut)
 
     #---------------------------------------------------------------------------
-    # Set the pins at hiz in order to use the read function
+    ## Set the pins at hiz in order to use the read function.
+    #  @param self The object pointer.
+    #  @return The commands to change the inOut pin to hiZ (input).
+    #
     #---------------------------------------------------------------------------
     def hiZ(self):
         ans = CmdList()
@@ -940,7 +1128,10 @@ class DigBusInOut(DigBusIn, DigBusOut):
         return ans
 
     #---------------------------------------------------------------------------
-    # Set the pins to low impedance in order to use the write function
+    ## Set the pins to low impedance in order to use the write function
+    #  @param self The object pointer.
+    #  @return The commands to change the inOut pin to lowZ (output).
+    #
     #---------------------------------------------------------------------------
     def lowZ(self):
         ans = CmdList()
@@ -950,23 +1141,25 @@ class DigBusInOut(DigBusIn, DigBusOut):
 
 
 #-------------------------------------------------------------------------------
-# Switch between two nodes. 
+## Sw class. Switch between two nodes. 
+#
 #-------------------------------------------------------------------------------
 class Sw():
 
     swCount = 1
     
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # hiLeveMod - Hi level model in which the model will be added
-    # pin1 - first node
-    # pin2 - second node
-    # cond - Real expression representing the initial switch conductance
-    # rise - Real expression representing the rise time for changes in the 
-    #        conductance
-    # fall - Real expression representing the fall time for changes in the 
-    #        conductance
+    ## Construtor
+    #  @param self The object pointer.
+    #  @param hiLeveMod Hi level model in which the analog command will be added.
+    #  @param pin1 First node
+    #  @param pin2 Second node
+    #  @param cond Real expression representing the initial switch conductance
+    #  @param rise Real expression representing the rise time for changes in the 
+    #         conductance
+    #  @param fall Real expression representing the fall time for changes in the 
+    #         conductance
+    #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, pin1, pin2, cond, rise, fall):
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
@@ -993,10 +1186,12 @@ class Sw():
         )
 
     #---------------------------------------------------------------------------
-    # Set the rise and the fall times of the digital output pin
-    # Parameters:
-    # rise - real expression holding the rise time
-    # fall - real expression holding the fall time
+    ## Set the rise and the fall times of all digital output pin.
+    #  @param self The object pointer.
+    #  @param Rise Real expression holding the rise time.
+    #  @param Fall Real expression holding the fall time.
+    #  @return The commands to change the rise and fall times.
+    #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         checkReal("rise", rise)
@@ -1007,9 +1202,11 @@ class Sw():
         )
 
     #---------------------------------------------------------------------------
-    # Set the conductance
-    # Parameters:
-    # cond - new value for the conductance
+    ## Set the conductance
+    #  @param self The object pointer.
+    #  @param cond Real expression holding the conductance value.
+    #  @return The commands to change the conductance.
+    #
     #---------------------------------------------------------------------------
     def setCond(self, cond):
         checkReal("cond", cond)
@@ -1017,17 +1214,19 @@ class Sw():
 
 
 #-------------------------------------------------------------------------------
-# Clock using a digital pin 
+## Clock class.
+# 
 #-------------------------------------------------------------------------------
 class Clock():
     
     clockCount = 1
     
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # hiLeveMod - Hi level model in which the model will be added
-    # pin - digital output or inout pin
+    ## Constructor
+    #  @param self The object pointer.
+    #  @param hiLeveMod Hi level model in which the analog command will be added.
+    #  @param pin DigIn or DigInOut
+    #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, pin):
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
@@ -1053,7 +1252,10 @@ class Clock():
         )
 
     #---------------------------------------------------------------------------
-    # Turn the clock generator on
+    ## Turn the clock generator on
+    #  @param self The object pointer.
+    #  @param frequency frequency of the clock generator.
+    #
     #---------------------------------------------------------------------------
     def on(self, frequency):
         checkReal("frequency", frequency)
@@ -1064,24 +1266,28 @@ class Clock():
                )
 
     #---------------------------------------------------------------------------
-    # Turn the clock generator off
+    ## Turn the clock generator off
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------
     def off(self):
-        return self.isOn.eq(Bool(0))
+        return self.isOn.eq(False)
 
 
 #-------------------------------------------------------------------------------
-# Child of the module class in the veriloA module. It provides aditional
-# methods for dealing with digital bus, current sources, voltage sources, 
-# clocks and switches
+## HiLevelMod class. Child of the module class in the veriloA module. It 
+#  provides aditional methods for dealing with digital bus, current sources, 
+#  voltage sources, clocks and switches
+#
 #-------------------------------------------------------------------------------
 class HiLevelMod(Module):
   
     #---------------------------------------------------------------------------
-    # Constructor 
-    # Parameters:
-    # tbName - name of the test bench
-    # timeTol - time tolerances for the timer
+    ## Constructor 
+    #  @param self The object pointer.
+    #  @param tbName Name of the test bench.
+    #  @param timeTol Time tolerances for the timer.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, tbName, timeTol = None):
         super(HiLevelMod, self).__init__(tbName)
@@ -1117,11 +1323,15 @@ class HiLevelMod(Module):
         )
                     
     #---------------------------------------------------------------------------
-    # Add variable to the module. Also, the intial value of the variable will 
-    # be set during the static analysis and the initial step of transient.
-    # Parameters:
-    # name - name of the variable
-    # value - Initial value
+    ## Add variable to the module. Also, the intial value of the variable will 
+    #  be set during the static analysis and the initial step of transient.
+    #  The type of the variable will be compatible with the type of the initial
+    #  value.
+    #  @param self The object pointer.
+    #  @param name Name of the variable.
+    #  @param value Initial value. Default is 0.
+    #  @return a variable class.
+    #
     #---------------------------------------------------------------------------
     def var(self, value = 0, name = ""):
         value = parseNumber("value", value)
@@ -1130,34 +1340,40 @@ class HiLevelMod(Module):
         return ans
 
     #---------------------------------------------------------------------------
-    # Return a marker object
-    # Parameters: 
-    # name - name of the marker
-    # riseFall - rise and fall times of the marker pin. Default is 10ps
+    ## Return a marker object.
+    #  @param self The object pointer.
+    #  @param name Name of the marker.
+    #  @param riseFall Rise and fall times of the marker pin. Default is 100ps.
+    #  @return Marker class.
+    #
     #---------------------------------------------------------------------------
-    def marker(self, name, riseFall = 10e-9):
+    def marker(self, name, riseFall = 100e-12):
         markerObj = Marker(self, name, riseFall)
         self.markers.append(markerObj)
         return markerObj
         
     #---------------------------------------------------------------------------
-    # Return a DigIn, DigOut, or DigInOut object. A DigBusIn, DigBusOut or
-    # DigBusInOut will be returned if width > 0
-    # Parameters:
-    # domain - electrical pin. The voltage across the domain will be equal
-    #          the voltage in the digial pins when the logical state is 1.
-    # name - name of the electrical pin
-    # value - integer expression holding the intial value of the digital pin
-    # width - if width is greather than 1, It returns a list
-    # direction - it can be internal, input, output, or inout
-    # inCap - real expression holding the value of the input capacitance. This
-    #       value will be set at the beggining of the simulation and can't be
-    #       changed afterwards
-    # serRes - real expression holding the value of the series resistance. This
-    #       value will be set at the beggining of the simulation and can't be
-    #       changed afterwards
-    # rise - real expression holding the initial rise time
-    # fall - real expression holding the initial fall time
+    ## Return a DigIn, DigOut, or DigInOut object. A DigBusIn, DigBusOut or
+    #  DigBusInOut will be returned if width > 0.
+    #  @param self The object pointer.
+    #  @param domain electrical pin. The voltage across the digial pins will be
+    #         equal to the domain when the logical state is 1.
+    #  @param name Name of the electrical pin.
+    #  @param value Integer expression holding the intial value of the digital 
+    #         pin.
+    #  @param width If width is greather than 1, It returns a bus.
+    #  @param direction It can be internal, input, output, or inout.
+    #  @param inCap Real expression holding the value of the input capacitance. 
+    #         This value will be set at the beggining of the simulation and 
+    #         can't be changed afterwards.
+    #  @param serRes Real expression holding the value of the series resistance. 
+    #         This value will be set at the beggining of the simulation and 
+    #         can't be changed afterwards.
+    #  @param rise Real expression holding the initial rise time.
+    #  @param fall Real expression holding the initial fall time.
+    #  @return DigIn, DigOut, or DigInOut object. A DigBusIn, DigBusOut or
+    #          DigBusInOut will be returned if width > 0.
+    #
     #---------------------------------------------------------------------------
     def dig(self, 
             domain, 
@@ -1166,7 +1382,7 @@ class HiLevelMod(Module):
             direction = "internal", 
             value = 0,
             inCap = 1e-12, 
-            serRes = 100, 
+            serRes = 100.0, 
             rise = 1e-12,
             fall = 1e-12):
         #Check the inputs
@@ -1213,17 +1429,17 @@ class HiLevelMod(Module):
             return bus
 
     #---------------------------------------------------------------------------
-    # switch
-    # Parameters:
-    # pin1 - first node
-    # pin2 - second node
-    # cond - initial switch conductance. Default is 0S.
-    # rise - rise time for changes in the conductance. Default is
-    #        1us
-    # fall - fall time for changes in the conductance. Default is
-    #        1us
+    ## switch
+    #  @param self The object pointer.
+    #  @param pin1 First node (Electrical)
+    #  @param pin2 Second node (Electrical)
+    #  @param cond Initial switch conductance. Default is 0S.
+    #  @param rise Rise time for changes in the conductance. Default is 1us.
+    #  @param fall Fall time for changes in the conductance. Default is 1us.
+    #  @return a Sw class.
+    #
     #---------------------------------------------------------------------------
-    def sw(self, pin1, pin2, cond = Real(0), rise=Real(1e-6), fall=Real(1e-6)):
+    def sw(self, pin1, pin2, cond = 0.0, rise = 1e-6, fall = 1e-6):
         checkInstance("pin1", pin1, Electrical)
         checkInstance("pin2", pin2, Electrical)
         checkReal("cond", cond)
@@ -1232,25 +1448,28 @@ class HiLevelMod(Module):
         return Sw(self, pin1, pin2, cond, rise, fall)
         
     #---------------------------------------------------------------------------
-    # Build a clock model using a digital pin
-    # Parameters:
-    # pin1 - digital output or inout pin
+    ## Build a clock model using a digital pin
+    #  @param self The object pointer.
+    #  @param pin DigIn or DigInOut.
+    #  @return a Clock class.
+    #
     #---------------------------------------------------------------------------
     def clock(self, pin):
         checkInstance("pin", pin, DigOut)
         return Clock(self, pin)
 
     #---------------------------------------------------------------------------
-    # Return a smu object or a list of smu objects if width > 0
-    # Parameters:
-    # hiLeveMod - Hi level model in which the model will be added
-    # name - name of the current source electrical pin
-    # width - if width is greather than 1, It returns a list
-    # direction - it can be internal, input, output, or inout
-    # volt - real expression holding the inital voltage
-    # minCur - real expression holding the inital minimum current
-    # maxCur - real expression holding the inital maximum current
-    # res - real expression holding the resitance
+    ## Return a Smu object or a SmuBus object if width > 1.
+    #  @param self The object pointer.
+    #  @param name Name of the smu electrical pin.
+    #  @param width If width is greather than 1, It returns a SmuBus.
+    #  @param direction It can be internal, input, output, or inout.
+    #  @param volt Real expression holding the inital voltage.
+    #  @param minCur Real expression holding the inital minimum current.
+    #  @param maxCur Real expression holding the inital maximum current.
+    #  @param res Real expression holding the resitance.
+    #  @return Smu or SmuBus depending on the width.  
+    #
     #---------------------------------------------------------------------------
     def smu(self, 
             name = "", 
@@ -1282,14 +1501,16 @@ class HiLevelMod(Module):
             return vector
         
     #---------------------------------------------------------------------------
-    # Return a vdc object or a list of vdc objects if width > 1
-    # Parameters:
-    # name - name of the voltage source
-    # width - if width is greather than 1, It returns a list
-    # direction - it can be internal, input, output, or inout
-    # value - real expression holding the inital value
-    # rise - real expression holding the initial rise time
-    # fall - real expression holding the initial fall time
+    ## Return a Vdc object or a VdcBus object if width > 1.
+    #  @param self The object pointer.
+    #  @param name Name of the voltage source.
+    #  @param width If width is greather than 1, It returns a list.
+    #  @param direction It can be internal, input, output, or inout.
+    #  @param value Real expression holding the inital value.
+    #  @param rise Real expression holding the initial rise time.
+    #  @param fall Real expression holding the initial fall time.
+    #  @return Vdc or VdcBus depending on the width. 
+    #
     #---------------------------------------------------------------------------
     def vdc(self, 
             name = "", 
@@ -1318,14 +1539,16 @@ class HiLevelMod(Module):
             return vBus
 
     #---------------------------------------------------------------------------
-    # Return a idc object or a list of idc objects if width > 0
-    # Parameters:
-    # name - name of the current source
-    # width - if width is greather than 1, It returns a list
-    # direction - it can be internal, input, output, or inout
-    # value - real expression holding the inital value
-    # rise - real expression holding the initial rise time
-    # fall - real expression holding the initial fall time
+    ## Return a Idc object or a IdcBus object if width > 1.
+    #  @param self The object pointer.
+    #  @param name Name of the voltage source.
+    #  @param width If width is greather than 1, It returns a list.
+    #  @param direction It can be internal, input, output, or inout.
+    #  @param value Real expression holding the inital value.
+    #  @param rise Real expression holding the initial rise time.
+    #  @param fall Real expression holding the initial fall time.
+    #  @return Idc or IdcBus depending on the width. 
+    #
     #---------------------------------------------------------------------------
     def idc(self, 
             name = "", 
@@ -1354,9 +1577,10 @@ class HiLevelMod(Module):
             return iBus
 
     #---------------------------------------------------------------------------
-    # Sequence
-    # Parameters:
-    # cmds - command list
+    ## Sequence. Do not use it! Use Seq instead.
+    #  @param cmdsIn list of commands to be processed.
+    #  @return The list of remaining commands to be processed.
+    #
     #---------------------------------------------------------------------------
     def seqNested(self, cmdsIn):
         cmdsIn = cmdsIn.flat()
@@ -1560,16 +1784,18 @@ class HiLevelMod(Module):
         return cmds
 
     #---------------------------------------------------------------------------
-    # Sequence
-    # Parameters:
-    # *args - variable number of commands
+    ## Sequence
+    #  @param cond condition to run the sequence.
+    #  @return function that accepts variable number of commands to be added to
+    #  the sequence.
+    #
     #---------------------------------------------------------------------------
     def seq(self, cond):
         def func(*args):
             self.nState   = 0
-            self.time     = self.var(Real(1e6),  "_$evntTime_" + str(self.nSeq)) 
+            self.time     = self.var(Real(1e-9), "_$evntTime_" + str(self.nSeq)) 
             self.state    = self.var(Integer(0), "_$state_"    + str(self.nSeq)) 
-            self.runSt    = self.var(Bool(True), "_$runSt_"    + str(self.nSeq)) 
+            self.runSt    = self.var(Bool(False),"_$runSt_"    + str(self.nSeq)) 
             self.eventId  = self.var(Integer(0), "_$eventId_"  + str(self.nSeq)) 
             self.pCase    = Case(self.state)()
             self.cond     = cond
@@ -1613,7 +1839,9 @@ class HiLevelMod(Module):
         return func
             
     #---------------------------------------------------------------------------
-    # Return the equations in a format that can be imported by the maestro view
+    ## Return the equations in a format that can be imported by the maestro view
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------
     def getEqs(self):
         ans = "Test,Name,Type,Output,Plot,Save,Spec\n"
@@ -1628,7 +1856,9 @@ class HiLevelMod(Module):
             
 
     #---------------------------------------------------------------------------
-    # Return a ocean script that add equations to the opened session of adexl
+    ## Return a ocean script that add equations to the opened session of adexl
+    #  @param self The object pointer.
+    #
     #---------------------------------------------------------------------------
     def getOcn(self):
         ans = "session = axlGetWindowSession()\n"

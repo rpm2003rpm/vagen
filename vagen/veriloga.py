@@ -1,11 +1,11 @@
-## @package va
-#  VerilogA generator
-# 
+## @file veriloga.py
+#  VerilogA modeling.
+#
+#  @section license_main License
+#
 #  @author  Rodrigo Pedroso Mendes
 #  @version V1.0
 #  @date    05/02/23 22:36:08
-#
-#  #LICENSE# 
 #    
 #  Copyright (c) 2023 Rodrigo Pedroso Mendes
 #
@@ -30,18 +30,20 @@
 ################################################################################
 
 #-------------------------------------------------------------------------------
-# Imports
+## Imports
+#
 #-------------------------------------------------------------------------------
 from datetime import date
 import re
 
 #-------------------------------------------------------------------------------
-# Check if the type of variable matches the Type. Raise an assertion error
-# if doesn't 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
-# Type - type that the variable should match
+## Check if the type of variable matches the Type. Raise an assertion error if
+#  it doesn't.
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @param Type Type that the variable should match.
+#  @return True if it matches the type or False otherwise.
+#
 #-------------------------------------------------------------------------------
 def checkType(param, var, Type):
     assert type(var) == Type, \
@@ -50,11 +52,13 @@ def checkType(param, var, Type):
 
 
 #-------------------------------------------------------------------------------
-# Check if the variable is instance of Type. Raise an assertion error if doesn't 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
-# Type - type that the variable should match
+## Check if the variable is an instance of Type. Raise an assertion error if 
+#  it doesn't. 
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @param Type Type that the variable should match.
+#  @return True if it is an instance or False otherwise.
+#
 #-------------------------------------------------------------------------------
 def checkInstance(param, var, Type):
     assert isinstance(var, Type), \
@@ -63,12 +67,13 @@ def checkInstance(param, var, Type):
 
 
 #-------------------------------------------------------------------------------
-# Check if the variable isn't instance of Type. Raise an assertion error if 
-# doesn't 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
-# Type - type that the variable should match
+## Check if the variable isn't an instance of Type. Raise an assertion error if 
+#  it doesn't. 
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @param Type Type that the variable should match.
+#  @return False if it is an instance or True otherwise.
+#
 #-------------------------------------------------------------------------------
 def checkNotInstance(param, var, Type):
     assert not isinstance(var, Type), \
@@ -76,10 +81,11 @@ def checkNotInstance(param, var, Type):
 
 
 #-------------------------------------------------------------------------------
-# Return a Real instance 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
+## Return a Real instance.
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @return Real object.
+#
 #-------------------------------------------------------------------------------
 def parseReal(param, var):
     if isinstance(var, Real):
@@ -92,10 +98,11 @@ def parseReal(param, var):
 
 
 #-------------------------------------------------------------------------------
-# Check if the var is Real or can be parsed to Real
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
+## Check if the var is Real or it can be parsed to Real.
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @return True if it can be parsed to Real or False otherwise.
+#
 #-------------------------------------------------------------------------------
 def checkReal(param, var):
     assert isinstance(var, Real) or type(var) == float or type(var) == int, \
@@ -104,10 +111,11 @@ def checkReal(param, var):
 
 
 #-------------------------------------------------------------------------------
-# Return a Integer instance 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
+## Return an Integer instance 
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @return Integer object.
+#
 #-------------------------------------------------------------------------------
 def parseInteger(param, var):
     if isinstance(var, Integer):
@@ -120,10 +128,11 @@ def parseInteger(param, var):
                  
                  
 #-------------------------------------------------------------------------------
-# Check if the variable is boolean 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
+## Check if the variable is Integer or can be parsed to Integer.
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @return True if it can be parsed to Integer or False otherwise.
+#
 #-------------------------------------------------------------------------------
 def checkInteger(param, var):
     assert isinstance(var, Integer) or type(var) == int, \
@@ -132,10 +141,11 @@ def checkInteger(param, var):
 
 
 #-------------------------------------------------------------------------------
-# Return a Bool instance 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
+## Return a Bool instance.
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @return Bool object.
+#
 #-------------------------------------------------------------------------------
 def parseBool(param, var):
     if isinstance(var, Bool):
@@ -148,10 +158,11 @@ def parseBool(param, var):
                         
                         
 #-------------------------------------------------------------------------------
-# Check if the variable is boolean 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
+## Check if the variable is Bool or can be parsed to Bool.
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @return True if it can be parsed to Bool or False otherwise.
+#
 #-------------------------------------------------------------------------------
 def checkBool(param, var):
     assert isinstance(var, Bool) or type(var) == bool, \
@@ -160,10 +171,11 @@ def checkBool(param, var):
 
 
 #-------------------------------------------------------------------------------
-# Return a Real, Integer or Boolean instance 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
+## Return a Real, Integer or Boolean instance.
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @return Real, Integer or Bool instance.
+#
 #-------------------------------------------------------------------------------                        
 def parseNumber(param, var):
     if isinstance(var, Bool)    or \
@@ -182,10 +194,11 @@ def parseNumber(param, var):
                         
            
 #-------------------------------------------------------------------------------
-# Check if the variable is a number 
-# Parameters:
-# param - string representing the name of the variable
-# var - variable
+## Check if the variable is a number or can be parsed to Bool.
+#  @param param String representing the name of the variable.
+#  @param var Variable.
+#  @return True if it can be parsed to number or False otherwise.
+#
 #-------------------------------------------------------------------------------                        
 def checkNumber(param, var):
     assert isinstance(var, Integer) or isinstance(var, Bool) or  \
@@ -194,37 +207,14 @@ def checkNumber(param, var):
            "Integer, Real, Bool, int, float, or bool, but a "+str(type(value))+\
            " was given instead" 
            
-                                               
-#-------------------------------------------------------------------------------
-# break long line
-#-------------------------------------------------------------------------------                        
-def breakLongLines(text):
-    checkType("text", text, str)
-    div = '),'
-    i = 0
-    k = 0
-    ans = ''
-    for j in range(0, len(text)):
-        if text[j] == '\n':
-            ans = ans + text[i:(j+1)]
-            i = j + 1
-            k = k + 1
-        else:
-            if text[j] in div:
-                k = j + 1
-            if (j - i) > 80 and j < (len(text) - 1) and k > i:
-                ans = ans + text[i:k] + '\n'
-                i = k  
-    ans = ans + text[i:len(text)]
-    return ans
-
 
 #-------------------------------------------------------------------------------
-# Creates a comment block
-# Parameters:
-# message - string representing the comment
-# padding - number of tabs by which the text will be shifted left  
-# align - center, left or right 
+## Creates a comment block
+#  @param message String representing the comment
+#  @param padding Number of tabs by which the text will be shifted left align
+#         center, left or right 
+#  @return The comment block.
+#
 #-------------------------------------------------------------------------------
 def blockComment(padding, message, align = "center"):
     #assertions 
@@ -264,14 +254,17 @@ def blockComment(padding, message, align = "center"):
          
 
 #-------------------------------------------------------------------------------
-# Class of Real operators
+## Class of Real operators
+#
 #-------------------------------------------------------------------------------
 class Real():
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # value - string representing the value
+    ## Constructor
+    #  @param self The object pointer.
+    #  @param value String representing a Real expression, an Integer, a Bool,
+    #  or a value that can be converted to Real.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, value):
         if isinstance(value, Bool):
@@ -286,157 +279,239 @@ class Real():
         self.value = value
     
     #---------------------------------------------------------------------------
-    # Return the operator value
+    ## Return the operator value.
+    #  @param self The object pointer.
+    #  @return String representing the Real expression.
+    #
     #---------------------------------------------------------------------------
     def getValue(self):
         return self.value
     
     #---------------------------------------------------------------------------
-    # adition override
+    ## Addition override.
+    #  @param self The object pointer.
+    #  @param other expression to be added.
+    #  @return expression representing the addition.
+    #
     #---------------------------------------------------------------------------
     def __add__(self, other):
         other = parseReal("other", other)
         return Real("( " + str(self) + ' ) + ( ' + str(other) + " )")
 
     #---------------------------------------------------------------------------
-    # subtraction override
+    ## Subtraction override.
+    #  @param self Minuend object pointer.
+    #  @param other Subtrahend. 
+    #  @return expression representing the subtraction.
+    #
     #---------------------------------------------------------------------------
     def __sub__(self, other):
         other = parseReal("other", other)
         return Real("( " + str(self) + ' ) - ( ' + str(other) + " )")
 
     #---------------------------------------------------------------------------
-    # multiplication override
+    ## Multiplication override.
+    #  @param self Multiplicand object pointer.
+    #  @param other Multiplier. 
+    #  @return expression representing the multiplication.
+    #
     #---------------------------------------------------------------------------
     def __mul__(self, other):
         other = parseReal("other", other)
         return Real('( '+ str(self) + ' )*( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # true division override
+    ## Division override.
+    #  @param self Dividend object pointer.
+    #  @param other Quotient. 
+    #  @return expression representing the division.
+    #
     #---------------------------------------------------------------------------
     def __truediv__(self, other):
         other = parseReal("other", other)
         return Real('( '+ str(self) + ' )/( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # power override
+    ## Pow override.
+    #  @param self Base object pointer.
+    #  @param other Exponent. 
+    #  @return expression representing the power.
+    #
     #---------------------------------------------------------------------------
     def __pow__(self, other):
         other = parseReal("other", other)
         return Real('pow('+ str(self) + ', ' + str(other) + ')')
 
     #---------------------------------------------------------------------------
-    # greater than override
+    ## Greater than override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __gt__(self, other):
         other = parseReal("other", other)
         return Bool('( '+ str(self) + ' ) > ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # less than override
+    ## Less than override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __lt__(self, other):
         other = parseReal("other", other)
         return Bool('( '+ str(self) + ' ) < ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # less than equal override
+    ## Less than equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __le__(self, other):
         other = parseReal("other", other)
         return Bool('( '+ str(self) + ' ) <= ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # greater than equal override
+    ## Greater than equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __ge__(self, other):
         other = parseReal("other", other)
         return Bool('( '+ str(self) + ' ) >= ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # equal override
+    ## Equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __eq__(self, other):
         other = parseReal("other", other)
         return Bool('( '+ str(self) + ' ) == ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # not equal override
+    ## Not equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __ne__(self, other):
         other = parseReal("other", other)
         return Bool('( '+ str(self) + ' ) != ( ' + str(other) + ' )')
         
     #---------------------------------------------------------------------------
-    # adition override
+    ## Reverse addition override
+    #  @param self The object pointer.
+    #  @param other expression to be added.
+    #  @return expression representing the addition.
+    #
     #---------------------------------------------------------------------------
     def __radd__(self, other):
         other = parseReal("other", other)
         return Real("( " + str(other) + ' ) + ( ' + str(self) + " )")
 
     #---------------------------------------------------------------------------
-    # subtraction override
+    ## Reverse subtraction override
+    #  @param self Subtrahend object pointer.
+    #  @param other Minuend. 
+    #  @return expression representing the subtraction.
+    #
     #---------------------------------------------------------------------------
     def __rsub__(self, other):
         other = parseReal("other", other)
         return Real("( " + str(other) + ' ) - ( ' + str(self) + " )")
 
     #---------------------------------------------------------------------------
-    # multiplication override
+    ## Reverse multiplication override.
+    #  @param self Multiplier object pointer.
+    #  @param other Multiplicand.
+    #  @return expression representing the multiplication.
+    #
     #---------------------------------------------------------------------------
     def __rmul__(self, other):
         other = parseReal("other", other)
         return Real('( '+ str(other) + ' )*( ' + str(self) + ' )')
 
     #---------------------------------------------------------------------------
-    # true division override
+    ## Reverse division override.
+    #  @param self Quotient object pointer.
+    #  @param other Dividend. 
+    #  @return expression representing the division.
+    #
     #---------------------------------------------------------------------------
     def __rtruediv__(self, other):
         other = parseReal("other", other)
         return Real('( '+ str(other) + ' )/( ' + str(self) + ' )')
 
     #---------------------------------------------------------------------------
-    # power override
+    ## Pow override.
+    #  @param self Exponent object pointer.
+    #  @param other Base. 
+    #  @return expression representing the power.
+    #
     #---------------------------------------------------------------------------
     def __rpow__(self, other):
         other = parseReal("other", other)
         return Real('pow('+ str(other) + ', ' + str(self) + ')')
         
     #---------------------------------------------------------------------------
-    # negation override
+    ## negation override
+    #  @param self Object pointer.
+    #  @return expression representing negation.
+    #
     #---------------------------------------------------------------------------
     def __neg__(self):
         return Real('-( '+ str(self) + ' )')
     
     #---------------------------------------------------------------------------
-    # equal override
+    ## pos override
+    #  @param self Object pointer.
+    #  @return copy of the same object.
+    #
     #---------------------------------------------------------------------------
     def __pos__(self):
         return Real(str(self))
 
     #---------------------------------------------------------------------------
-    # abs override
+    ## abs override
+    #  @param self Object pointer.
+    #  @return expression representing absolute value.
+    #
     #---------------------------------------------------------------------------
     def __abs__(self):
         return Real('abs( '+ str(self) + ' )')
 
     #---------------------------------------------------------------------------
-    # String representation
+    ## str override
+    #  @param self Object pointer.
+    #  @return string representing the expression
+    #
     #---------------------------------------------------------------------------
     def __str__(self):
         return self.value
 
 
 #-------------------------------------------------------------------------------
-# class of binary operators
+## Class of Bool operators
+#
 #-------------------------------------------------------------------------------
 class Bool():
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # value - string representing the value
+    ## Constructor
+    #  @param Self The object pointer.
+    #  @param Value String representing a Real expression, an Integer, a Bool,
+    #  or a value that can be converted to Bool.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, value):
         if isinstance(value, Real):
@@ -453,13 +528,20 @@ class Bool():
         self.value = value
     
     #---------------------------------------------------------------------------
-    # Return the operator value
+    ## Return the operator value.
+    #  @param Self The object pointer.
+    #  @return String representing the Bool expression.
+    #
     #---------------------------------------------------------------------------
     def getValue(self):
         return self.value
 
     #---------------------------------------------------------------------------
-    # and logic override
+    ## And logic override
+    #  @param Self First operand object pointer.
+    #  @param Other Second operand.
+    #  @return Result of the and operation.
+    #
     #---------------------------------------------------------------------------
     def __and__(self, other):
         checkBool("other", other)
@@ -472,7 +554,11 @@ class Bool():
                 return False
 
     #---------------------------------------------------------------------------
-    # and logic override
+    ## Reverse and logic override
+    #  @param Self First operand object pointer.
+    #  @param Other Second operand.
+    #  @return Result of the and operation.
+    #
     #---------------------------------------------------------------------------
     def __rand__(self, other):
         checkBool("other", other)
@@ -485,7 +571,11 @@ class Bool():
                 return False
         
     #---------------------------------------------------------------------------
-    # or logic override
+    ## Or logic override
+    #  @param Self First operand object pointer.
+    #  @param Other Second operand.
+    #  @return Result of the or operation.
+    #
     #---------------------------------------------------------------------------
     def __or__(self, other):
         checkBool("other", other)
@@ -498,7 +588,11 @@ class Bool():
                 return Bool(str(self))
         
     #---------------------------------------------------------------------------
-    # or logic override
+    ## Reverse or logic override
+    #  @param Self First operand object pointer.
+    #  @param Other Second operand.
+    #  @return Result of the or operation.
+    #
     #---------------------------------------------------------------------------
     def __ror__(self, other):
         checkBool("other", other)
@@ -511,7 +605,11 @@ class Bool():
                 return Bool(str(self))
         
     #---------------------------------------------------------------------------
-    # xor logic override
+    ## Xor logic override
+    #  @param Self First operand object pointer.
+    #  @param Other Second operand.
+    #  @return Result of the exclusive or operation.
+    #
     #---------------------------------------------------------------------------
     def __xor__(self, other):
         checkBool("other", other)
@@ -524,7 +622,11 @@ class Bool():
                 return Bool(str(self))
 
     #---------------------------------------------------------------------------
-    # xor logic override
+    ## Reverse xor logic override
+    #  @param Self First operand object pointer.
+    #  @param Other Second operand.
+    #  @return Result of the exclusive or operation.
+    #
     #---------------------------------------------------------------------------
     def __rxor__(self, other):
         checkBool("other", other)
@@ -537,40 +639,57 @@ class Bool():
                 return Bool(str(self))
                 
     #---------------------------------------------------------------------------
-    # iversion override
+    ## Inversion override
+    #  @param Self Object pointer.
+    #  @return Expression representing inversion.
+    #
     #---------------------------------------------------------------------------
     def __invert__(self):
         return Bool('!( ' + str(self) + ' )')
         
     #---------------------------------------------------------------------------
-    # String representation
+    ## str override
+    #  @param Self Object pointer.
+    #  @return String representing the expression
+    #
     #---------------------------------------------------------------------------
     def __str__(self):
         return self.value
 
     #---------------------------------------------------------------------------
-    # equal override
+    ## Equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __eq__(self, other):
         other = parseBool("other", other)
         return Bool('( '+ str(self) + ' ) == ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # not equal override
+    ## Not equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __ne__(self, other):
         other = parseBool("other", other)
         return Bool('( '+ str(self) + ' ) != ( ' + str(other) + ' )')
         
 #-------------------------------------------------------------------------------
-# class of integer operators
+## Class of Integer operators
+#
 #-------------------------------------------------------------------------------
 class Integer():
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # value - string representing the value
+    ## Constructor
+    #  @param Self The object pointer.
+    #  @param Value String representing a Real expression, an Integer, a Bool,
+    #  or a value that can be converted to Integer.
+    #
     #---------------------------------------------------------------------------
     def __init__(self, value):
         if isinstance(value, Bool):
@@ -578,303 +697,449 @@ class Integer():
         elif isinstance(value, Real):
             value = str(ceil(value)) 
         elif isinstance(value, Integer):
-            assert value > -2147483648 and value < 2147483647,                +\
-            "Can't convert " +str(value)+ " to integer, because it is outside"+\
-            " the range [-2147483648, 2147483647]" 
             value = str(value)
         elif type(value) != str:
             try:
+                if isinstance(value, int):
+                    assert value > -2147483648 and value < 2147483647, "Can't " +\
+                    "convert " +str(value)+ " to integer, because it is outside"+\
+                    " the range [-2147483648, 2147483647]" 
                 value = str(int(value))
             except:
                 raise TypeError("Can't convert " + str(value) + " to integer")
         self.value = value
     
     #---------------------------------------------------------------------------
-    # return the operator value
+    ## Return the operator value.
+    #  @param Self The object pointer.
+    #  @return String representing the Bool expression.
+    #
     #---------------------------------------------------------------------------
     def getValue(self):
         return self.value
 
     #---------------------------------------------------------------------------
-    # adition override
+    ## Addition override.
+    #  @param self The object pointer.
+    #  @param other expression to be added.
+    #  @return expression representing the addition.
+    #
     #---------------------------------------------------------------------------
     def __add__(self, other):
         other = parseInteger("other", other)
         return Integer("( " + str(self) + ' ) + ( ' + str(other) + " )")
         
     #---------------------------------------------------------------------------
-    # adition override
+    ## Reverse addition override
+    #  @param self The object pointer.
+    #  @param other expression to be added.
+    #  @return expression representing the addition.
+    #
     #---------------------------------------------------------------------------
     def __radd__(self, other):
         other = parseInteger("other", other)
         return Integer("( " + str(other) + ' ) + ( ' + str(self) + " )")
-
+        
     #---------------------------------------------------------------------------
-    # subtraction override
+    ## Subtraction override.
+    #  @param self Minuend object pointer.
+    #  @param other Subtrahend. 
+    #  @return expression representing the subtraction.
+    #
     #---------------------------------------------------------------------------
     def __sub__(self, other):
         other = parseInteger("other", other)
         return Integer("( " + str(self) + ' ) - ( ' + str(other) + " )")
         
     #---------------------------------------------------------------------------
-    # subtraction override
-    #---------------------------------------------------------------------------
+    ## Reverse subtraction override
+    #  @param self Subtrahend object pointer.
+    #  @param other Minuend. 
+    #  @return expression representing the subtraction.
+    #
+    #--------------------------------------------------------------------------- 
     def __rsub__(self, other):
         other = parseInteger("other", other)
         return Integer("( " + str(other) + ' ) - ( ' + str(self) + " )")
 
     #---------------------------------------------------------------------------
-    # multiplication override
+    ## Multiplication override.
+    #  @param self Multiplicand object pointer.
+    #  @param other Multiplier. 
+    #  @return expression representing the multiplication.
+    #
     #---------------------------------------------------------------------------
     def __mul__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(self) + ' )*( ' + str(other) + ' )')
         
     #---------------------------------------------------------------------------
-    # multiplication override
+    ## Reverse multiplication override.
+    #  @param self Multiplier object pointer.
+    #  @param other Multiplicand.
+    #  @return expression representing the multiplication.
+    #
     #---------------------------------------------------------------------------
     def __rmul__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(other) + ' )*( ' + str(self) + ' )')
 
     #---------------------------------------------------------------------------
-    # true division override
+    ## Division override.
+    #  @param self Dividend object pointer.
+    #  @param other Quotient. 
+    #  @return expression representing the division.
+    #
     #---------------------------------------------------------------------------
     def __truediv__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(self) + ' )/( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # true division override
+    ## Reverse division override.
+    #  @param self Quotient object pointer.
+    #  @param other Dividend. 
+    #  @return expression representing the division.
+    #
     #---------------------------------------------------------------------------
     def __rtruediv__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(other) + ' )/( ' + str(self) + ' )')
         
     #---------------------------------------------------------------------------
-    # module override
+    ## module override
+    #  @param self Dividend.
+    #  @param other Quotient. 
+    #  @return expression representing the mdule.
+    #
     #---------------------------------------------------------------------------
     def __mod__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(self) + ' ) % ( ' + str(other) + ' )')
         
     #---------------------------------------------------------------------------
-    # module override
+    ## reverse module override
+    #  @param self Quotient. 
+    #  @param other Dividend.
+    #  @return expression representing the mdule.
+    #
     #---------------------------------------------------------------------------
     def __rmod__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(other) + ' ) % ( ' + str(self) + ' )')
 
     #---------------------------------------------------------------------------
-    # power override
+    ## Pow override.
+    #  @param self Base object pointer.
+    #  @param other Exponent. 
+    #  @return expression representing the power.
+    #
     #---------------------------------------------------------------------------
     def __pow__(self, other):
         other = parseInteger("other", other)
         return Integer('pow(' + str(self) + ', ' + str(other) + ')')
         
     #---------------------------------------------------------------------------
-    # power override
+    ## Reverse pow override.
+    #  @param self Exponent object pointer.
+    #  @param other Base. 
+    #  @return expression representing the power.
+    #
     #---------------------------------------------------------------------------
     def __rpow__(self, other):
         other = parseInteger("other", other)
         return Integer('pow(' + str(other) + ', ' + str(self) + ')')
         
     #---------------------------------------------------------------------------
-    # right shift override
+    ## right shift override.
+    #  @param self Integer to be shifted.
+    #  @param other number of times the number will be shifted.
+    #  @return expression representing the shift.
+    #
     #---------------------------------------------------------------------------
     def __rshift__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(self) + ' ) >> ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # right shift override
+    ## Reverse right shift override.
+    #  @param self number of times the number will be shifted.
+    #  @param other Integer to be shifted.
+    #  @return expression representing the shift.
+    #
     #---------------------------------------------------------------------------
     def __rrshift__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(other) + ' ) >> ( ' + str(self) + ' )')
         
     #---------------------------------------------------------------------------
-    # left shift override
+    ## left shift override.
+    #  @param self Integer to be shifted.
+    #  @param other number of times the number will be shifted.
+    #  @return expression representing the shift.
+    #
     #---------------------------------------------------------------------------
     def __lshift__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(self) + ' ) << ( ' + str(other) + ' )')
         
     #---------------------------------------------------------------------------
-    # left shift override
+    ## Reverse left shift override.
+    #  @param self number of times the number will be shifted.
+    #  @param other Integer to be shifted.
+    #  @return expression representing the shift.
+    #
     #---------------------------------------------------------------------------
     def __rlshift__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(other) + ' ) << ( ' + str(self) + ' )')
         
     #---------------------------------------------------------------------------
-    # and logic override
+    ## Bitwise and logic
+    #  @param self first operator.
+    #  @param other second operator.
+    #  @return expression representing the bitwise and.
+    #
     #---------------------------------------------------------------------------
     def __and__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(self) + ' ) & ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # and logic override
+    ## Reverse bitwise and logic
+    #  @param self first operator.
+    #  @param other second operator.
+    #  @return expression representing the bitwise and.
+    #
     #---------------------------------------------------------------------------
     def __rand__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(other) + ' ) & ( ' + str(self) + ' )')
         
     #---------------------------------------------------------------------------
-    # or logic override
+    ## Bitwise or logic
+    #  @param self first operator.
+    #  @param other second operator.
+    #  @return expression representing the bitwise and.
+    #
     #---------------------------------------------------------------------------
     def __or__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(self) + ' ) | ( ' + str(other) + ' )')
         
     #---------------------------------------------------------------------------
-    # or logic override
+    ## Reverse bitwise or logic
+    #  @param self first operator.
+    #  @param other second operator.
+    #  @return expression representing the bitwise and.
+    #
     #---------------------------------------------------------------------------
     def __ror__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(other) + ' ) | ( ' + str(self) + ' )')
 
     #---------------------------------------------------------------------------
-    # xor logic override
+    ## Bitwise xor logic
+    #  @param self first operator.
+    #  @param other second operator.
+    #  @return expression representing the bitwise and.
+    #
     #---------------------------------------------------------------------------
     def __xor__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(self) + ' ) ^ ( ' + str(other) + ' )')
         
     #---------------------------------------------------------------------------
-    # xor logic override
+    ## Reverse bitwise xor logic
+    #  @param self first operator.
+    #  @param other second operator.
+    #  @return expression representing the bitwise and.
+    #
     #---------------------------------------------------------------------------
     def __rxor__(self, other):
         other = parseInteger("other", other)
         return Integer('( ' + str(other) + ' ) ^ ( ' + str(self) + ' )')
         
     #---------------------------------------------------------------------------
-    # less than override
+    ## Less than override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __lt__(self, other):
         other = parseInteger("other", other)
         return Bool('( ' + str(self) + ' ) < ( ' + str(other) + ' )')
-
+    
     #---------------------------------------------------------------------------
-    # greater than override
+    ## Greater than override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __gt__(self, other):
         other = parseInteger("other", other)
         return Bool('( ' + str(self) + ' ) > ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # less than equal override
+    ## Less than equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __le__(self, other):
         other = parseInteger("other", other)
         return Bool('( ' + str(self) + ' ) <= ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # greater than equal override
+    ## Greater than equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __ge__(self, other):
         other = parseInteger("other", other)
         return Bool('( ' + str(self) + ' ) >= ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # equal override
+    ## Equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __eq__(self, other):
         other = parseInteger("other", other)
         return Bool('( ' + str(self) + ' ) == ( ' + str(other) + ' )')
 
     #---------------------------------------------------------------------------
-    # not equal override
+    ## Not equal override
+    #  @param self Left operand object pointer.
+    #  @param other Right operand. 
+    #  @return expression representing the comparison.
+    #
     #---------------------------------------------------------------------------
     def __ne__(self, other):
         other = parseInteger("other", other)
         return Bool('( ' + str(self) + ' ) != ( ' + str(other) + ' )')
         
     #---------------------------------------------------------------------------
-    # negation override
+    ## negation override
+    #  @param self Object pointer.
+    #  @return expression representing negation.
+    #
     #---------------------------------------------------------------------------
     def __neg__(self):
         return Integer('-( ' + str(self) + ' )')
     
     #---------------------------------------------------------------------------
-    # abs override
+    ## abs override
+    #  @param self Object pointer.
+    #  @return expression representing absolute value.
+    #
     #---------------------------------------------------------------------------
     def __abs__(self):
         return Integer('abs( ' + str(self) + ' )')
 
     #---------------------------------------------------------------------------
-    # equal override
+    ## pos override
+    #  @param self Object pointer.
+    #  @return copy of the same object.
+    #
     #---------------------------------------------------------------------------
     def __pos__(self):
         return Integer(str(self))
 
     #---------------------------------------------------------------------------
-    # iversion override
+    ## invert override
+    #  @param self Object pointer.
+    #  @return expression representing bitwise not in all bits
+    #
     #---------------------------------------------------------------------------
     def __invert__(self):
         return Integer('~( ' + str(self) + ' )')
         
     #---------------------------------------------------------------------------
-    # String representation
+    ## str override
+    #  @param self Object pointer.
+    #  @return string representing the expression
+    #
     #---------------------------------------------------------------------------
     def __str__(self):
         return self.value
 
         
 #-------------------------------------------------------------------------------
-# Integer variable class
+## Integer variable class
+#
 #-------------------------------------------------------------------------------
 class IntegerVar(Integer):
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # value - string representing the value
+    ## Constructor
+    #  @param self object pointer
+    #  @param value string representing the value
+    #
     #---------------------------------------------------------------------------
     def __init__(self, value):
         checkType("value", value, str)
         super(IntegerVar, self).__init__(value)
 
     #---------------------------------------------------------------------------
-    # Return a command representing the increment of the variable
+    ## Increment
+    #  @param self object pointer
+    #  @return command representing the increment
+    #
     #---------------------------------------------------------------------------
     def inc(self):
         return Cmd(self.getValue() + ' = ' + self.getValue() + " + 1")  
         
     #---------------------------------------------------------------------------
-    # Return a command representing the decrement of the variable
+    ## Decrement
+    #  @param self object pointer
+    #  @return command representing the decrement
+    #
     #---------------------------------------------------------------------------
     def dec(self):
         return Cmd(self.getValue() + ' = ' + self.getValue() + " - 1")     
                      
     #---------------------------------------------------------------------------
-    # Return a command representing the attribution to a variable
-    # Parameters:
-    # value - A number representing the value
+    ## Atribution
+    #  @param self object pointer
+    #  @param value A number representing the value
+    #  @return Return a command representing the attribution to a variable
+    #
     #---------------------------------------------------------------------------
     def eq(self, value):
         value = parseInteger("value", value)
         return Cmd(self.getValue() + ' = ' + str(value))         
     
-    
+
 #-------------------------------------------------------------------------------
-# Real variable class
+## Real variable class
+#
 #-------------------------------------------------------------------------------
 class RealVar(Real):
+
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # value - string representing the value
+    ## Constructor
+    #  @param self object pointer
+    #  @param value string representing the value
+    #
     #---------------------------------------------------------------------------
     def __init__(self, value):
         checkType("value", value, str)
         super(RealVar, self).__init__(value)
 
     #---------------------------------------------------------------------------
-    # Return a command representing the attribution to a variable
-    # Parameters:
-    # value - A number representing the value
+    ## Atribution
+    #  @param self object pointer
+    #  @param value A number representing the value
+    #  @return Return a command representing the attribution to a variable
+    #
     #---------------------------------------------------------------------------
     def eq(self, value):
         value = parseReal("value", value)
@@ -882,28 +1147,36 @@ class RealVar(Real):
         
         
 #-------------------------------------------------------------------------------
-# Boolean variable class
+## Boolean variable class
+#
 #-------------------------------------------------------------------------------
 class BoolVar(Bool):
+
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # value - string representing the value
+    ## Constructor
+    #  @param self object pointer
+    #  @param value string representing the value
+    #
     #---------------------------------------------------------------------------
     def __init__(self, value):
         checkType("value", value, str)
         super(BoolVar, self).__init__(value)
 
     #---------------------------------------------------------------------------
-    # Return a command representing the state toggle
+    ## Toogle
+    #  @param self object pointer
+    #  @return  Return a command representing the state toggle
+    #
     #---------------------------------------------------------------------------
     def toggle(self):
         return Cmd(self.getValue() + ' = !' + self.getValue())  
         
     #---------------------------------------------------------------------------
-    # Return a command representing the attribution to a variable
-    # Parameters:
-    # value - A number representing the value
+    ## Atribution
+    #  @param self object pointer
+    #  @param value A number representing the value
+    #  @return Return a command representing the attribution to a variable
+    #
     #---------------------------------------------------------------------------
     def eq(self, value):
         value = parseBool("value", value)
@@ -911,35 +1184,46 @@ class BoolVar(Bool):
         
        
 #-------------------------------------------------------------------------------
-# Class of events
+## Class of events
+#
 #-------------------------------------------------------------------------------
 class Event():
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # value - string representing the value
+    ## Constructor
+    #  @param self object pointer
+    #  @param value string representing the event
+    #
     #---------------------------------------------------------------------------
     def __init__(self, value):
         checkType("value", value, str)
         self.value = value
 
     #---------------------------------------------------------------------------
-    # or logic override
+    ## or logic override
+    #  @param self object pointer
+    #  @param other pointer to another Event object
+    #  @return Return an Event representing the or logic between the two
+    #
     #---------------------------------------------------------------------------
     def __or__(self, other):
         checkInstance("other", other, Event)
         return Event(str(self) + ' or ' + str(other))
 
     #---------------------------------------------------------------------------
-    # String representation
+    ## string representation
+    #  @param self object pointer
+    #  @param other pointer to another Event object
+    #  @return The string representation of the Event
+    #
     #---------------------------------------------------------------------------
     def __str__(self):
         return self.value
                
                
 #-------------------------------------------------------------------------------
-# Command class
+## Command class
+#
 #-------------------------------------------------------------------------------
 class Cmd:
     
