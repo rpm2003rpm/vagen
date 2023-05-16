@@ -1426,7 +1426,7 @@ class WaitAnalogEvent(Block):
         
 
 #-------------------------------------------------------------------------------
-# Cross Class
+## Cross Class
 #
 #-------------------------------------------------------------------------------
 class Cross(Event):
@@ -1438,7 +1438,7 @@ class Cross(Event):
     #  @param threshold Real class representing the threshold that must be 
     #         crossed
     #  @param edge It can be rising, falling or both
-    #  @param *pars optional real parameters timeTol and expTol in this order
+    #  @param *pars optional Real parameters timeTol and expTol in this order
     #
     #---------------------------------------------------------------------------
     def __init__(self, signal, threshold, edge, *pars):
@@ -1460,7 +1460,7 @@ class Cross(Event):
 
 
 #-------------------------------------------------------------------------------
-# Above Class
+## Above Class
 #
 #-------------------------------------------------------------------------------
 class Above(Event):
@@ -1471,7 +1471,7 @@ class Above(Event):
     #  @param signal Real class representing the signal
     #  @param threshold Real class representing the threshold that must be 
     #         crossed
-    #  @param *pars optional real parameters timeTol and expTol in this order
+    #  @param *pars optional Real parameters timeTol and expTol in this order
     #
     #---------------------------------------------------------------------------
     def __init__(self, signal, threshold, *pars):
@@ -1498,7 +1498,7 @@ class Timer(Event):
     ## Constructor
     #  @param self object pointer
     #  @param startTime Real class representing the time tolerance
-    #  @param *pars optional real parameters timeTol and expTol in this order
+    #  @param *pars optional Real parameters timeTol and expTol in this order
     #
     #----------------------------------------------------------------------------
     def __init__(self, startTime, *pars):
