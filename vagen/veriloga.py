@@ -1228,24 +1228,31 @@ class Event():
 class Cmd:
     
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # cmd - command to be added to the va
+    ## Constructor
+    #  @param self object pointer
+    #  @param cmd command to be added to the va
+    #
     #---------------------------------------------------------------------------
     def __init__(self, cmd):
         checkType("cmd", cmd, str)
         self.cmd = cmd
 
     #---------------------------------------------------------------------------
-    # Return string representation
+    ## Return string representation
+    #  @param self object pointer
+    #  @return string representation
+    #
     #---------------------------------------------------------------------------
     def __str__(self):
         return self.cmd
 
     #---------------------------------------------------------------------------
-    # Return the VA verilog command
-    # Parameters:
-    # padding - number of tabs by which the text will be right shifted  
+    ## Return the VA verilog command
+    #  @param self object pointer
+    #  @param padding padding number of tabs by which the text will be right 
+    #         shifted
+    #  @return verilog command
+    #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
         checkType("padding", padding, int)
@@ -1258,27 +1265,35 @@ class Cmd:
 
 
 #-------------------------------------------------------------------------------
-# Command List class
+## Command List class
+#
 #-------------------------------------------------------------------------------
 class CmdList(list, Cmd):
     
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # cmds - command to be added to the va
+    ## Constructor
+    #  @param self object pointer
+    #  @param cmds commands to be added to the va
+    #
     #---------------------------------------------------------------------------
     def __init__(self, *cmds):
         super(CmdList, self).__init__()
         self.append(*cmds)
         
     #---------------------------------------------------------------------------
-    # Return string representation
+    ## Return string representation
+    #  @param self object pointer
+    #  @return string representation
+    #
     #---------------------------------------------------------------------------
     def __str__(self):
         return ", ".join([str(x) for x in self])
         
     #---------------------------------------------------------------------------
-    # Fatten
+    ## Return a flat command list Fatten
+    #  @param self object pointer
+    #  @return flat command list. Only imediate CmdLists will be open.
+    #
     #---------------------------------------------------------------------------
     def flat(self):
         ans = []
@@ -1290,7 +1305,9 @@ class CmdList(list, Cmd):
         return ans
 
     #---------------------------------------------------------------------------
-    # append override 
+    ## append override 
+    #  @param self object pointer
+    #
     #---------------------------------------------------------------------------
     def append(self, *cmds):
         i = 0
@@ -1304,9 +1321,11 @@ class CmdList(list, Cmd):
             i = i + 1
         
     #---------------------------------------------------------------------------
-    # Return the VA verilog command
-    # Parameters:
-    # padding number of tabs by which the text will be right shifted
+    ## Return the VA verilog command
+    #  @param self object pointer
+    #  @param padding number of tabs by which the text will be right shifted
+    #  @return verilog command
+    #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
         checkType("padding", padding, int)
@@ -1317,9 +1336,10 @@ class CmdList(list, Cmd):
 
 
 #-------------------------------------------------------------------------------
-# Returns the pointer to a function that add commands to an analog event
-# Parameters:
-# header - header of the block
+## Returns the pointer to a function that add commands to an analog event
+#  @param header header of the block
+#  @return pointer to a function that creates a block object
+#
 #-----------------------------------------------------------------------------
 def block(header):
     def func (*cmds):
@@ -1328,15 +1348,17 @@ def block(header):
     
     
 #-------------------------------------------------------------------------------
-# Command Block Class
+## Command Block Class
+#
 #-------------------------------------------------------------------------------
 class Block(CmdList):
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # header - header of the command block
-    # *cmds - variable number of commands to be added
+    ## Constructor
+    #  @param self object pointer
+    #  @param header header of the command block
+    #  @param *cmds variable number of commands to be added
+    #
     #---------------------------------------------------------------------------
     def __init__(self, header, *cmds):
         checkType("header", header, str)
@@ -1344,15 +1366,20 @@ class Block(CmdList):
         super(Block, self).__init__(*cmds)
         
     #---------------------------------------------------------------------------
-    # Return the header of a block command
+    ## Return the header of a block command
+    #  @param self object pointer
+    #  @return header o the block 
+    # 
     #---------------------------------------------------------------------------
     def getHeader(self):
         return self.header
                 
     #---------------------------------------------------------------------------
-    # Return the VA verilog command
-    # Parameters:
-    # padding number of tabs by which the text will be right shifted
+    ## Return the VA verilog command
+    #  @param self object pointer
+    #  @param padding number of tabs by which the text will be right shifted
+    #  @return verilog command
+    #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
         checkType("padding", padding, int)
@@ -1370,9 +1397,10 @@ class Block(CmdList):
 
 
 #-------------------------------------------------------------------------------
-# Returns the pointer to a function that add commands to an analog event
-# Parameters:
-# event - instance of the Event class representing the analog event
+## Returns the pointer to a function that add commands to an analog event
+#  @param event instance of the Event class representing the analog event
+#  @return function pointer
+#
 #-------------------------------------------------------------------------------
 def At(event):
     def func (*cmds):
@@ -1381,14 +1409,16 @@ def At(event):
     
     
 #-------------------------------------------------------------------------------
-# Class generated by the At function.
+## Wait analog event class
+#
 #-------------------------------------------------------------------------------
 class WaitAnalogEvent(Block):
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # event - Event to be waited for
-    # *cmds - variable number of commands to be added
+    ## Constructor
+    #  @param self object pointer
+    #  @param event Event to be waited for
+    #  @param *cmds variable number of commands to be added
+    #
     #---------------------------------------------------------------------------
     def __init__(self, event, *cmds):
         checkInstance("event", event, Event)
@@ -1397,17 +1427,19 @@ class WaitAnalogEvent(Block):
 
 #-------------------------------------------------------------------------------
 # Cross Class
+#
 #-------------------------------------------------------------------------------
 class Cross(Event):
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # signal crossing function
-    # Parameters:
-    # signal - Real class representing the signal
-    # threshold - Real class representing the threshold that must be crossed
-    # edge: It can be rising, falling or both
-    # *pars - optional parameters in order: timeTol and expTol both Real
+    ## Constructor
+    #  @param self object pointer
+    #  @param signal Real class representing the signal
+    #  @param threshold Real class representing the threshold that must be 
+    #         crossed
+    #  @param edge It can be rising, falling or both
+    #  @param *pars optional real parameters timeTol and expTol in this order
+    #
     #---------------------------------------------------------------------------
     def __init__(self, signal, threshold, edge, *pars):
         assert len(pars) >= 0 and len(pars) <= 2, "Wrong number of parameters"
@@ -1429,15 +1461,18 @@ class Cross(Event):
 
 #-------------------------------------------------------------------------------
 # Above Class
+#
 #-------------------------------------------------------------------------------
 class Above(Event):
 
     #---------------------------------------------------------------------------
-    # check if the signal is above a pre-define value
-    # Parameters:
-    # signal - Real class representing the signal
-    # threshold - Real class representing the threshold that must be crossed
-    # *pars - optional parameters in order: timeTol and expTol both Real
+    ## Constructor
+    #  @param self object pointer
+    #  @param signal Real class representing the signal
+    #  @param threshold Real class representing the threshold that must be 
+    #         crossed
+    #  @param *pars optional real parameters timeTol and expTol in this order
+    #
     #---------------------------------------------------------------------------
     def __init__(self, signal, threshold, *pars):
         assert len(pars) >= 0 and len(pars) <= 2, "Wrong number of parameters"
@@ -1454,15 +1489,17 @@ class Above(Event):
 
 
 #-------------------------------------------------------------------------------
-# Timer Class
+## Timer Class
+#
 #-------------------------------------------------------------------------------
 class Timer(Event):
     
     #----------------------------------------------------------------------------
-    # check if the signal is above a pre-define value
-    # Parameters:
-    # startTime - Real class representing the time tolerance
-    # *pars - optional parameters in order: period and timeTol both Real
+    ## Constructor
+    #  @param self object pointer
+    #  @param startTime Real class representing the time tolerance
+    #  @param *pars optional real parameters timeTol and expTol in this order
+    #
     #----------------------------------------------------------------------------
     def __init__(self, startTime, *pars):
         assert len(pars) >= 0 and len(pars) <= 2, "Wrong number of parameters"
@@ -1478,7 +1515,8 @@ class Timer(Event):
 
 
 #-------------------------------------------------------------------------------
-# types of analysis
+## types of analysis
+#
 #-------------------------------------------------------------------------------
 anaTypes = ["ac", 
             "dc", 
@@ -1495,7 +1533,10 @@ anaTypes = ["ac",
             
             
 #-------------------------------------------------------------------------------
-# Unfold variable number of simulation types
+## Unfold variable number of simulation types
+#  @param list of simulation types
+#  @result string with the unfolded simulation types
+#
 #-------------------------------------------------------------------------------
 def unfoldSimTypes(*simTypes):
     ans = []
@@ -1510,14 +1551,16 @@ def unfoldSimTypes(*simTypes):
 
 
 #-------------------------------------------------------------------------------
-# InitialStep class
+## InitialStep class
+#
 #-------------------------------------------------------------------------------
 class InitialStep(Event):
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # *simTypes - optional parameters representing the simulation type
+    ## Constructor
+    #  @param self object pointer
+    #  @param *simTypes optional parameters representing the simulation type
+    #
     #---------------------------------------------------------------------------
     def __init__(self, *simTypes):
         ans = "initial_step"
@@ -1528,14 +1571,16 @@ class InitialStep(Event):
                                           
 
 #-------------------------------------------------------------------------------
-# FinalStep class
+## FinalStep class
+#
 #-------------------------------------------------------------------------------
 class FinalStep(Event):
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # *simTypes - optional parameters representing the simulation type
+    ## Constructor
+    #  @param self object pointer
+    #  @param *simTypes optional parameters representing the simulation type
+    #
     #---------------------------------------------------------------------------
     def __init__(self, *simTypes):
         ans = "final_step"
@@ -1546,7 +1591,10 @@ class FinalStep(Event):
   
    
 #-------------------------------------------------------------------------------
-# type of analysis
+## Type of analysis
+#  @param *simTypes optional parameters representing the simulation type
+#  @return analysis type boolean expression
+#
 #-------------------------------------------------------------------------------
 def analysis(*simTypes):
     if simTypes == "":
