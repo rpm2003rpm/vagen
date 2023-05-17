@@ -1357,7 +1357,7 @@ class Block(CmdList):
     ## Constructor
     #  @param self object pointer
     #  @param header header of the command block
-    #  @param *cmds variable number of commands to be added
+    #  @param *cmds variable number of Cmd or CmdList to be added 
     #
     #---------------------------------------------------------------------------
     def __init__(self, header, *cmds):
@@ -1417,7 +1417,7 @@ class WaitAnalogEvent(Block):
     ## Constructor
     #  @param self object pointer
     #  @param event Event to be waited for
-    #  @param *cmds variable number of commands to be added
+    #  @param *cmds variable number of Cmd or CmdList to be added 
     #
     #---------------------------------------------------------------------------
     def __init__(self, event, *cmds):
@@ -1434,11 +1434,12 @@ class Cross(Event):
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
-    #  @param signal Real class representing the signal
-    #  @param threshold Real class representing the threshold that must be 
-    #         crossed
+    #  @param signal Real class or build-in real representing the signal
+    #  @param threshold Real class or build-in real representing the threshold 
+    #         that must be crossed
     #  @param edge It can be rising, falling or both
-    #  @param *pars optional Real parameters timeTol and expTol in this order
+    #  @param *pars optional Real or build-in real parameters timeTol and expTol
+    #         in this order
     #
     #---------------------------------------------------------------------------
     def __init__(self, signal, threshold, edge, *pars):
@@ -1468,10 +1469,11 @@ class Above(Event):
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
-    #  @param signal Real class representing the signal
-    #  @param threshold Real class representing the threshold that must be 
-    #         crossed
-    #  @param *pars optional Real parameters timeTol and expTol in this order
+    #  @param signal Real class or build-in real representing the signal
+    #  @param threshold Real class or build-in real representing the threshold 
+    #         that must be crossed
+    #  @param *pars optional Real or build-in real parameters timeTol and expTol
+    #         in this order
     #
     #---------------------------------------------------------------------------
     def __init__(self, signal, threshold, *pars):
@@ -1497,8 +1499,9 @@ class Timer(Event):
     #----------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
-    #  @param startTime Real class representing the time tolerance
-    #  @param *pars optional Real parameters timeTol and expTol in this order
+    #  @param startTime Real or build-in real representing the time tolerance
+    #  @param *pars optional Real or build-in real parameters timeTol and expTol
+    #         in this order
     #
     #----------------------------------------------------------------------------
     def __init__(self, startTime, *pars):
@@ -1593,7 +1596,7 @@ class FinalStep(Event):
 #-------------------------------------------------------------------------------
 ## Type of analysis
 #  @param *simTypes optional parameters representing the simulation type
-#  @return analysis type boolean expression
+#  @return Bool expression representing the analysis type test
 #
 #-------------------------------------------------------------------------------
 def analysis(*simTypes):
@@ -1603,7 +1606,12 @@ def analysis(*simTypes):
 
 
 #-------------------------------------------------------------------------------
-# ac stimulus
+## ac stimulus
+#  @param mag Real class or build-in real representing the magnitude
+#  @param phase Real class or build-in representing the phase (default it 0)
+#  @param simType string representing the simulation type (default is "ac")
+#  @return Real expression representing the ac stimulus command
+#
 #-------------------------------------------------------------------------------
 def acStim(mag, phase = 0, simType = "ac"):
     assert simType in anaTypes, \
@@ -1616,9 +1624,11 @@ def acStim(mag, phase = 0, simType = "ac"):
     
                    
 #-------------------------------------------------------------------------------
-# Returns the pointer to a function that add commands to an Block 
-# Parameters:
-# n - number of times the sequence of commands must be repeated
+## Returns the pointer to a function that add commands to an Repeat block
+#  @param n Integer class or int representing the number of times the 
+#         sequence must be repeated
+#  @return pointer to a function that returns a RepeatLoop class
+#
 #-------------------------------------------------------------------------------
 def Repeat(n):
     def func (*cmds):
@@ -1627,13 +1637,18 @@ def Repeat(n):
 
 
 #-------------------------------------------------------------------------------
-# Repeat loop class
+## RepeatLoop class  
+#
 #-------------------------------------------------------------------------------
 class RepeatLoop(Block):
+
     #---------------------------------------------------------------------------
-    # Returns the pointer to a function that add commands to an Block 
-    # Parameters:
-    # n - number of times the sequence of commands must be repeated
+    ## Constructor
+    #  @param self object pointer
+    #  @param n Integer class or int representing the number of times the block 
+    #         of commands must be repeated
+    #  @param *cmds variable number of Cmd or CmdList to be added 
+    #
     #---------------------------------------------------------------------------
     def __init__(self, n, *cmds):
         n = parseInteger("n", n)
@@ -1641,17 +1656,22 @@ class RepeatLoop(Block):
         super(RepeatLoop, self).__init__("repeat( " + str(n) + " )", *cmds)  
         
     #---------------------------------------------------------------------------
-    # Return the repeat count
+    ## Return the repeat count
+    #  @param self object pointer
+    #  @return Integer class representing the number of times the block of 
+    #          commands will be repeated
+    #
     #---------------------------------------------------------------------------
     def getN(self):
         return self.n
         
 
 #-------------------------------------------------------------------------------
-# Returns the pointer to a function that add commands to a While loop 
-# Parameters:
-# cond - condition that must be satisfied in order repeat the sequence of 
-#        commands in the block
+## Returns the pointer to a function that add commands to a While loop 
+#  @param cond Bool class or build-in bool representing the condition that must 
+#         be satisfied in order repeat the sequence of commands in the block
+#  @return pointer to a function that returns a RepeatLoop class
+# 
 #-------------------------------------------------------------------------------
 def While(cond):
     def func (*cmds):
@@ -1660,15 +1680,18 @@ def While(cond):
 
 
 #-------------------------------------------------------------------------------
-# While loop class
+## WhileLoop class
+#
 #-------------------------------------------------------------------------------
 class WhileLoop(Block):
     #---------------------------------------------------------------------------
-    # Returns the pointer to a function that add commands to an Block 
-    # Parameters:
-    # cond - condition that must be satisfied in order repeat the sequence of 
-    #        commands in the block
-    # *cmds - variable number of commands to be added
+    ## Constructor
+    #  @param self object pointer
+    #  @param cond Bool class or build-in bool representing the condition that 
+    #         must be satisfied in order repeat the sequence of commands in the 
+    #         block
+    #  @param *cmds variable number of Cmd or CmdList to be added  
+    # 
     #---------------------------------------------------------------------------
     def __init__(self, cond, *cmds):
         cond = parseBool("cond", cond)
@@ -1676,7 +1699,11 @@ class WhileLoop(Block):
         super(WhileLoop, self).__init__("while( " + str(cond) + " )", *cmds)  
         
     #---------------------------------------------------------------------------
-    # Return the while loop condition
+    ## Return the while loop condition
+    #  @param self object pointer
+    #  @return Bool class representing the condition that must be satisfied in 
+    #          order repeat the sequence of commands in the block
+    #
     #---------------------------------------------------------------------------
     def getCond(self):
         return self.cond   
@@ -1707,7 +1734,7 @@ class ForLoop(Block):
     # cond - condition that must be satisfied in order repeat the sequence of 
     #        commands in the block
     # inc - command executed at the end of each step
-    # *cmds - variable number of commands to be added
+    # *cmds - variable number of Cmd or CmdList to be added 
     #---------------------------------------------------------------------------
     def __init__(self, start, cond, inc, *cmds):
         cond = parseBool("cond", cond)
@@ -1765,7 +1792,7 @@ class Cond(Cmd):
     # Constructor
     # cond - condition that must be satisfied in order repeat the sequence of 
     #        commands in the block
-    # *cmds - variable number of commands to be added
+    # *cmds - variable number of Cmd or CmdList to be added 
     #---------------------------------------------------------------------------
     def __init__(self, cond, *cmds):
         cond = parseBool("cond", cond)
