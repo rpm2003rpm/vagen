@@ -1670,7 +1670,7 @@ class RepeatLoop(Block):
 ## Returns the pointer to a function that add commands to a While loop 
 #  @param cond Bool class or build-in bool representing the condition that must 
 #         be satisfied in order repeat the sequence of commands in the block
-#  @return pointer to a function that returns a RepeatLoop class
+#  @return pointer to a function that returns a WhileLoop class
 # 
 #-------------------------------------------------------------------------------
 def While(cond):
@@ -1684,6 +1684,7 @@ def While(cond):
 #
 #-------------------------------------------------------------------------------
 class WhileLoop(Block):
+
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
@@ -1710,12 +1711,13 @@ class WhileLoop(Block):
     
     
 #-------------------------------------------------------------------------------
-# Returns the pointer to a function that add commands to a ForLoop
-# Parameters:
-# start - command executed at the beggining
-# cond - condition that must be satisfied in order repeat the sequence of 
-#        commands in the block
-# inc - command executed at the end of each step
+## Returns the pointer to a function that add commands to a ForLoop
+#  @param start command executed at the beggining
+#  @param cond condition that must be satisfied in order repeat the sequence of 
+#         commands in the block
+#  @param inc command executed at the end of each step
+#  @return pointer to a function that returns a ForLoop class
+#
 #-------------------------------------------------------------------------------
 def For(start, cond, inc):
     def func (*cmds):
@@ -1724,17 +1726,20 @@ def For(start, cond, inc):
     
     
 #-------------------------------------------------------------------------------
-# For loop class
+## ForLoop class
+#
 #-------------------------------------------------------------------------------
 class ForLoop(Block):
+
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # start - command executed at the beggining
-    # cond - condition that must be satisfied in order repeat the sequence of 
-    #        commands in the block
-    # inc - command executed at the end of each step
-    # *cmds - variable number of Cmd or CmdList to be added 
+    ## Constructor
+    #  @param self object pointer
+    #  @param start command executed at the beggining
+    #  @param cond condition that must be satisfied in order repeat the sequence
+    #         of commands in the block
+    #  @param inc command executed at the end of each step
+    #  @param *cmds variable number of Cmd or CmdList to be added 
+    #
     #---------------------------------------------------------------------------
     def __init__(self, start, cond, inc, *cmds):
         cond = parseBool("cond", cond)
@@ -1751,29 +1756,41 @@ class ForLoop(Block):
         super(ForLoop, self).__init__(head, *cmds)
 
     #---------------------------------------------------------------------------
-    # Return the for loop condition
+    ## Return the Forloop condition
+    #  @param self object pointer
+    #  @return Bool class representing the condition that must be satisfied in 
+    #          order repeat the sequence of commands in the block
+    #
     #---------------------------------------------------------------------------
     def getCond(self):
         return self.cond
         
     #---------------------------------------------------------------------------
-    # Return the for loop start commands
+    ## Return the Forloop start
+    #  @param self object pointer
+    #  @return Cmd class representing the initial command run by the loop
+    #
     #---------------------------------------------------------------------------
     def getStart(self):
         return self.start  
         
     #---------------------------------------------------------------------------
-    # Return the for loop increment commands
+    ## Return the Forloop increment
+    #  @param self object pointer
+    #  @return Cmd class representing the increment command run at each 
+    #          iteraction
+    #
     #---------------------------------------------------------------------------
     def getInc(self):
         return self.inc   
         
         
 #-------------------------------------------------------------------------------
-# Returns the pointer to a function that add commands to an Block 
-# Parameters:
-# cond - condition that must be satisfied in order repeat the sequence of 
-#        commands in the block
+## Returns the pointer to a function that add commands to a Cond Class
+#  @param cond condition that must be satisfied in order to run the sequence of 
+#         commands in the block
+#  @return pointer to a function that returns a Cmd class
+#
 #-------------------------------------------------------------------------------
 def If(cond):
     def ifFunc (*cmds):
@@ -1783,16 +1800,19 @@ def If(cond):
 
 
 #-------------------------------------------------------------------------------
-# Condition Class. It is used inside the function If in order to provide an If
-# and else structure
+## Condition Class. It is used inside the function If in order to provide an If
+#  and else structure
+#
 #-------------------------------------------------------------------------------
 class Cond(Cmd):
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # cond - condition that must be satisfied in order repeat the sequence of 
-    #        commands in the block
-    # *cmds - variable number of Cmd or CmdList to be added 
+    ## Constructor
+    #  @param self object pointer
+    #  @param cond condition that must be satisfied in order to run the sequence 
+    #         of commands in the block
+    #  @param *cmds variable number of Cmd or CmdList to be added 
+    #
     #---------------------------------------------------------------------------
     def __init__(self, cond, *cmds):
         cond = parseBool("cond", cond)
@@ -1803,40 +1823,54 @@ class Cond(Cmd):
                         False:Block(falseHead)}
 
     #---------------------------------------------------------------------------
-    # Return the Cond condition
+    ## Return the Cond condition
+    #  @param self object pointer
+    #  @return Bool class representing the condition that must be satisfied in 
+    #          order run the sequence of commands in the block
+    #
     #---------------------------------------------------------------------------
     def getCond(self):
         return self.cond
         
     #---------------------------------------------------------------------------
-    # Return the block of commands for a given state
+    ## Return the block of commands for a given state
+    #  @param self object pointer
+    #  @param state true or false
+    #  @return block of commands for True and False conditions
+    #
     #---------------------------------------------------------------------------
     def getBlock(self, state = True):
         checkType("state", state, bool)
         return self.cmdDict[state]
                 
     #---------------------------------------------------------------------------
-    # Add command
-    # Parameters:
-    # state - state in which this command needs to be executed 
-    # cmd - command and list of commands
+    ## Add command
+    #  @param self object pointer
+    #  @param state true or false 
+    #  @param *cmds variable number of Cmd or CmdList to be added 
+    #
     #---------------------------------------------------------------------------
     def append(self, state = True, *cmds):
         checkType("state", state, bool)
         self.cmdDict[state].append(*cmds)
 
     #---------------------------------------------------------------------------
-    # List of commands to be run when condition is false
-    # *cmds - variable number of commands or command list
+    ## List of commands to be run when condition is false
+    #  @param self object pointer
+    #  @param *cmds variable number of Cmd or CmdList to be added 
+    #  @return pointer to self
+    # 
     #---------------------------------------------------------------------------
     def Else(self, *cmds):
         self.cmdDict[False].append(*cmds)
         return self
 
     #---------------------------------------------------------------------------
-    # Return the VA verilog command
-    # Parameters:
-    # padding number of tabs by which the text will be right shifted
+    ## Return the VA verilog command
+    #  @param self object pointer
+    #  @param padding number of tabs by which the text will be right shifted
+    #  @return verilog command
+    #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
         checkType("padding", padding, int)
@@ -1847,9 +1881,10 @@ class Cond(Cmd):
 
 
 #-------------------------------------------------------------------------------
-# Returns the pointer to a function that add commands to a Block 
-# Parameters:
-# test - variable under test of the case structure
+## Returns the pointer to a function that add commands to a Block 
+#  @param variable under test of the case structure
+#  @return pointer to a function that returns a CaseClass
+#  
 #-------------------------------------------------------------------------------
 def Case(test):
     def caseFunc(*cmds):
@@ -1858,16 +1893,19 @@ def Case(test):
 
 
 #-------------------------------------------------------------------------------
-# Condition Class. It is used by the function Case in order to provide the case
-# structure
+## Condition Class. It is used by the function Case in order to provide the case
+#  structure
+#
 #-------------------------------------------------------------------------------
 class CaseClass(Cmd):
 
     #---------------------------------------------------------------------------
-    # Constructor
-    # Parameters:
-    # test - Must be Integer, Bool, or Real
-    # *cmd - variable number of tuples with case conditions and command objects
+    ## Constructor
+    #  @param self object pointer
+    #  @param test Must be Integer, Bool, or Real
+    #  @param *cmds variable number of tupples containing a condition and a 
+    #         command
+    #
     #---------------------------------------------------------------------------
     def __init__(self, test, *cmds):
         self.test = parseNumber("test", test)
@@ -1875,15 +1913,20 @@ class CaseClass(Cmd):
         self.append(*cmds)
 
     #---------------------------------------------------------------------------
-    # Return the block of commands for a given state
+    ## Return the list of block of commands 
+    #  @param self object pointer
+    #  @return a list of block of commands
+    #
     #---------------------------------------------------------------------------
     def getBlockList(self):
         return self.cmds
                       
     #---------------------------------------------------------------------------
-    # Add command
-    # Parameters:
-    # *cmd - variable number of tuples with case conditions and command objects
+    ## Add command
+    #  @param self object pointer
+    #  @param *cmds variable number of tupples containing a condition and a 
+    #         command
+    #
     #---------------------------------------------------------------------------
     def append(self, *cmds):
         i = 0
@@ -1922,9 +1965,11 @@ class CaseClass(Cmd):
             i = i + 1
 
     #---------------------------------------------------------------------------
-    # Return the VA verilog command
-    # Parameters:
-    # padding number of tabs by which the text will be right shifted
+    ## Return the VA verilog command
+    #  @param self object pointer
+    #  @param padding number of tabs by which the text will be right shifted
+    #  @return verilog command
+    #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
         checkType("padding", padding, int)
@@ -1936,7 +1981,10 @@ class CaseClass(Cmd):
 
 
 #-------------------------------------------------------------------------------
-# Unfold variable number of parameters
+## Unfold variable number of parameters
+#  @param *params variable number of parameters
+#  @return string representing the parameters separeted by comma
+#
 #-------------------------------------------------------------------------------
 def unfoldParams(*params):
     cmd = ""
@@ -1949,7 +1997,11 @@ def unfoldParams(*params):
 
 
 #-------------------------------------------------------------------------------
-# Strobe
+## Strobe
+#  @param msg message to be printed
+#  @param *params variable number of parameters
+#  @return Cmd representing the strobe
+#
 #-------------------------------------------------------------------------------
 def Strobe(msg, *params):
     checkType("msg", msg, str)
@@ -1957,7 +2009,11 @@ def Strobe(msg, *params):
 
 
 #-------------------------------------------------------------------------------
-# Write
+## Write
+#  @param msg message to be printed
+#  @param *params variable number of parameters
+#  @return Cmd representing the Write
+#
 #-------------------------------------------------------------------------------
 def Write(msg, *params):
     checkType("msg", msg, str)
@@ -1965,15 +2021,21 @@ def Write(msg, *params):
 
 
 #-------------------------------------------------------------------------------
-# Fopen
+## Fopen
+#  @param fileName name of the file
+#  @return Integer representing the file descriptor
+#
 #-------------------------------------------------------------------------------
-def Fopen(msg):
-    checkType("msg", msg, str)
-    return Integer('$fopen("' + msg + '")') 
+def Fopen(fileName):
+    checkType("msg", fileName, str)
+    return Integer('$fopen("' + fileName + '")') 
 
 
 #-------------------------------------------------------------------------------
-# Fwrite
+## Fclose
+#  @param desc Integer or int representing the file descriptor
+#  @return Cmd to close the file
+#
 #-------------------------------------------------------------------------------
 def Fclose(desc):
     desc = parseInteger("desc", desc)
@@ -1981,7 +2043,12 @@ def Fclose(desc):
 
 
 #-------------------------------------------------------------------------------
-# Fstrobe
+## Fstrobe
+#  @param desc Integer or int representing the file descriptor
+#  @param msg message to be written
+#  @param *params variable number of parameters
+#  @return Cmd representing the Fstrobe
+#
 #-------------------------------------------------------------------------------
 def Fstrobe(desc, msg, *params):
     desc = parseInteger("desc", desc)
@@ -1992,7 +2059,12 @@ def Fstrobe(desc, msg, *params):
 
 
 #-------------------------------------------------------------------------------
-# Fwrite
+## Fwrite
+#  @param desc Integer or int representing the file descriptor
+#  @param msg message to be written
+#  @param *params variable number of parameters
+#  @return Cmd representing the FWrite
+#
 #-------------------------------------------------------------------------------
 def Fwrite(desc, msg, *params):
     desc = parseInteger("desc", desc)
@@ -2003,7 +2075,11 @@ def Fwrite(desc, msg, *params):
                          
 
 #-------------------------------------------------------------------------------
-# discontinuity
+## discontinuity
+#  @param degree Integer or int representing the degree of the derivative with
+#         discontinuity
+#  @return Cmd representing the discontinuity
+#
 #-------------------------------------------------------------------------------
 def Discontinuity(degree = 0):
     degree = parseInteger("degree", degree)
@@ -2011,14 +2087,19 @@ def Discontinuity(degree = 0):
 
 
 #-------------------------------------------------------------------------------
-# finish
+## finish
+#  @return Cmd representing the finish
+#
 #-------------------------------------------------------------------------------
 def Finish():
     return Cmd('$finish') 
 
 
 #-------------------------------------------------------------------------------
-# bond step
+## bond step
+#  @param step Real, float or int representing the step
+#  @return Cmd representing the BondStep
+#
 #-------------------------------------------------------------------------------
 def BoundStep(step):
     step = parseReal("step", step)
@@ -2026,11 +2107,13 @@ def BoundStep(step):
 
 
 #-------------------------------------------------------------------------------
-# last time a signal crossed a treshold
-# Parameters
-# signal - Real class representing the signal
-# threshold - Real class representing the threshold that must be crossed
-# edge - It can be rising, falling or both
+## last time a signal crossed a treshold
+#  @param signal Real, float or int representing the signal
+#  @param threshold Real, float or int representing the threshold that must be 
+#         crossed
+#  @param edge It can be one the strings "rising", "falling" or "both"
+#  @return Real class representing the last crossing.
+#
 #-------------------------------------------------------------------------------
 def lastCrossing(signal, threshold, edge = 'both'):
     signal = parseReal("signal", signal)
