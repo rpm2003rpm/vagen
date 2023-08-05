@@ -371,18 +371,25 @@ class Vdc(Electrical):
     #  @param hiLeveMod Hi level model in which the analog command will be added.
     #  @param name Name of the voltage source electrical pin.
     #  @param value Real expression holding the inital voltage.
+    #  @param gnd Electrical representing the ground reference.
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, hiLevelMod, name, value, rise, fall): 
+    def __init__(self, hiLevelMod, name, value, gnd, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
+        if gnd != None:
+            checkType("gnd", gnd, Electrical)
+            checkNotInstance("gnd", gnd, Branch)
         checkType("name", name, str)
         value = parseReal("value", value)
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
-        super(Vdc, self).__init__(name)
-        prefix = name.replace("[", "_$").replace("]", "$")
+        if gnd == None:
+            super(Vdc, self).__init__(name)
+        else:
+            super(Vdc, self).__init__(name + ", " + gnd.getName())
+        prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.volt = hiLevelMod.var(value, prefix + "_$value$")
         self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
         self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
@@ -486,18 +493,25 @@ class Idc(Electrical):
     #  @param hiLeveMod Hi level model in which the analog command will be added.
     #  @param name Name of the current source electrical pin.
     #  @param value Real expression holding the inital voltage.
+    #  @param gnd Electrical representing the ground reference.
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, hiLevelMod, name, value, rise, fall): 
+    def __init__(self, hiLevelMod, name, value, gnd, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         value = parseReal("value", value)
+        if gnd != None:
+            checkType("gnd", gnd, Electrical)
+            checkNotInstance("gnd", gnd, Branch)
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
-        super(Idc, self).__init__(name)
-        prefix = name.replace("[", "_$").replace("]", "$")
+        if gnd == None:
+            super(Idc, self).__init__(name)
+        else:
+            super(Idc, self).__init__(name + ", " + gnd.getName())
+        prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.cur = hiLevelMod.var(value, prefix + "_$value$")
         self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
         self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
@@ -603,17 +617,24 @@ class Smu(Electrical):
     #  @param minCur Real expression holding the inital minimum current.
     #  @param maxCur Real expression holding the inital maximum current.
     #  @param res Real expression holding the resitance.
+    #  @param gnd Electrical representing the ground reference.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, hiLevelMod, name, volt, minCur, maxCur, res): 
+    def __init__(self, hiLevelMod, name, volt, minCur, maxCur, res, gnd): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         volt = parseReal("volt", volt)
         minCur = parseReal("minCur", minCur)
         maxCur = parseReal("maxCur", maxCur)
         res = parseReal("res", res)
-        super(Smu, self).__init__(name)
-        prefix = name.replace("[", "_$").replace("]", "$")
+        if gnd != None:
+            checkType("gnd", gnd, Electrical)
+            checkNotInstance("gnd", gnd, Branch)
+        if gnd == None:
+            super(Smu, self).__init__(name)
+        else:
+            super(Smu, self).__init__(name + ", " + gnd.getName())
+        prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.volt     = hiLevelMod.var(volt, prefix + "_$volt$")
         self.maxCur   = hiLevelMod.var(maxCur, prefix + "_$maxCur")
         self.minCur   = hiLevelMod.var(minCur, prefix + "_$minCur$")
@@ -824,36 +845,58 @@ class DigOut(Electrical):
     #  @param serRes Real expression holding the value of the series resistance.
     #         This value will be set at the beggining of the simulation and 
     #         can't be changed afterwards.
+    #  @param gnd Electrical representing the ground reference.
+    #  @param delay Real expression holding the initial delay time.
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, rise, fall): 
+    def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, gnd, 
+                 delay, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
         state = parseBool("state", state)
         serRes = parseReal("serRes", serRes)
+        if gnd != None:
+            checkType("gnd", gnd, Electrical)
+            checkNotInstance("gnd", gnd, Branch)
+        delay = parseReal("delay", delay) 
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
-        super(DigOut, self).__init__(name)
-        prefix = name.replace("[", "_$").replace("]", "$")
+        if gnd == None:
+            super(DigOut, self).__init__(name)
+        else:
+            super(DigOut, self).__init__(name + ", " + gnd.getName())
+        prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.st = hiLevelMod.var(state, prefix + "_$state$")
         self.serRes = hiLevelMod.var(serRes, prefix + "_$serRes$")
-        self.rise = hiLevelMod.var(rise, prefix + "_$rise")
+        self.delay = hiLevelMod.var(delay, prefix + "_$delay$")
+        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
         self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
         hiLevelMod.endAnalog(
             self.vCont(
                 domain.v*transition(
                     ternary(self.st, 1.0, 0.0), 
-                    0, 
+                    self.delay, 
                     self.rise, 
                     self.fall
                 )
             ),
             self.vCont(self.i*self.serRes)
         ) 
-   
+
+    #---------------------------------------------------------------------------
+    ## Set the delay times of the digital output pin.
+    #  @param self The object pointer.
+    #  @param delay Real expression holding the delay time.
+    #  @return The commands to change the delay.
+    #
+    #---------------------------------------------------------------------------
+    def setDelay(self, delay):
+        checkReal("delay", delay)
+        return self.delay.eq(delay)
+           
     #---------------------------------------------------------------------------
     ## Set the rise and the fall times of the digital output pin.
     #  @param self The object pointer.
@@ -901,18 +944,27 @@ class DigIn(Electrical):
     #         This value will be set at the beggining of the simulation and can't 
     #         be changed afterwards.
     #  @param serRes Dummy parameter for consistency.
+    #  @param gnd Electrical representing the ground reference.
+    #  @param delay Dummy parameter for consistency.
     #  @param rise Dummy parameter for consistency.
     #  @param fall Dummy parameter for consistency.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, rise, fall): 
+    def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, gnd, 
+                 delay, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
         inCap = parseReal("inCap", inCap)
-        super(DigIn, self).__init__(name)
+        if gnd != None:
+            checkType("gnd", gnd, Electrical)
+            checkNotInstance("gnd", gnd, Branch)
+        if gnd == None:
+            super(DigIn, self).__init__(name)
+        else:
+            super(DigIn, self).__init__(name + ", " + gnd.getName())
         self.domain = domain
-        prefix = name.replace("[", "_$").replace("]", "$")
+        prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.inCap = hiLevelMod.var(inCap, prefix + "_$inCap$")
         hiLevelMod.endAnalog(
             self.iCont(ddt(self.v)*self.inCap)
@@ -950,26 +1002,37 @@ class DigInOut(DigIn, DigOut):
     #  @param serRes Real expression holding the value of the series resistance.
     #         This value will be set at the beggining of the simulation and 
     #         can't be changed afterwards.
+    #  @param gnd Electrical representing the ground reference.
+    #  @param delay Real expression holding the initial delay time.
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, rise, fall): 
+    def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, gnd, 
+                 delay, rise, fall): 
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
         state = parseBool("state", state)
         serRes = parseReal("serRes", serRes)
-        inCap = parseReal("inCap", inCap)        
+        inCap = parseReal("inCap", inCap) 
+        if gnd != None:
+            checkType("gnd", gnd, Electrical)
+            checkNotInstance("gnd", gnd, Branch)  
+        delay = parseReal("delay", delay)     
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
-        super(DigOut, self).__init__(name)
-        prefix = name.replace("[", "_$").replace("]", "$")
+        if gnd == None:
+            super(DigOut, self).__init__(name)
+        else:
+            super(DigOut, self).__init__(name + ", " + gnd.getName())
+        prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.st = hiLevelMod.var(state, prefix + "_$state$")
         self.serRes = hiLevelMod.var(serRes, prefix + "_$serRes$")
         self.inCap = hiLevelMod.var(inCap, prefix + "_$inCap$")
         self.res = hiLevelMod.var(serRes, prefix + "_$res$")
-        self.rise = hiLevelMod.var(rise, prefix + "_$rise")
+        self.delay = hiLevelMod.var(delay, prefix + "_$delay$")
+        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
         self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
         self.domain = domain
         pin = hiLevelMod.electrical()
@@ -978,13 +1041,13 @@ class DigInOut(DigIn, DigOut):
             pin.vCont(
                 domain.v*transition(
                     ternary(self.st, 1.0, 0.0), 
-                    0, 
+                    self.delay, 
                     self.rise, 
                     self.fall
                 )
             ),
             conn.vCont(
-                conn.i*transition(self.res, 0, self.rise, self.fall)
+                conn.i*transition(self.res, self.delay, self.rise, self.fall)
             ),
             self.iCont(ddt(self.v)*self.inCap)
         ) 
@@ -1023,7 +1086,22 @@ class DigBusOut(Bus):
     #---------------------------------------------------------------------------
     def __init__(self):
         super(DigBusOut, self).__init__(DigOut, DigBusOut)
-        
+ 
+ 
+    #---------------------------------------------------------------------------
+    ## Set the delay times for all digital output pin.
+    #  @param self The object pointer.
+    #  @param delay Real expression holding the delay time.
+    #  @return The commands to change the delay times.
+    #
+    #---------------------------------------------------------------------------
+    def setDelay(self, delay):
+        checkReal("delay", delay)
+        ans = CmdList()
+        for pin in self:
+            ans.append(pin.setDelay(delay))
+        return ans
+       
     #---------------------------------------------------------------------------
     ## Set the rise and the fall times of all digital output pin.
     #  @param self The object pointer.
@@ -1171,7 +1249,7 @@ class Sw():
         prefix = "sw" + str(self.swCount)
         self.swCount = self.swCount + 1
         self.cond = hiLevelMod.var(cond, prefix + "_$cond$")
-        self.rise = hiLevelMod.var(rise, prefix + "_$rise")
+        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
         self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
         self.branch = Branch(pin1, pin2)
         hiLevelMod.endAnalog(
@@ -1369,6 +1447,8 @@ class HiLevelMod(Module):
     #  @param serRes Real expression holding the value of the series resistance. 
     #         This value will be set at the beggining of the simulation and 
     #         can't be changed afterwards.
+    #  @param gnd Electrical representing the ground reference.
+    #  @param delay Real expression holding the delay.    
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #  @return DigIn, DigOut, or DigInOut object. A DigBusIn, DigBusOut or
@@ -1381,8 +1461,10 @@ class HiLevelMod(Module):
             width = 1, 
             direction = "internal", 
             value = 0,
-            inCap = 1e-12, 
+            inCap = 1e-14, 
             serRes = 100.0, 
+            gnd = None, 
+            delay = 0,
             rise = 1e-12,
             fall = 1e-12):
         #Check the inputs
@@ -1410,6 +1492,8 @@ class HiLevelMod(Module):
                            domain, 
                            inCap, 
                            serRes, 
+                           gnd,
+                           delay,
                            rise, 
                            fall)
         #Create a bus
@@ -1423,6 +1507,8 @@ class HiLevelMod(Module):
                                    domain, 
                                    inCap, 
                                    serRes,
+                                   gnd,
+                                   delay,
                                    rise, 
                                    fall))
                 j = j << 1
@@ -1468,7 +1554,8 @@ class HiLevelMod(Module):
     #  @param minCur Real expression holding the inital minimum current.
     #  @param maxCur Real expression holding the inital maximum current.
     #  @param res Real expression holding the resitance.
-    #  @return Smu or SmuBus depending on the width.  
+    #  @return Smu or SmuBus depending on the width. 
+    #  @param gnd Electrical representing the ground reference. 
     #
     #---------------------------------------------------------------------------
     def smu(self, 
@@ -1478,14 +1565,15 @@ class HiLevelMod(Module):
             volt = 0, 
             minCur = 0, 
             maxCur = 0, 
-            res = 1e12): 
+            res = 1e12,
+            gnd = None): 
         checkReal("volt", volt)
         checkReal("minCur", minCur)
         checkReal("maxCur", maxCur)
         checkReal("res", res)
         name = self.addNode(name, width, direction)
         if width == 1:
-            return  Smu(self, name, volt, minCur, maxCur, res)
+            return  Smu(self, name, volt, minCur, maxCur, res, gnd)
         else:
             vector = SmuBus()
             for i in range(0, width):
@@ -1495,7 +1583,8 @@ class HiLevelMod(Module):
                         volt, 
                         minCur,
                         maxCur,
-                        res
+                        res,
+                        gnd
                     )
                 )
             return vector
@@ -1507,6 +1596,7 @@ class HiLevelMod(Module):
     #  @param width If width is greather than 1, It returns a list.
     #  @param direction It can be internal, input, output, or inout.
     #  @param value Real expression holding the inital value.
+    #  @param gnd Electrical representing the ground reference.
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #  @return Vdc or VdcBus depending on the width. 
@@ -1517,6 +1607,7 @@ class HiLevelMod(Module):
             width = 1, 
             direction = "internal", 
             value = 0,
+            gnd = None,
             rise = 0,
             fall = 0):
         checkReal("value", value)
@@ -1524,7 +1615,7 @@ class HiLevelMod(Module):
         checkReal("fall", fall)
         name = self.addNode(name, width, direction)
         if width == 1:
-            return  Vdc(self, name, value, rise, fall)
+            return  Vdc(self, name, value, gnd, rise, fall)
         else:
             vBus = VdcBus()
             for i in range(0, width):
@@ -1532,6 +1623,7 @@ class HiLevelMod(Module):
                     Vdc(self, 
                         name + "[" + str(i) + "]", 
                         value,
+                        gnd,
                         rise, 
                         fall
                     )
@@ -1545,6 +1637,7 @@ class HiLevelMod(Module):
     #  @param width If width is greather than 1, It returns a list.
     #  @param direction It can be internal, input, output, or inout.
     #  @param value Real expression holding the inital value.
+    #  @param gnd Electrical representing the ground reference.
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #  @return Idc or IdcBus depending on the width. 
@@ -1555,6 +1648,7 @@ class HiLevelMod(Module):
             width = 1, 
             direction = "internal", 
             value = 0,
+            gnd = None,
             rise = 0,
             fall = 0):
         checkReal("value", value)
@@ -1562,7 +1656,7 @@ class HiLevelMod(Module):
         checkReal("fall", fall)
         name = self.addNode(name, width, direction)
         if width == 1:
-            return  Idc(self, name, value, rise, fall)
+            return  Idc(self, name, value, gnd, rise, fall)
         else:
             iBus = IdcBus()
             for i in range(0, width):
@@ -1570,6 +1664,7 @@ class HiLevelMod(Module):
                     Idc(self, 
                         name + "[" + str(i) + "]", 
                         value,
+                        gnd,
                         rise, 
                         fall
                     )

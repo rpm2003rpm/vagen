@@ -1850,7 +1850,7 @@ class Cond(Cmd):
     #  @param *cmds variable number of Cmd or CmdList to be added 
     #
     #---------------------------------------------------------------------------
-    def append(self, state = True, *cmds):
+    def append(self, state, *cmds):
         checkType("state", state, bool)
         self.cmdDict[state].append(*cmds)
 
