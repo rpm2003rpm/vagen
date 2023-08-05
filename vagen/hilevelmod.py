@@ -1392,7 +1392,7 @@ class HiLevelMod(Module):
         checkReal("serRes", serRes)
         checkReal("rise", rise)
         checkReal("fall", fall)
-        name = self.addPort(name, width, direction)
+        name = self.addNode(name, width, direction)
         if direction == "input":
             digType = DigIn
             busType = DigBusIn
@@ -1483,7 +1483,7 @@ class HiLevelMod(Module):
         checkReal("minCur", minCur)
         checkReal("maxCur", maxCur)
         checkReal("res", res)
-        name = self.addPort(name, width, direction)
+        name = self.addNode(name, width, direction)
         if width == 1:
             return  Smu(self, name, volt, minCur, maxCur, res)
         else:
@@ -1522,7 +1522,7 @@ class HiLevelMod(Module):
         checkReal("value", value)
         checkReal("rise", rise)
         checkReal("fall", fall)
-        name = self.addPort(name, width, direction)
+        name = self.addNode(name, width, direction)
         if width == 1:
             return  Vdc(self, name, value, rise, fall)
         else:
@@ -1560,7 +1560,7 @@ class HiLevelMod(Module):
         checkReal("value", value)
         checkReal("rise", rise)
         checkReal("fall", fall)
-        name = self.addPort(name, width, direction)
+        name = self.addNode(name, width, direction)
         if width == 1:
             return  Idc(self, name, value, rise, fall)
         else:

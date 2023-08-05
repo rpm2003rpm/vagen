@@ -2127,19 +2127,40 @@ def lastCrossing(signal, threshold, edge = 'both'):
 
 
 #-------------------------------------------------------------------------------
-# random number generators
+## random number generator
+#  @param seed IntegerVar with the seed
+#  @return random Integer
+#
 #-------------------------------------------------------------------------------
 def random(seed):
     checkInstance("seed", seed, IntegerVar)
     return Integer('$random(' + str(seed) + ')')
-        
+
+
+#-------------------------------------------------------------------------------
+## Uniforme distribution random number generator
+#  @param seed IntegerVar with the seed
+#  @param start Integer or int representing the start of the range
+#  @param end Integer or int representing the end of the range
+#  @return random Integer
+#
+#-------------------------------------------------------------------------------        
 def uDistInt(seed, start, end):
     checkInstance("seed", seed, IntegerVar)
     start = parseInteger("start", start)
     end = parseInteger("end", end)
     return Integer('$dist_uniform(' + str(seed) + ', ' + str(start) + ', ' + \
                       str(end) + ')')
-        
+            
+                      
+#-------------------------------------------------------------------------------
+## Uniforme distribution random number generator
+#  @param seed IntegerVar with the seed
+#  @param start Real, float or int representing the start of the range
+#  @param end Real, float or int representing the end of the range
+#  @return random Real
+#
+#-------------------------------------------------------------------------------       
 def uDistReal(seed, start, end):
     checkInstance("seed", seed, IntegerVar)
     start = parseReal("start", start)
@@ -2147,6 +2168,15 @@ def uDistReal(seed, start, end):
     return Real('$rdist_uniform(' + str(seed) + ', ' + str(start) + ', ' + \
                   str(end) + ')')
 
+
+#-------------------------------------------------------------------------------
+## Gaussian distribution random number generator
+#  @param seed IntegerVar with the seed
+#  @param mean Integer or int representing the start of the range
+#  @param std Integer or int representing the end of the range
+#  @return random Integer
+#
+#-------------------------------------------------------------------------------   
 def gaussDistInt(seed, mean, std):
     checkInstance("seed", seed, IntegerVar)
     mean = parseInteger("mean", mean)
@@ -2154,6 +2184,15 @@ def gaussDistInt(seed, mean, std):
     return Integer('$dist_normal(' + str(seed) + ', ' + str(mean) + ', ' + \
                       str(std) + ')')
         
+        
+#-------------------------------------------------------------------------------
+## Gaussian distribution random number generator
+#  @param seed IntegerVar with the seed
+#  @param mean Real, float or int representing the start of the range
+#  @param std Real, float or int representing the end of the range
+#  @return random Real
+#
+#------------------------------------------------------------------------------- 
 def gaussDistReal(seed, mean, std):
     checkInstance("seed", seed, IntegerVar)
     mean = parseReal("mean", mean)
@@ -2161,21 +2200,52 @@ def gaussDistReal(seed, mean, std):
     return Real('$rdist_normal(' + str(seed) + ', ' + str(mean) + ', ' + \
                   str(std) + ')')
 
+#-------------------------------------------------------------------------------
+## Exponential distribution random number generator
+#  @param seed IntegerVar with the seed
+#  @param mean Integer or int representing the start of the range
+#  @return random Integer
+#
+#-------------------------------------------------------------------------------   
 def expDistInt(seed, mean):
     checkInstance("seed", seed, IntegerVar)
     mean = parseInteger("mean", mean)
     return Integer('$dist_exponential(' + str(seed) + ', ' + str(mean) + ')')
 
+
+#-------------------------------------------------------------------------------
+## Exponential distribution random number generator
+#  @param seed IntegerVar with the seed
+#  @param mean Real, float or int representing the start of the range
+#  @return random Real
+#
+#------------------------------------------------------------------------------- 
 def expDistReal(seed, mean):
     checkInstance("seed", seed, IntegerVar)
     mean = parseReal("mean", mean)
     return Real('$rdist_exponential(' + str(seed) + ', ' + str(mean) + ')')
 
+
+#-------------------------------------------------------------------------------
+## Poisson distribution random number generator
+#  @param seed IntegerVar with the seed
+#  @param mean Integer or int representing the start of the range
+#  @return random Integer
+#
+#-------------------------------------------------------------------------------  
 def poissonDistInt(seed, mean):
     checkInstance("seed", seed, IntegerVar)
     mean = parseInteger("mean", mean)
     return Integer('$dist_poisson(' + str(seed) + ', ' + str(mean) + ')')
 
+
+#-------------------------------------------------------------------------------
+## Poisson distribution random number generator
+#  @param seed IntegerVar with the seed
+#  @param mean Real, float or int representing the start of the range
+#  @return random Real
+#
+#-------------------------------------------------------------------------------
 def poissonDistReal(seed, mean):
     checkInstance("seed", seed, IntegerVar)
     mean = parseReal("mean", mean)
@@ -2183,7 +2253,8 @@ def poissonDistReal(seed, mean):
 
 
 #-------------------------------------------------------------------------------
-# Constants for tasks that represents numbers
+## Constants for tasks that represents numbers
+#
 #-------------------------------------------------------------------------------
 temp = Real("$temperature")
 abstime = Real("$abstime")
@@ -2191,21 +2262,49 @@ vt = Real("$vt")
 
 
 #-------------------------------------------------------------------------------
-# math functions
+## Exponential function
+#  @param x Real, float or int input
+#  @return Real expressing the exponential function
+#
 #-------------------------------------------------------------------------------
 def exp(x):
     x = parseReal("x", x)
     return Real("exp(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## Limited Exponential function
+#  @param x Real, float or int input
+#  @return Real expressing the limited exponential function
+#
+#-------------------------------------------------------------------------------
 def limexp(x):
     x = parseReal("x", x)
     return Real("limexp(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## Absolute Delay
+#  @param x Real, float or int input
+#  @param delay Real, float or int delay input
+#  @return Real expressing the absolute delay function
+#
+#-------------------------------------------------------------------------------
 def absDelay(x, delay):
     x = parseReal("x", x)
     delay = parseReal("delay", delay)
     return Real("absdelay(" + str(x) + ", " + str(delay) + ")")
 
+
+#-------------------------------------------------------------------------------
+## transition filter
+#  @param x Real, float or int input
+#  @param delay Real, float or int delay input
+#  @param riseTime delay Real, float or int delay input
+#  @param fallTime delay Real, float or int delay input
+#  @return Real expressing the transition filter
+#
+#-------------------------------------------------------------------------------
 def transition(x, 
                delay = 0, 
                riseTime = 1e-6, 
@@ -2217,6 +2316,17 @@ def transition(x,
     return Real("transition(" + str(x) + ", " + str(delay) + ", " + \
                   str(riseTime) + ", " + str(fallTime) + ")")
 
+
+#-------------------------------------------------------------------------------
+## ternary function
+#  @param test Bool or bool representing the test
+#  @param op1 any Bool, Real, Integer, int, float or bool that represents the 
+#         expression when test is true
+#  @param op2 any Bool, Real, Integer, int, float or bool that represents the 
+#         expression when test is false
+#  @return Bool, Real or Inteter representing the ternary operator
+#
+#-------------------------------------------------------------------------------
 def ternary(test, op1, op2):
     test = parseBool("test", test)
     if (isinstance(op1, Integer) or type(op1) == int) and \
@@ -2241,6 +2351,15 @@ def ternary(test, op1, op2):
            Integer
     return Type(str(test) + " ? ( " + str(op1) + " ) : ( " + str(op2) + " )")    
 
+
+#-------------------------------------------------------------------------------
+## slew filter
+#  @param x Real, float or int input
+#  @param riseSlope Real, float or int delay input
+#  @param fallSlope Real, float or int delay input
+#  @return Real expressing the slew filter
+#
+#-------------------------------------------------------------------------------
 def slew(x, riseSlope = 10e-6, fallSlope = 10e-6):
     x = parseReal("x", x)
     riseSlope = parseReal("riseSlope", riseSlope)
@@ -2250,103 +2369,255 @@ def slew(x, riseSlope = 10e-6, fallSlope = 10e-6):
                   str(riseSlope) + ", " + \
                   str(fallSlope) + ")")
 
+
+#-------------------------------------------------------------------------------
+## Diferential function
+#  @param x Real, float or int input
+#  @return Real expressing the diferential function
+#
+#-------------------------------------------------------------------------------
 def ddt(x):
     x = parseReal("x", x)
     return Real("ddt(" + str(x) + ")")
-    
+ 
+ 
+#-------------------------------------------------------------------------------
+## Integral function
+#  @param x Real, float or int input
+#  @param start Real, float or int input
+#  @return Real expressing the integral function
+#
+#-------------------------------------------------------------------------------   
 def idt(x, start = Real(0)):
     x = parseReal("x", x)
     start = parseReal("start", start)
     return Real("idt(" + str(x) + ", " + str(start) + ")")
 
+
+#-------------------------------------------------------------------------------
+## Ceil function
+#  @param x Real, float or int input
+#  @return Integer expressing the ceil function
+#
+#-------------------------------------------------------------------------------
 def ceil(x):
     x = parseReal("x", x)
     return Integer("ceil(" + str(x) + ")")
-        
+      
+
+#-------------------------------------------------------------------------------
+## floor function
+#  @param x Real, float or int input
+#  @return Integer expressing the floor function
+#
+#-------------------------------------------------------------------------------  
 def floor(x):
     x = parseReal("x", x)
     return Integer("floor(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## natural log function
+#  @param x Real, float or int input
+#  @return Real expressing the natural log function
+#
+#-------------------------------------------------------------------------------
 def ln(x):
     x = parseReal("x", x)
     return Real("ln(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## log function
+#  @param x Real, float or int input
+#  @return Real expressing the log function
+#
+#-------------------------------------------------------------------------------
 def log(x):
     x = parseReal("x", x)
     return Real("log(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## square root function
+#  @param x Real, float or int input
+#  @return Real expressing the square root function
+#
+#-------------------------------------------------------------------------------
 def sqrt(x):
     x = parseReal("x", x)
     return Real("sqrt(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## sin function
+#  @param x Real, float or int angle in radians
+#  @return Real expressing the sin function
+#
+#-------------------------------------------------------------------------------
 def sin(x):
     x = parseReal("x", x)
     return Real("sin(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## cos function
+#  @param x Real, float or int angle in radians
+#  @return Real expressing the cos function
+#
+#-------------------------------------------------------------------------------
 def cos(x):
     x = parseReal("x", x)
     return Real("cos(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## tan function
+#  @param x Real, float or int angle in radians
+#  @return Real expressing the tan function
+#
+#-------------------------------------------------------------------------------
 def tan(x):
     x = parseReal("x", x)
     return Real("tan(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## arc sin function
+#  @param x Real, float or int angle input
+#  @return Real expressing the arc sin function in radians
+#
+#-------------------------------------------------------------------------------
 def asin(x):
     x = parseReal("x", x)
     return Real("asin(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## arc cos function
+#  @param x Real, float or int angle input
+#  @return Real expressing the arc cos function in radians
+#
+#-------------------------------------------------------------------------------
 def acos(x):
     x = parseReal("x", x)
     return Real("acos(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## arc tan function
+#  @param x Real, float or int angle input
+#  @return Real expressing the arc tan function in radians
+#
+#-------------------------------------------------------------------------------
 def atan(x):
     x = parseReal("x", x)
     return Real("atan(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## arc tanh2 function. Equivalent to atan(x/y)
+#  @param x Real, float or int angle input
+#  @param x Real, float or int angle input
+#  @return Real expressing the arc tan function in radians
+#
+#-------------------------------------------------------------------------------
 def atan2(x, y):
     x = parseReal("x", x)
     y = parseReal("y", y)
     return Real("atan2(" + str(x) + ", " + str(y) + ")")
 
+
+#-------------------------------------------------------------------------------
+## hypot function. Equivalent to sqrt(x*x + y*y)
+#  @param x Real, float or int angle input
+#  @param x Real, float or int angle input
+#  @return Real expressing the hypot function
+#
+#-------------------------------------------------------------------------------
 def hypot(x, y):
     x = parseReal("x", x)
     y = parseReal("y", y)
     return Real("hypot(" + str(x) + ", " + str(y) + ")")
 
+
+#-------------------------------------------------------------------------------
+## sinh function
+#  @param x Real, float or int angle in radians
+#  @return Real expressing the sinh function
+#
+#-------------------------------------------------------------------------------
 def sinh(x):
     x = parseReal("x", x)
     return Real("sinh(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## cosh function
+#  @param x Real, float or int angle in radians
+#  @return Real expressing the cosh function
+#
+#-------------------------------------------------------------------------------
 def cosh(x):
     x = parseReal("x", x)
     return Real("cosh(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## tanh function
+#  @param x Real, float or int angle in radians
+#  @return Real expressing the tanh function
+#
+#-------------------------------------------------------------------------------
 def tanh(x):
     x = parseReal("x", x)
     return Real("tanh(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## arc sinh function
+#  @param x Real, float or int angle input
+#  @return Real expressing the arc sinh function in radians
+#
+#-------------------------------------------------------------------------------
 def asinh(x):
     x = parseReal("x", x)
     return Real("asinh(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## arc cosh function
+#  @param x Real, float or int angle input
+#  @return Real expressing the arc cosh function in radians
+#
+#-------------------------------------------------------------------------------
 def acosh(x):
     x = parseReal("x", x)
     return Real("acosh(" + str(x) + ")")
 
+
+#-------------------------------------------------------------------------------
+## arc tanh function
+#  @param x Real, float or int angle input
+#  @return Real expressing the arc tanh function in radians
+#
+#-------------------------------------------------------------------------------
 def atanh(x):
     x = parseReal("x", x)
     return Real("atanh(" + str(x) + ")")
 
 
 #-------------------------------------------------------------------------------
-# Class of electrical signals
+## Class of electrical signals
+#
 #-------------------------------------------------------------------------------
 class Electrical():
 
     #---------------------------------------------------------------------------
-    # constructor
-    # Parameters:
-    # name - name of the electrical signal
+    ## constructor
+    #  @param self The object pointer.
+    #  @param name string representing the name of the electrical signal
+    # 
     #---------------------------------------------------------------------------
     def __init__(self, name):
         checkType("name", name, str)
@@ -2355,60 +2626,77 @@ class Electrical():
         self.i = Real("I(" + name + ")") 
         
     #---------------------------------------------------------------------------
-    # Return electrical name
+    ## Return electrical name
+    #  @param self The object pointer.
+    #  @return string representing the name of the signal
+    # 
     #---------------------------------------------------------------------------
     def getName(self):
         return self.name
 
     #---------------------------------------------------------------------------
-    # Return a command representing voltage contribution
-    # Parameters:
-    # value - A Real representing the value
+    ## Return a command representing voltage contribution
+    #  @param self The object pointer.
+    #  @param value Real, float or int representig the value of the contribution
+    #  @return a Cmd representing the voltage contribution 
+    # 
     #---------------------------------------------------------------------------
     def vCont(self, value):
         value = parseReal("value", value)
         return Cmd('V(' + self.name + ') <+ ' + str(value))
 
     #---------------------------------------------------------------------------
-    # Return a command representing curruent contribution
-    # Parameters:
-    # value - A Real representing the value
+    ## Return a command representing current contribution
+    #  @param self The object pointer.
+    #  @param value Real, float or int representig the value of the contribution
+    #  @return a Cmd representing the current contribution 
+    # 
     #---------------------------------------------------------------------------
     def iCont(self, value):
         value = parseReal("value", value)
         return Cmd('I(' + self.name + ') <+ ' + str(value))
 
     #---------------------------------------------------------------------------
-    # Return a command representing voltage attribution
-    # Parameters:
-    # value - A Real representing the value
+    ## Return a command representing voltage attribution
+    #  @param self The object pointer.
+    #  @param value Real, float or int representig the value of the attribution
+    #  @return a Cmd representing the voltage attribution
+    # 
     #---------------------------------------------------------------------------
     def vAttr(self, value):
         value = parseReal("value", value)
         return Cmd('V(' + self.name + ') = ' + str(value))
 
     #---------------------------------------------------------------------------
-    # Return a command representing current attribution
-    # Parameters:
-    # value - A Real representing the value
+    ## Return a command representing current attribution
+    #  @param self The object pointer.
+    #  @param value Real, float or int representig the value of the attribution
+    #  @return a Cmd representing the current attribution
+    # 
     #---------------------------------------------------------------------------
     def iAttr(self, value):
         value = parseReal("value", value)
         return Cmd('I(' + self.name + ') = ' + str(value))
 
     #---------------------------------------------------------------------------
-    # Return a command representing voltage indirect assigment
-    # Parameters:
-    # value - A Bool representing the value
+    ## Return a command representing voltage indirect assigment (Voltage that
+    #  makes value true)
+    #  @param self The object pointer.
+    #  @param value Bool or bool condition
+    #  @return a Cmd representing the voltage indirect assigment 
+    #
     #---------------------------------------------------------------------------
     def vInd(self, value):
         value = parseBool("value", value)
         return Cmd('V(' + self.name + ') : ' + str(value))
 
     #---------------------------------------------------------------------------
-    # Return a command representing current indirect assigment
-    # Parameters:
-    # value - A Bool representing the value
+    ## Return a command representing current indirect assigment (Current that
+    #  makes value true)
+    #  @param self The object pointer.
+    #  @param value Bool or bool condition
+    #  @return a Cmd representing the current indirect assigment 
+    #
     #---------------------------------------------------------------------------
     def iInd(self, value):
         value = parseBool("value", value)
@@ -2416,15 +2704,17 @@ class Electrical():
  
 
 #-------------------------------------------------------------------------------
-# Branch class
+## Branch class
+#
 #-------------------------------------------------------------------------------
 class Branch(Electrical):
 
     #---------------------------------------------------------------------------
-    # constructor
-    # Parameters:
-    # node1 - electrical signal representing the first node
-    # node2 - electrical signal representing the second node
+    ## constructor
+    #  @param self The object pointer.
+    #  @param node1 Electrical signal representing the first node
+    #  @param node2 Electrical signal representing the second node
+    #
     #---------------------------------------------------------------------------
     def __init__(self, node1, node2):
         checkInstance("node1", node1, Electrical)
@@ -2435,14 +2725,18 @@ class Branch(Electrical):
 
 
 #-------------------------------------------------------------------------------
-# verilogA class
+## verilogA class
+#
 #-------------------------------------------------------------------------------
 class Module:
 
     #---------------------------------------------------------------------------
-    # constructor
-    # Parameters:
-    # moduleName - name of the module (the first word after module in the va)
+    ## constructor
+    #  @param self The object pointer.
+    #  @param node1 Electrical signal representing the first node
+    #  @param moduleName name of the module (the first word after module in the 
+    #         va)
+    #
     #---------------------------------------------------------------------------
     def __init__(self, moduleName):
         checkType("moduleName", moduleName, str)
@@ -2458,17 +2752,22 @@ class Module:
         self.beginningCmds = []
 
     #---------------------------------------------------------------------------
-    # return module name
+    ## return module name
+    #  @param self The object pointer
+    #  @return string representing the name of the module
+    #
     #---------------------------------------------------------------------------
     def getModuleName(self):
         return self.moduleName
 
     #---------------------------------------------------------------------------
-    # If name is an empty string, get the next name available in the namespace.
-    # If name isn't empty, check if the name is available in the verilogA 
-    # namespace and raise an exception if it doesn't
-    # Parameters: 
-    # name - name to be checked
+    ## If name is an empty string, get the next name available in the namespace.
+    #  If name isn't empty, check if the name is available in the verilogA 
+    #  namespace and raise an exception if it doesn't
+    #  @param self The object pointer. 
+    #  @param name string to be checked
+    #  @return string representing a valid name in the verilogA namespace
+    #
     #---------------------------------------------------------------------------
     def fixName(self, name):
         checkType("name", name, str)
@@ -2482,10 +2781,12 @@ class Module:
         return name
 
     #---------------------------------------------------------------------------
-    # Add variable to the module
-    # Parameters: 
-    # name - name of the parameter
-    # value - the variable created will be the same type as value
+    ## Add variable to the module
+    #  @param self The object pointer. 
+    #  @param vType it can be Integer Bool or Real
+    #  @param name string representing the name of the variable in the verilogA
+    #  @return RealVar, IntegerVar or BoolVar depending on the vType
+    #   
     #---------------------------------------------------------------------------
     def var(self, vType = Integer, name = ""):
         name = self.fixName(name)
@@ -2505,10 +2806,12 @@ class Module:
         return ans
 
     #---------------------------------------------------------------------------
-    # Add parameter to the module
-    # Parameters: 
-    # name - name of the parameter
-    # value - the variable created will be the same type as value
+    ## Add parameter to the module
+    #  @param self The object pointer. 
+    #  @param value Initial value. It can be Real, Integer, int or float.
+    #  @param name string representing the name of the parameter in the verilogA
+    #  @return RealVar or RealVar depending on the initial value
+    #
     #---------------------------------------------------------------------------
     def par(self, value, name):
         name = self.fixName(name)
@@ -2527,9 +2830,10 @@ class Module:
         return ans
 
     #---------------------------------------------------------------------------
-    # Add commands to the analog block
-    # Parameters:
-    # *args - variable number of cmd arguments
+    ## Add commands to the analog block
+    #  @param self The object pointer.
+    #  @param *args variable number of Cmd or CmdList to be added 
+    #
     #---------------------------------------------------------------------------
     def analog(self, *args):
         i = 1
@@ -2540,6 +2844,12 @@ class Module:
             i = i + 1
             self.cmds.append(arg)
 
+    #---------------------------------------------------------------------------
+    ## Add commands to beginning of the analog block
+    #  @param self The object pointer.
+    #  @param *args variable number of Cmd or CmdList to be added 
+    #
+    #---------------------------------------------------------------------------
     def beginningAnalog(self, *args):
         i = 1
         for arg in args:
@@ -2549,6 +2859,12 @@ class Module:
             i = i + 1
             self.beginningCmds.append(arg)
 
+    #---------------------------------------------------------------------------
+    ## Add commands to the end of the analog block
+    #  @param self The object pointer.
+    #  @param *args variable number of Cmd or CmdList to be added 
+    #
+    #---------------------------------------------------------------------------
     def endAnalog(self, *args):
         i = 1
         for arg in args:
@@ -2558,16 +2874,16 @@ class Module:
             i = i + 1
             self.endCmds.append(arg)
 
-
     #---------------------------------------------------------------------------
-    # Add port
-    # Parameters:
-    # name - name of the electrical signal
-    # width - width of the electrical signal
-    # direction - direction of the signal. It can be internal, input, output, or
-    #             inout
+    ## Add node
+    #  @param name string representing the name of the electrical signal
+    #  @param width int representing the width of the electrical signal
+    #  @param direction direction of the signal. It can be on the strings 
+    #         "internal", "input", "output", or "inout"
+    #  @return string with the name of the node
+    #
     #---------------------------------------------------------------------------
-    def addPort(self, name, width, direction):
+    def addNode(self, name, width, direction):
         checkType("width", width, int)
         assert width > 0, "width must be greather than 0"
         checkType("direction", direction, str)
@@ -2588,7 +2904,7 @@ class Module:
     #             inout
     #---------------------------------------------------------------------------
     def electrical(self, name = "", width = 1, direction = "internal"):
-        name = self.addPort(name, width, direction)
+        name = self.addNode(name, width, direction)
         if width == 1:
             return Electrical(name)
         else:
