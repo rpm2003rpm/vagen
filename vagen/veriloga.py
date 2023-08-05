@@ -1,5 +1,5 @@
 ## @file veriloga.py
-#  VerilogA modeling.
+#  VerilogA modeling
 #
 #  @section license_main License
 #
@@ -2876,6 +2876,7 @@ class Module:
 
     #---------------------------------------------------------------------------
     ## Add node
+    #  @param self The object pointer.
     #  @param name string representing the name of the electrical signal
     #  @param width int representing the width of the electrical signal
     #  @param direction direction of the signal. It can be on the strings 
@@ -2896,12 +2897,15 @@ class Module:
         return name
 
     #---------------------------------------------------------------------------
-    # Return electrical class
-    # Parameters:
-    # name - name of the electrical signal
-    # width - width of the electrical signal
-    # direction - direction of the signal. It can be internal, input, output, or
-    #             inout
+    ## Return electrical class
+    #  @param self The object pointer.
+    #  @param name string representing the name of the electrical signal
+    #  @param width int representing the width of the electrical signal
+    #  @param direction direction of the signal. It can be on the strings 
+    #         "internal", "input", "output", or "inout"
+    #  @return list of electrical classes or an electrical class depending on 
+    #          the width
+    #
     #---------------------------------------------------------------------------
     def electrical(self, name = "", width = 1, direction = "internal"):
         name = self.addNode(name, width, direction)
@@ -2914,7 +2918,10 @@ class Module:
             return vector
 
     #---------------------------------------------------------------------------
-    # Return the VA verilog command
+    ## Return the VA verilog code
+    #  @param self The object pointer.
+    #  @return string with the verilogA code
+    #
     #---------------------------------------------------------------------------
     def getVA(self):
         #-----------------------------------------------------------------------
