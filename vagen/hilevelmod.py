@@ -385,16 +385,17 @@ class Vdc(Electrical):
         value = parseReal("value", value)
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
-        if gnd == None:
-            super(Vdc, self).__init__(name)
-        else:
-            super(Vdc, self).__init__(name + ", " + gnd.getName())
+        super(Vdc, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.volt = hiLevelMod.var(value, prefix + "_$value$")
         self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
         self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        if gnd == None:
+            out = self
+        else:
+            out = Branch(self, gnd)
         hiLevelMod.endAnalog(
-            self.vCont(
+            out.vCont(
                 transition(self.volt, Real(0), self.rise, self.fall)
             )
         ) 
@@ -507,16 +508,17 @@ class Idc(Electrical):
             checkNotInstance("gnd", gnd, Branch)
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
-        if gnd == None:
-            super(Idc, self).__init__(name)
-        else:
-            super(Idc, self).__init__(name + ", " + gnd.getName())
+        super(Idc, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.cur = hiLevelMod.var(value, prefix + "_$value$")
         self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
         self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        if gnd == None:
+            out = self
+        else:
+            out = Branch(self, gnd)
         hiLevelMod.endAnalog(
-            self.iCont(
+            out.iCont(
                 transition(self.cur, Real(0), self.rise, self.fall)
             )
         ) 
@@ -630,10 +632,7 @@ class Smu(Electrical):
         if gnd != None:
             checkType("gnd", gnd, Electrical)
             checkNotInstance("gnd", gnd, Branch)
-        if gnd == None:
-            super(Smu, self).__init__(name)
-        else:
-            super(Smu, self).__init__(name + ", " + gnd.getName())
+        super(Smu, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.volt     = hiLevelMod.var(volt, prefix + "_$volt$")
         self.maxCur   = hiLevelMod.var(maxCur, prefix + "_$maxCur")
@@ -647,6 +646,10 @@ class Smu(Electrical):
         maxCurTran    = hiLevelMod.var(Real(0), prefix + "_$maxCurTran$")
         minCurTran    = hiLevelMod.var(Real(0), prefix + "_$minCurTran$")
         resTran       = hiLevelMod.var(Real(0), prefix + "_$resTran$")
+        if gnd == None:
+            out = self
+        else:
+            out = Branch(self, gnd)
         hiLevelMod.endAnalog(
             voltTran.eq(
                 transition(
@@ -678,13 +681,13 @@ class Smu(Electrical):
                     self.rDelay,
                     self.riseFall, 
                     self.riseFall)),
-            self.iCont(
-                tanh(50*(self.v - voltTran))*
+            out.iCont(
+                tanh(50*(out.v - voltTran))*
                 0.5*(maxCurTran - minCurTran) + 
                 0.5*(maxCurTran + minCurTran)
             ),
-            self.iCont(self.v/resTran),
-            self.iCont(1e-12*ddt(self.v))
+            out.iCont(out.v/resTran),
+            out.iCont(1e-12*ddt(out.v))
         ) 
     
     #---------------------------------------------------------------------------
@@ -864,26 +867,29 @@ class DigOut(Electrical):
         delay = parseReal("delay", delay) 
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
-        if gnd == None:
-            super(DigOut, self).__init__(name)
-        else:
-            super(DigOut, self).__init__(name + ", " + gnd.getName())
+        super(DigOut, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.st = hiLevelMod.var(state, prefix + "_$state$")
         self.serRes = hiLevelMod.var(serRes, prefix + "_$serRes$")
         self.delay = hiLevelMod.var(delay, prefix + "_$delay$")
         self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
         self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        if gnd == None:
+            out = self
+            dm  = domain
+        else:
+            out = Branch(self, gnd)
+            dm  = Branch(domain, gnd)
         hiLevelMod.endAnalog(
-            self.vCont(
-                domain.v*transition(
+            out.vCont(
+                dm.v*transition(
                     ternary(self.st, 1.0, 0.0), 
                     self.delay, 
                     self.rise, 
                     self.fall
                 )
             ),
-            self.vCont(self.i*self.serRes)
+            out.vCont(out.i*self.serRes)
         ) 
 
     #---------------------------------------------------------------------------
@@ -923,6 +929,16 @@ class DigOut(Electrical):
     def write(self, value):
         checkBool("value", value)
         return self.st.eq(value)
+        
+    #---------------------------------------------------------------------------
+    ## Toogle the state to the digital output.
+    #  @param self The object pointer.
+    #  @return The commands to change the stare of a digital pin.
+    #
+    #---------------------------------------------------------------------------
+    def toggle(self):
+        return self.st.toggle()
+
 
 
 #-------------------------------------------------------------------------------
@@ -959,15 +975,17 @@ class DigIn(Electrical):
         if gnd != None:
             checkType("gnd", gnd, Electrical)
             checkNotInstance("gnd", gnd, Branch)
-        if gnd == None:
-            super(DigIn, self).__init__(name)
-        else:
-            super(DigIn, self).__init__(name + ", " + gnd.getName())
+        super(DigIn, self).__init__(name)
         self.domain = domain
+        self.gnd = gnd
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.inCap = hiLevelMod.var(inCap, prefix + "_$inCap$")
+        if self.gnd == None:
+            out = self
+        else:
+            out = Branch(self, gnd)
         hiLevelMod.endAnalog(
-            self.iCont(ddt(self.v)*self.inCap)
+            out.iCont(ddt(out.v)*self.inCap)
         ) 
  
     #---------------------------------------------------------------------------
@@ -977,7 +995,13 @@ class DigIn(Electrical):
     #
     #---------------------------------------------------------------------------   
     def read(self):
-        return self.v > self.domain.v/2
+        if self.gnd == None:
+            out = self
+            dm  = self.domain
+        else:
+            out = Branch(self, gnd)
+            dm  = Branch(self.domain, gnd)
+        return out.v > dm.v/2
 
 
 #-------------------------------------------------------------------------------
@@ -1022,10 +1046,7 @@ class DigInOut(DigIn, DigOut):
         delay = parseReal("delay", delay)     
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
-        if gnd == None:
-            super(DigOut, self).__init__(name)
-        else:
-            super(DigOut, self).__init__(name + ", " + gnd.getName())
+        super(DigOut, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.st = hiLevelMod.var(state, prefix + "_$state$")
         self.serRes = hiLevelMod.var(serRes, prefix + "_$serRes$")
@@ -1037,9 +1058,16 @@ class DigInOut(DigIn, DigOut):
         self.domain = domain
         pin = hiLevelMod.electrical()
         conn = Branch(pin, self)
+        if gnd == None:
+            out = self
+            dm  = domain
+        else:
+            out = Branch(self, gnd)
+            pin = Branch(pin,  gnd)
+            dm  = Branch(domain, gnd)
         hiLevelMod.endAnalog(
             pin.vCont(
-                domain.v*transition(
+                dm.v*transition(
                     ternary(self.st, 1.0, 0.0), 
                     self.delay, 
                     self.rise, 
@@ -1049,7 +1077,7 @@ class DigInOut(DigIn, DigOut):
             conn.vCont(
                 conn.i*transition(self.res, self.delay, self.rise, self.fall)
             ),
-            self.iCont(ddt(self.v)*self.inCap)
+            out.iCont(ddt(out.v)*self.inCap)
         ) 
 
     #---------------------------------------------------------------------------
@@ -1136,7 +1164,18 @@ class DigBusOut(Bus):
             i = i << 1
         return ans
 
-
+    #---------------------------------------------------------------------------
+    ## Toogle all the states of a digital bus
+    #  @param self The object pointer.
+    #  @return The commands to change the stare of a digital pin.
+    #
+    #---------------------------------------------------------------------------
+    def toggle(self):
+        ans = CmdList()
+        for pin in self:
+            ans.append(pin.toggle())
+        return ans
+        
 #-------------------------------------------------------------------------------
 ## DigBusIn class. Child of a list. It implements aditional methods to deal with
 #  read and write operations to a bus. It also overrides the slice method, so
@@ -1448,7 +1487,7 @@ class HiLevelMod(Module):
     #         This value will be set at the beggining of the simulation and 
     #         can't be changed afterwards.
     #  @param gnd Electrical representing the ground reference.
-    #  @param delay Real expression holding the delay.    
+    #  @param delay Real expression holding the initial delay time.    
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #  @return DigIn, DigOut, or DigInOut object. A DigBusIn, DigBusOut or
