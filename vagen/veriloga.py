@@ -1434,18 +1434,15 @@ class Cross(Event):
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
-    #  @param signal Real class or build-in real representing the signal
-    #  @param threshold Real class or build-in real representing the threshold 
-    #         that must be crossed
+    #  @param exp Real class or build-in real representing the expression
     #  @param edge It can be rising, falling or both
     #  @param *pars optional Real or build-in real parameters timeTol and expTol
     #         in this order
     #
     #---------------------------------------------------------------------------
-    def __init__(self, signal, threshold, edge, *pars):
+    def __init__(self, expr, edge, *pars):
         assert len(pars) >= 0 and len(pars) <= 2, "Wrong number of parameters"
-        signal = parseReal("signal", signal)
-        threshold = parseReal("threshold", threshold)
+        expr = parseReal("expr", expr)
         checkType("edge", edge, str)
         mapping = {'rising': '1', 'falling': '-1', 'both': '0'}  
         assert edge in mapping.keys(), "Wrong value for edge"
@@ -1455,8 +1452,7 @@ class Cross(Event):
             par = parseReal("timeTol or expTol", par)
             params.append(str(par))
         
-        evnt = "cross(" + str(signal) + " - " + str(threshold) + ", " + \
-                ", ".join(params) + ")" 
+        evnt = "cross(" + str(expr) + ", " + ", ".join(params) + ")" 
         super(Cross, self).__init__(evnt)
 
 
@@ -1469,18 +1465,15 @@ class Above(Event):
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
-    #  @param signal Real class or build-in real representing the signal
-    #  @param threshold Real class or build-in real representing the threshold 
-    #         that must be crossed
+    #  @param expr Real class or build-in real representing the expression
     #  @param *pars optional Real or build-in real parameters timeTol and expTol
     #         in this order
     #
     #---------------------------------------------------------------------------
-    def __init__(self, signal, threshold, *pars):
+    def __init__(self, expr, *pars):
         assert len(pars) >= 0 and len(pars) <= 2, "Wrong number of parameters"
-        signal = parseReal("signal", signal)
-        threshold = parseReal("threshold", threshold)
-        params = [str(signal) + " - " + str(threshold)] 
+        expr = parseReal("expr", expr)
+        params = [str(expr)] 
 
         for par in pars:
             par = parseReal("timeTol or expTol", par)

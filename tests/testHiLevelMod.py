@@ -77,7 +77,7 @@ class TestHiLevelMod(unittest.TestCase):
         #Create an electrical pin (No base model atached to it)
         pin14 = mod.electrical("pin14", 1, direction = "inout")
         #Create a cross at 0.5 event based on the voltage of pin7 for both edges
-        evnt1 = Cross(pin7.v, Real(0.5), "both")
+        evnt1 = Cross(pin7.v - Real(0.5), "both")
         #Create a switch between pin7 and pin14. Initial conductance will be 10mS
         sw = mod.sw(pin7, pin14, Real(10e-3))
         #Create a clock source using the dig4 pin
@@ -696,7 +696,7 @@ analog begin
     @( timer(_$evntTime_2) )
         if( ( _$eventId_2 ) == ( 0 ) )
             _$runSt_2 = 1;
-    @( cross(V(pin7) - 5.000000e-01, 0) )
+    @( cross(( V(pin7) ) - ( 5.000000e-01 ), 0) )
         if( ( _$eventId_2 ) == ( 1 ) )
             _$runSt_2 = 1;
     if( ( TEST_SEQ_PARAM ) == ( 1 ) )
@@ -1052,7 +1052,7 @@ endmodule'''
         #Create an electrical pin (No base model atached to it)
         pin14 = mod.electrical("pin14", 1, direction = "inout")
         #Create a cross at 0.5 event based on the voltage of pin7 for both edges
-        evnt1 = Cross(pin7.v, 0.5, "both")
+        evnt1 = Cross(pin7.v - 0.5, "both")
         #Create a switch between pin7 and pin14. Initial conductance will be 10mS
         sw = mod.sw(pin7, pin14, 10e-3)
         #Create a clock source using the dig4 pin
@@ -1672,7 +1672,7 @@ analog begin
     @( timer(_$evntTime_2) )
         if( ( _$eventId_2 ) == ( 0 ) )
             _$runSt_2 = 1;
-    @( cross(V(pin7) - 5.000000e-01, 0) )
+    @( cross(( V(pin7) ) - ( 5.000000e-01 ), 0) )
         if( ( _$eventId_2 ) == ( 1 ) )
             _$runSt_2 = 1;
     if( ( TEST_SEQ_PARAM ) == ( 1 ) )
@@ -1995,7 +1995,7 @@ endmodule'''
         #Create an electrical pin (No base model atached to it)
         pin7 = mod.electrical("pin7", 1, direction = "inout")
         #Create a cross at 0.5 event based on the voltage of pin7 for both edges
-        evnt1 = Cross(pin7.v, Real(0.5), "both")
+        evnt1 = Cross(pin7.v - Real(0.5), "both")
         mod.seq(True)(
             var1.eq(0),
             var1.eq(1),
@@ -2015,7 +2015,7 @@ endmodule'''
         #Create an electrical pin (No base model atached to it)
         pin7 = mod.electrical("pin7", 1, direction = "inout")
         #Create a cross at 0.5 event based on the voltage of pin7 for both edges
-        evnt1 = Cross(pin7.v, Real(0.5), "both")
+        evnt1 = Cross(pin7.v - Real(0.5), "both")
         mod.seq(True)(
             var1.eq(0),
             WaitUs(100),
@@ -2041,7 +2041,7 @@ endmodule'''
         #Create an electrical pin (No base model atached to it)
         pin7 = mod.electrical("pin7", 1, direction = "inout")
         #Create a cross at 0.5 event based on the voltage of pin7 for both edges
-        evnt1 = Cross(pin7.v, Real(0.5), "both")
+        evnt1 = Cross(pin7.v - Real(0.5), "both")
         mod.seq(True)(
             var1.eq(0),
             WaitUs(100),

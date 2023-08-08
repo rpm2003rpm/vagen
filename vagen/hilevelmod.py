@@ -394,6 +394,8 @@ class Vdc(Electrical):
             out = self
         else:
             out = Branch(self, gnd)
+        self.dv = out.v
+        self.di = out.i
         hiLevelMod.endAnalog(
             out.vCont(
                 transition(self.volt, Real(0), self.rise, self.fall)
@@ -517,6 +519,8 @@ class Idc(Electrical):
             out = self
         else:
             out = Branch(self, gnd)
+        self.dv = out.v
+        self.di = out.i
         hiLevelMod.endAnalog(
             out.iCont(
                 transition(self.cur, Real(0), self.rise, self.fall)
@@ -650,6 +654,8 @@ class Smu(Electrical):
             out = self
         else:
             out = Branch(self, gnd)
+        self.dv = out.v
+        self.di = out.i
         hiLevelMod.endAnalog(
             voltTran.eq(
                 transition(
@@ -880,6 +886,9 @@ class DigOut(Electrical):
         else:
             out = Branch(self, gnd)
             dm  = Branch(domain, gnd)
+        self.dv = out.v
+        self.di = out.i
+        self.diffHalfDomain = self.dv - dm.v/2
         hiLevelMod.endAnalog(
             out.vCont(
                 dm.v*transition(
@@ -982,8 +991,13 @@ class DigIn(Electrical):
         self.inCap = hiLevelMod.var(inCap, prefix + "_$inCap$")
         if self.gnd == None:
             out = self
+            dm  = self.domain
         else:
             out = Branch(self, gnd)
+            dm  = Branch(self.domain, gnd)
+        self.dv = out.v
+        self.di = out.i
+        self.diffHalfDomain = self.dv - dm.v/2
         hiLevelMod.endAnalog(
             out.iCont(ddt(out.v)*self.inCap)
         ) 
@@ -995,13 +1009,7 @@ class DigIn(Electrical):
     #
     #---------------------------------------------------------------------------   
     def read(self):
-        if self.gnd == None:
-            out = self
-            dm  = self.domain
-        else:
-            out = Branch(self, gnd)
-            dm  = Branch(self.domain, gnd)
-        return out.v > dm.v/2
+        return self.diffHalfDomain > 0
 
 
 #-------------------------------------------------------------------------------
@@ -1065,6 +1073,9 @@ class DigInOut(DigIn, DigOut):
             out = Branch(self, gnd)
             pin = Branch(pin,  gnd)
             dm  = Branch(domain, gnd)
+        self.dv = out.v
+        self.di = out.i
+        self.diffHalfDomain = self.dv - dm.v/2
         hiLevelMod.endAnalog(
             pin.vCont(
                 dm.v*transition(

@@ -67,7 +67,7 @@ dig6 = mod.dig(vdc2, "pin13", 1, direction = "inout")
 #Create an electrical pin (No base model atached to it)
 pin14 = mod.electrical("pin14", 1, direction = "inout")
 #Create a cross at 0.5 event based on the voltage of pin7 for both edges
-evnt1 = Cross(pin7.v, 0.5, "both")
+evnt1 = Cross(pin7.v - 0.5, "both")
 #Create a switch between pin7 and pin14. Initial conductance will be 10mS
 sw = mod.sw(pin7, pin14, 10e-3)
 #Create a clock source using the dig4 pin
