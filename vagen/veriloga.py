@@ -2100,6 +2100,17 @@ def Error(msg, *params):
     return Cmd('$error("' + msg + '"' + unfoldParams(*params) + ")")
 
 #-------------------------------------------------------------------------------
+## fatal
+#  @param msg message to be printed
+#  @param *params variable number of parameters
+#  @return Cmd representing the error
+#
+#-------------------------------------------------------------------------------
+def Fatal(msg, *params):
+    checkType("msg", msg, str)
+    return Cmd('$fatal("' + msg + '"' + unfoldParams(*params) + ")")
+
+#-------------------------------------------------------------------------------
 ## bond step
 #  @param step Real, float or int representing the step
 #  @return Cmd representing the BondStep

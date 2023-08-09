@@ -60,7 +60,7 @@ from vagen.hilevelmod import HiLevelMod, Module, Branch, Cmd, CmdList, Electrica
                      sinh, cosh, tanh, asinh, acosh, atanh, \
                      Strobe, Write, Discontinuity, BoundStep, \
                      Fopen, Fwrite, Fstrobe, Fclose, \
-                     Finish, Error, WaitUs, WaitSignal
+                     Finish, Error, Fatal, WaitUs, WaitSignal
             
             
 
