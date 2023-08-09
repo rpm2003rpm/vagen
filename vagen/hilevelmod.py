@@ -940,6 +940,15 @@ class DigOut(Electrical):
         return self.st.eq(value)
         
     #---------------------------------------------------------------------------
+    ## Return the state of the digital output.
+    #  @param self The object pointer.
+    #  @return The commands to change the stare of a digital pin.
+    #
+    #---------------------------------------------------------------------------
+    def getST(self):
+        return Bool(self.st)
+
+    #---------------------------------------------------------------------------
     ## Toogle the state to the digital output.
     #  @param self The object pointer.
     #  @return The commands to change the stare of a digital pin.
