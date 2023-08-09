@@ -946,7 +946,7 @@ class DigOut(Electrical):
     #
     #---------------------------------------------------------------------------
     def getST(self):
-        return Bool(self.st)
+        return self.st
 
     #---------------------------------------------------------------------------
     ## Toogle the state to the digital output.
