@@ -2108,7 +2108,7 @@ def Error(msg, *params):
 #-------------------------------------------------------------------------------
 def Fatal(msg, *params):
     checkType("msg", msg, str)
-    return Cmd('$fatal("' + msg + '"' + unfoldParams(*params) + ")")
+    return Cmd('$fatal(0, "' + msg + '"' + unfoldParams(*params) + ")")
 
 #-------------------------------------------------------------------------------
 ## bond step
