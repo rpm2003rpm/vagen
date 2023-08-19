@@ -50,7 +50,7 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(d), Real)
         self.assertEqual(str(a), 'a')  
         self.assertEqual(str(b), 'b')         
-        self.assertEqual(str(c), 'c ? ( 1.0 ) : ( 0.0 )')  
+        self.assertEqual(str(c), 'c ? {:e} : {:e}'.format(1,0))  
         self.assertEqual(str(d), "{:e}".format(1.5))  
         
     def testRealSum(self):
@@ -62,11 +62,11 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b + a), Real)
         self.assertEqual(type(b + c), Real)
         self.assertEqual(type(c + a), Real)
-        self.assertEqual(str(a + b), '( a ) + ( b )')
-        self.assertEqual(str(b + a), '( b ) + ( a )')
-        self.assertEqual(str(b + c), '( b ) + ' + "( {:e} )".format(c))
-        self.assertEqual(str(c + a), "( {:e} )".format(c) + ' + ( a )')
-
+        self.assertEqual(str(a + b), 'a + b')
+        self.assertEqual(str(b + a), 'b + a')
+        self.assertEqual(str(b + c), 'b + {:e}'.format(c))
+        self.assertEqual(str(c + a), "{:e} + a".format(c))
+        
     def testRealSub(self):
         a = Real('a')
         b = Real('b')
@@ -75,10 +75,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b - a), Real)
         self.assertEqual(type(b - c), Real)
         self.assertEqual(type(c - a), Real)
-        self.assertEqual(str(a - b), '( a ) - ( b )')
-        self.assertEqual(str(b - a), '( b ) - ( a )')
-        self.assertEqual(str(b - c), '( b ) - ' + "( {:e} )".format(c))
-        self.assertEqual(str(c - a), "( {:e} )".format(c) + ' - ( a )')
+        self.assertEqual(str(a - b), 'a - b')
+        self.assertEqual(str(b - a), 'b - a')
+        self.assertEqual(str(b - c), 'b - {:e}'.format(c))
+        self.assertEqual(str(c - a), "{:e} - a".format(c))
 
     def testRealTrueDiv(self):
         a = Real('a')
@@ -88,10 +88,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b/a), Real)
         self.assertEqual(type(b/c), Real)
         self.assertEqual(type(c/a), Real)
-        self.assertEqual(str(a/b), '( a )/( b )')
-        self.assertEqual(str(b/a), '( b )/( a )')
-        self.assertEqual(str(b/c), '( b )/' + "( {:e} )".format(c))
-        self.assertEqual(str(c/a), "( {:e} )".format(c) + '/( a )')
+        self.assertEqual(str(a/b), 'a/b')
+        self.assertEqual(str(b/a), 'b/a')
+        self.assertEqual(str(b/c), 'b/{:e}'.format(c))
+        self.assertEqual(str(c/a), "{:e}/a".format(c))
         
     def testRealMul(self):
         a = Real('a')
@@ -101,10 +101,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b*a), Real)
         self.assertEqual(type(b*c), Real)
         self.assertEqual(type(c*a), Real)
-        self.assertEqual(str(a*b), '( a )*( b )')
-        self.assertEqual(str(b*a), '( b )*( a )')
-        self.assertEqual(str(b*c), '( b )*' + "( {:e} )".format(c))
-        self.assertEqual(str(c*a), "( {:e} )".format(c) + '*( a )')
+        self.assertEqual(str(a*b), 'a*b')
+        self.assertEqual(str(b*a), 'b*a')
+        self.assertEqual(str(b*c), 'b*{:e}'.format(c))
+        self.assertEqual(str(c*a), '{:e}*a'.format(c))
         
     def testRealPow(self):
         a = Real('a')
@@ -127,10 +127,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b > a), Bool)
         self.assertEqual(type(b > c), Bool)
         self.assertEqual(type(c > a), Bool)
-        self.assertEqual(str(a > b), '( a ) > ( b )')
-        self.assertEqual(str(b > a), '( b ) > ( a )')
-        self.assertEqual(str(b > c), '( b ) > ( {:e} )'.format(c))
-        self.assertEqual(str(c > a), '( a ) < ( {:e} )'.format(c))
+        self.assertEqual(str(a > b), 'a > b')
+        self.assertEqual(str(b > a), 'b > a')
+        self.assertEqual(str(b > c), 'b > {:e}'.format(c))
+        self.assertEqual(str(c > a), 'a < {:e}'.format(c))
 
     def testRealLt(self):
         a = Real('a')
@@ -140,10 +140,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b < a), Bool)
         self.assertEqual(type(b < c), Bool)
         self.assertEqual(type(c < a), Bool)
-        self.assertEqual(str(a < b), '( a ) < ( b )')
-        self.assertEqual(str(b < a), '( b ) < ( a )')
-        self.assertEqual(str(b < c), '( b ) < ( {:e} )'.format(c))
-        self.assertEqual(str(c < a), '( a ) > ( {:e} )'.format(c))
+        self.assertEqual(str(a < b), 'a < b')
+        self.assertEqual(str(b < a), 'b < a')
+        self.assertEqual(str(b < c), 'b < {:e}'.format(c))
+        self.assertEqual(str(c < a), 'a > {:e}'.format(c))
         
     def testRealLe(self):
         a = Real('a')
@@ -153,10 +153,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b <= a), Bool)
         self.assertEqual(type(b <= c), Bool)
         self.assertEqual(type(c <= a), Bool)
-        self.assertEqual(str(a <= b), '( a ) <= ( b )')
-        self.assertEqual(str(b <= a), '( b ) <= ( a )')
-        self.assertEqual(str(b <= c), '( b ) <= ( {:e} )'.format(c))
-        self.assertEqual(str(c <= a), '( a ) >= ( {:e} )'.format(c))
+        self.assertEqual(str(a <= b), 'a <= b')
+        self.assertEqual(str(b <= a), 'b <= a')
+        self.assertEqual(str(b <= c), 'b <= {:e}'.format(c))
+        self.assertEqual(str(c <= a), 'a >= {:e}'.format(c))
         
     def testRealGe(self):
         a = Real('a')
@@ -166,10 +166,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b >= a), Bool)
         self.assertEqual(type(b >= c), Bool)
         self.assertEqual(type(c >= a), Bool)
-        self.assertEqual(str(a >= b), '( a ) >= ( b )')
-        self.assertEqual(str(b >= a), '( b ) >= ( a )')
-        self.assertEqual(str(b >= c), '( b ) >= ( {:e} )'.format(c))
-        self.assertEqual(str(c >= a), '( a ) <= ( {:e} )'.format(c))
+        self.assertEqual(str(a >= b), 'a >= b')
+        self.assertEqual(str(b >= a), 'b >= a')
+        self.assertEqual(str(b >= c), 'b >= {:e}'.format(c))
+        self.assertEqual(str(c >= a), 'a <= {:e}'.format(c))
         
     def testRealEq(self):
         a = Real('a')
@@ -179,10 +179,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b == a), Bool)
         self.assertEqual(type(b == c), Bool)
         self.assertEqual(type(c == a), Bool)
-        self.assertEqual(str(a == b), '( a ) == ( b )')
-        self.assertEqual(str(b == a), '( b ) == ( a )')
-        self.assertEqual(str(b == c), '( b ) == ( {:e} )'.format(c))
-        self.assertEqual(str(c == a), '( a ) == ( {:e} )'.format(c)) 
+        self.assertEqual(str(a == b), 'a == b')
+        self.assertEqual(str(b == a), 'b == a')
+        self.assertEqual(str(b == c), 'b == {:e}'.format(c))
+        self.assertEqual(str(c == a), 'a == {:e}'.format(c)) 
            
     def testRealNeq(self):
         a = Real('a')
@@ -192,22 +192,28 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b != a), Bool)
         self.assertEqual(type(b != c), Bool)
         self.assertEqual(type(c != a), Bool)
-        self.assertEqual(str(a != b), '( a ) != ( b )')
-        self.assertEqual(str(b != a), '( b ) != ( a )')
-        self.assertEqual(str(b != c), '( b ) != ( {:e} )'.format(c))
-        self.assertEqual(str(c != a), '( a ) != ( {:e} )'.format(c))   
+        self.assertEqual(str(a != b), 'a != b')
+        self.assertEqual(str(b != a), 'b != a')
+        self.assertEqual(str(b != c), 'b != {:e}'.format(c))
+        self.assertEqual(str(c != a), 'a != {:e}'.format(c))   
  
     def testRealUnary(self):
         a = Real('a')
         self.assertEqual(type(-a), Real)
         self.assertEqual(type(+a), Real)
         self.assertEqual(type(abs(a)), Real)
-        self.assertEqual(str(-a), '-( a )') 
-        self.assertEqual(str(+a), 'a')  
-        self.assertEqual(str(abs(a)), 'abs( a )')             
+        self.assertEqual(str(-a), '-a') 
+        self.assertEqual(str(+a), '+a')  
+        self.assertEqual(str(abs(a)), 'abs(a)')             
         
         
-        
+    def testRealPrecedence(self):
+        a = Real('a')
+        b = Real('b')
+        self.assertEqual(str(((a + b - b*a/b)*a >= a + b)&Bool(a)), \
+        '( a + b - b*a/b )*a >= a + b && a != 0.000000e+00')
+
+            
     ############################################################################
     # Integer
     ############################################################################  
@@ -223,7 +229,7 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(d), Integer)
         self.assertEqual(str(a), 'a')  
         self.assertEqual(str(b), 'ceil(b)')         
-        self.assertEqual(str(c), 'c ? ( 1 ) : ( 0 )')  
+        self.assertEqual(str(c), 'c ? 1 : 0')  
         self.assertEqual(str(d), '1')  
                                            
     def testIntegerSum(self):
@@ -235,10 +241,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b + a), Integer)
         self.assertEqual(type(b + c), Integer)
         self.assertEqual(type(c + a), Integer)
-        self.assertEqual(str(a + b), '( a ) + ( b )')
-        self.assertEqual(str(b + a), '( b ) + ( a )')
-        self.assertEqual(str(b + c), '( b ) + ' + "( {:d} )".format(c))
-        self.assertEqual(str(c + a), "( {:d} )".format(c) + ' + ( a )')
+        self.assertEqual(str(a + b), 'a + b')
+        self.assertEqual(str(b + a), 'b + a')
+        self.assertEqual(str(b + c), 'b + {:d}'.format(c))
+        self.assertEqual(str(c + a), '{:d} + a'.format(c))
 
     def testIntegerSub(self):
         a = Integer('a')
@@ -248,10 +254,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b - a), Integer)
         self.assertEqual(type(b - c), Integer)
         self.assertEqual(type(c - a), Integer)
-        self.assertEqual(str(a - b), '( a ) - ( b )')
-        self.assertEqual(str(b - a), '( b ) - ( a )')
-        self.assertEqual(str(b - c), '( b ) - ' + "( {:d} )".format(c))
-        self.assertEqual(str(c - a), "( {:d} )".format(c) + ' - ( a )')
+        self.assertEqual(str(a - b), 'a - b')
+        self.assertEqual(str(b - a), 'b - a')
+        self.assertEqual(str(b - c), 'b - {:d}'.format(c))
+        self.assertEqual(str(c - a), '{:d} - a'.format(c))
 
     def testIntegerTrueDiv(self):
         a = Integer('a')
@@ -261,10 +267,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b/a), Integer)
         self.assertEqual(type(b/c), Integer)
         self.assertEqual(type(c/a), Integer)
-        self.assertEqual(str(a/b), '( a )/( b )')
-        self.assertEqual(str(b/a), '( b )/( a )')
-        self.assertEqual(str(b/c), '( b )/' + "( {:d} )".format(c))
-        self.assertEqual(str(c/a), "( {:d} )".format(c) + '/( a )')
+        self.assertEqual(str(a/b), 'a/b')
+        self.assertEqual(str(b/a), 'b/a')
+        self.assertEqual(str(b/c), 'b/{:d}'.format(c))
+        self.assertEqual(str(c/a), '{:d}/a'.format(c))
         
     def testIntegerMul(self):
         a = Integer('a')
@@ -274,10 +280,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b*a), Integer)
         self.assertEqual(type(b*c), Integer)
         self.assertEqual(type(c*a), Integer)
-        self.assertEqual(str(a*b), '( a )*( b )')
-        self.assertEqual(str(b*a), '( b )*( a )')
-        self.assertEqual(str(b*c), '( b )*' + "( {:d} )".format(c))
-        self.assertEqual(str(c*a), "( {:d} )".format(c) + '*( a )')
+        self.assertEqual(str(a*b), 'a*b')
+        self.assertEqual(str(b*a), 'b*a')
+        self.assertEqual(str(b*c), 'b*{:d}'.format(c))
+        self.assertEqual(str(c*a), '{:d}*a'.format(c))
   
     def testIntegerMod(self):
         a = Integer('a')
@@ -287,10 +293,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b%a), Integer)
         self.assertEqual(type(b%c), Integer)
         self.assertEqual(type(c%a), Integer)
-        self.assertEqual(str(a%b), '( a ) % ( b )')
-        self.assertEqual(str(b%a), '( b ) % ( a )')
-        self.assertEqual(str(b%c), '( b ) % ( {:d} )'.format(c))
-        self.assertEqual(str(c%a), '( {:d} ) % ( a )'.format(c))
+        self.assertEqual(str(a%b), 'a%b')
+        self.assertEqual(str(b%a), 'b%a')
+        self.assertEqual(str(b%c), 'b%{:d}'.format(c))
+        self.assertEqual(str(c%a), '{:d}%a'.format(c))
               
     def testIntegerPow(self):
         a = Integer('a')
@@ -313,10 +319,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b>>a), Integer)
         self.assertEqual(type(b>>c), Integer)
         self.assertEqual(type(c>>a), Integer)
-        self.assertEqual(str(a>>b), '( a ) >> ( b )')
-        self.assertEqual(str(b>>a), '( b ) >> ( a )')
-        self.assertEqual(str(b>>c), '( b ) >> ( {:d} )'.format(c))
-        self.assertEqual(str(c>>a), '( {:d} ) >> ( a )'.format(c))
+        self.assertEqual(str(a>>b), 'a >> b')
+        self.assertEqual(str(b>>a), 'b >> a')
+        self.assertEqual(str(b>>c), 'b >> {:d}'.format(c))
+        self.assertEqual(str(c>>a), '{:d} >> a'.format(c))
         
     def testIntegerLShift(self):
         a = Integer('a')
@@ -326,10 +332,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b<<a), Integer)
         self.assertEqual(type(b<<c), Integer)
         self.assertEqual(type(c<<a), Integer)
-        self.assertEqual(str(a<<b), '( a ) << ( b )')
-        self.assertEqual(str(b<<a), '( b ) << ( a )')
-        self.assertEqual(str(b<<c), '( b ) << ( {:d} )'.format(c))
-        self.assertEqual(str(c<<a), '( {:d} ) << ( a )'.format(c))     
+        self.assertEqual(str(a<<b), 'a << b')
+        self.assertEqual(str(b<<a), 'b << a')
+        self.assertEqual(str(b<<c), 'b << {:d}'.format(c))
+        self.assertEqual(str(c<<a), '{:d} << a'.format(c))     
 
     def testIntegerAnd(self):
         a = Integer('a')
@@ -339,10 +345,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b&a), Integer)
         self.assertEqual(type(b&c), Integer)
         self.assertEqual(type(c&a), Integer)
-        self.assertEqual(str(a&b), '( a ) & ( b )')
-        self.assertEqual(str(b&a), '( b ) & ( a )')
-        self.assertEqual(str(b&c), '( b ) & ( {:d} )'.format(c))
-        self.assertEqual(str(c&a), '( {:d} ) & ( a )'.format(c))
+        self.assertEqual(str(a&b), 'a & b')
+        self.assertEqual(str(b&a), 'b & a')
+        self.assertEqual(str(b&c), 'b & {:d}'.format(c))
+        self.assertEqual(str(c&a), '{:d} & a'.format(c))
         
     def testIntegerOr(self):
         a = Integer('a')
@@ -352,10 +358,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b|a), Integer)
         self.assertEqual(type(b|c), Integer)
         self.assertEqual(type(c|a), Integer)
-        self.assertEqual(str(a|b), '( a ) | ( b )')
-        self.assertEqual(str(b|a), '( b ) | ( a )')
-        self.assertEqual(str(b|c), '( b ) | ( {:d} )'.format(c))
-        self.assertEqual(str(c|a), '( {:d} ) | ( a )'.format(c))
+        self.assertEqual(str(a|b), 'a | b')
+        self.assertEqual(str(b|a), 'b | a')
+        self.assertEqual(str(b|c), 'b | {:d}'.format(c))
+        self.assertEqual(str(c|a), '{:d} | a'.format(c))
         
     def testIntegerXor(self):
         a = Integer('a')
@@ -365,10 +371,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b^a), Integer)
         self.assertEqual(type(b^c), Integer)
         self.assertEqual(type(c^a), Integer)
-        self.assertEqual(str(a^b), '( a ) ^ ( b )')
-        self.assertEqual(str(b^a), '( b ) ^ ( a )')
-        self.assertEqual(str(b^c), '( b ) ^ ( {:d} )'.format(c))
-        self.assertEqual(str(c^a), '( {:d} ) ^ ( a )'.format(c))  
+        self.assertEqual(str(a^b), 'a ^ b')
+        self.assertEqual(str(b^a), 'b ^ a')
+        self.assertEqual(str(b^c), 'b ^ {:d}'.format(c))
+        self.assertEqual(str(c^a), '{:d} ^ a'.format(c))  
                    
     def testIntegerGt(self):
         a = Integer('a')
@@ -378,10 +384,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b > a), Bool)
         self.assertEqual(type(b > c), Bool)
         self.assertEqual(type(c > a), Bool)
-        self.assertEqual(str(a > b), '( a ) > ( b )')
-        self.assertEqual(str(b > a), '( b ) > ( a )')
-        self.assertEqual(str(b > c), '( b ) > ( {:d} )'.format(c))
-        self.assertEqual(str(c > a), '( a ) < ( {:d} )'.format(c))
+        self.assertEqual(str(a > b), 'a > b')
+        self.assertEqual(str(b > a), 'b > a')
+        self.assertEqual(str(b > c), 'b > {:d}'.format(c))
+        self.assertEqual(str(c > a), 'a < {:d}'.format(c))
 
     def testIntegerLt(self):
         a = Integer('a')
@@ -391,10 +397,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b < a), Bool)
         self.assertEqual(type(b < c), Bool)
         self.assertEqual(type(c < a), Bool)
-        self.assertEqual(str(a < b), '( a ) < ( b )')
-        self.assertEqual(str(b < a), '( b ) < ( a )')
-        self.assertEqual(str(b < c), '( b ) < ( {:d} )'.format(c))
-        self.assertEqual(str(c < a), '( a ) > ( {:d} )'.format(c))
+        self.assertEqual(str(a < b), 'a < b')
+        self.assertEqual(str(b < a), 'b < a')
+        self.assertEqual(str(b < c), 'b < {:d}'.format(c))
+        self.assertEqual(str(c < a), 'a > {:d}'.format(c))
         
     def testIntegerLe(self):
         a = Integer('a')
@@ -404,10 +410,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b <= a), Bool)
         self.assertEqual(type(b <= c), Bool)
         self.assertEqual(type(c <= a), Bool)
-        self.assertEqual(str(a <= b), '( a ) <= ( b )')
-        self.assertEqual(str(b <= a), '( b ) <= ( a )')
-        self.assertEqual(str(b <= c), '( b ) <= ( {:d} )'.format(c))
-        self.assertEqual(str(c <= a), '( a ) >= ( {:d} )'.format(c))
+        self.assertEqual(str(a <= b), 'a <= b')
+        self.assertEqual(str(b <= a), 'b <= a')
+        self.assertEqual(str(b <= c), 'b <= {:d}'.format(c))
+        self.assertEqual(str(c <= a), 'a >= {:d}'.format(c))
         
     def testIntegerGe(self):
         a = Integer('a')
@@ -417,10 +423,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b >= a), Bool)
         self.assertEqual(type(b >= c), Bool)
         self.assertEqual(type(c >= a), Bool)
-        self.assertEqual(str(a >= b), '( a ) >= ( b )')
-        self.assertEqual(str(b >= a), '( b ) >= ( a )')
-        self.assertEqual(str(b >= c), '( b ) >= ( {:d} )'.format(c))
-        self.assertEqual(str(c >= a), '( a ) <= ( {:d} )'.format(c))
+        self.assertEqual(str(a >= b), 'a >= b')
+        self.assertEqual(str(b >= a), 'b >= a')
+        self.assertEqual(str(b >= c), 'b >= {:d}'.format(c))
+        self.assertEqual(str(c >= a), 'a <= {:d}'.format(c))
         
     def testIntegerEq(self):
         a = Integer('a')
@@ -430,10 +436,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b == a), Bool)
         self.assertEqual(type(b == c), Bool)
         self.assertEqual(type(c == a), Bool)
-        self.assertEqual(str(a == b), '( a ) == ( b )')
-        self.assertEqual(str(b == a), '( b ) == ( a )')
-        self.assertEqual(str(b == c), '( b ) == ( {:d} )'.format(c))
-        self.assertEqual(str(c == a), '( a ) == ( {:d} )'.format(c)) 
+        self.assertEqual(str(a == b), 'a == b')
+        self.assertEqual(str(b == a), 'b == a')
+        self.assertEqual(str(b == c), 'b == {:d}'.format(c))
+        self.assertEqual(str(c == a), 'a == {:d}'.format(c)) 
            
     def testIntegerNeq(self):
         a = Integer('a')
@@ -443,10 +449,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b != a), Bool)
         self.assertEqual(type(b != c), Bool)
         self.assertEqual(type(c != a), Bool)
-        self.assertEqual(str(a != b), '( a ) != ( b )')
-        self.assertEqual(str(b != a), '( b ) != ( a )')
-        self.assertEqual(str(b != c), '( b ) != ( {:d} )'.format(c))
-        self.assertEqual(str(c != a), '( a ) != ( {:d} )'.format(c))  
+        self.assertEqual(str(a != b), 'a != b')
+        self.assertEqual(str(b != a), 'b != a')
+        self.assertEqual(str(b != c), 'b != {:d}'.format(c))
+        self.assertEqual(str(c != a), 'a != {:d}'.format(c))  
         
     def testIntegerUnary(self):
         a = Integer('a')
@@ -454,11 +460,17 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(+a), Integer)
         self.assertEqual(type(abs(a)), Integer)
         self.assertEqual(type(~a), Integer)
-        self.assertEqual(str(-a), '-( a )') 
-        self.assertEqual(str(+a), 'a')  
-        self.assertEqual(str(abs(a)), 'abs( a )')  
-        self.assertEqual(str(~a), '~( a )')  
+        self.assertEqual(str(-a), '-a') 
+        self.assertEqual(str(+a), '+a')  
+        self.assertEqual(str(abs(a)), 'abs(a)')  
+        self.assertEqual(str(~a), '~a')  
 
+    def testIntegerPrecedence(self):
+        a = Integer('a')
+        b = Integer('b')
+        self.assertEqual(str(((a + b - b*a/b)*a < a + b >> 2)), \
+        '( a + b - b*a/b )*a < a + b >> 2')
+        
     ############################################################################
     # Bool
     ############################################################################  
@@ -472,8 +484,8 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b), Bool)
         self.assertEqual(type(c), Bool)
         self.assertEqual(type(d), Bool)
-        self.assertEqual(str(a), '( a ) != ( 0 )')  
-        self.assertEqual(str(b), '( b ) != ( {:e} )'.format(0))         
+        self.assertEqual(str(a), 'a != 0')  
+        self.assertEqual(str(b), 'b != {:e}'.format(0))         
         self.assertEqual(str(c), 'c')  
         self.assertEqual(str(d), '1')  
         
@@ -487,8 +499,8 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(True&a), Bool)
         self.assertEqual(type(b&False), bool)
         self.assertEqual(type(False&a), bool)
-        self.assertEqual(str(a&b), '( a ) && ( b )')
-        self.assertEqual(str(b&a), '( b ) && ( a )')
+        self.assertEqual(str(a&b), 'a && b')
+        self.assertEqual(str(b&a), 'b && a')
         self.assertEqual(str(b&True), 'b')
         self.assertEqual(str(True&a), 'a')
         self.assertEqual(b&False, False)
@@ -503,8 +515,8 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(True|a), bool)
         self.assertEqual(type(b|False), Bool)
         self.assertEqual(type(False|a), Bool)
-        self.assertEqual(str(a|b), '( a ) || ( b )')
-        self.assertEqual(str(b|a), '( b ) || ( a )')
+        self.assertEqual(str(a|b), 'a || b')
+        self.assertEqual(str(b|a), 'b || a')
         self.assertEqual(b|True, True)
         self.assertEqual(True|a, True)
         self.assertEqual(str(b|False), 'b')
@@ -519,18 +531,24 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(True^a), Bool)
         self.assertEqual(type(b^False), Bool)
         self.assertEqual(type(False^a), Bool)
-        self.assertEqual(str(a^b), '( ( a ) && ( !( b ) ) ) || ( ( !( a ) ) && ( b ) )')
-        self.assertEqual(str(b^a), '( ( b ) && ( !( a ) ) ) || ( ( !( b ) ) && ( a ) )')
-        self.assertEqual(str(b^True), '!( b )')
-        self.assertEqual(str(True^a), '!( a )')
+        self.assertEqual(str(a^b), 'a && !b || !a && b')
+        self.assertEqual(str(b^a), 'b && !a || !b && a')
+        self.assertEqual(str(b^True), '!b')
+        self.assertEqual(str(True^a), '!a')
         self.assertEqual(str(b^False), 'b')
         self.assertEqual(str(False^a), 'a')        
             
     def testBoolUnary(self):
         a = Bool('a')
         self.assertEqual(type(~a), Bool)
-        self.assertEqual(str(~a), '!( a )')  
-        
+        self.assertEqual(str(~a), '!a')  
+
+    def testBoolPrecedence(self):
+        a = Bool('a')
+        b = Bool('b')
+        self.assertEqual(str(~(a | ~b & a)), \
+        '!( a || !b && a )')
+                
     ############################################################################
     # Variables
     ############################################################################ 
@@ -583,10 +601,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(str(a), 'cross({:e}, 1)'.format(-1))
         self.assertEqual(str(b), 'cross({:e}, -1)'.format(-0.05))
         self.assertEqual(str(c), 'cross({:e}, 0)'.format(-0.1))
-        self.assertEqual(str(d), 'cross(( a ) - ( b ), 0)')
-        self.assertEqual(str(e), 'cross(( a ) - ( b ), 0, {:e})'.format(0.5))
-        self.assertEqual(str(f), 'cross(( a ) - ( b ), 0, {:e}, {:e})'.format(0.6, 0.3))       
-        self.assertEqual(str(g), 'cross(( a ) - ( {:e} ), 0, c, d)'.format(5.7))  
+        self.assertEqual(str(d), 'cross(a - b, 0)')
+        self.assertEqual(str(e), 'cross(a - b, 0, {:e})'.format(0.5))
+        self.assertEqual(str(f), 'cross(a - b, 0, {:e}, {:e})'.format(0.6, 0.3))       
+        self.assertEqual(str(g), 'cross(a - {:e}, 0, c, d)'.format(5.7))  
 
     def testAbove(self):
         a = Above(1.0  - 2.0)
@@ -600,10 +618,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(str(a), 'above({:e})'.format(-1))
         self.assertEqual(str(b), 'above({:e})'.format(-0.05))
         self.assertEqual(str(c), 'above({:e})'.format(-0.1))
-        self.assertEqual(str(d), 'above(( a ) - ( b ))')
-        self.assertEqual(str(e), 'above(( a ) - ( b ), {:e})'.format(0.5))
-        self.assertEqual(str(f), 'above(( a ) - ( b ), {:e}, {:e})'.format(0.6, 0.3))       
-        self.assertEqual(str(g), 'above(( a ) - ( {:e} ), c, d)'.format(5.7))
+        self.assertEqual(str(d), 'above(a - b)')
+        self.assertEqual(str(e), 'above(a - b, {:e})'.format(0.5))
+        self.assertEqual(str(f), 'above(a - b, {:e}, {:e})'.format(0.6, 0.3))       
+        self.assertEqual(str(g), 'above(a - {:e}, c, d)'.format(5.7))
         
     def testTimer(self):
         a = Timer(1.0)
@@ -986,12 +1004,12 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(ternary(Bool('a'), Real('b'), Real('c'))), Real)
         self.assertEqual(type(ternary(Bool('a'), Integer('b'), Integer('c'))), Integer)
         self.assertEqual(type(ternary(Bool('a'), Bool('b'), Bool('c'))), Bool)
-        self.assertEqual(str(ternary(False, 1.9, 1)), "0 ? ( {:e} ) : ( {:e} )".format(1.9, 1))
-        self.assertEqual(str(ternary(True, 1, 2)), "1 ? ( 1 ) : ( 2 )")
-        self.assertEqual(str(ternary(False, True, False)), "0 ? ( 1 ) : ( 0 )")
-        self.assertEqual(str(ternary(Bool('a'), Real('b'), Real('c'))), "a ? ( b ) : ( c )")
-        self.assertEqual(str(ternary(Bool('a'), Integer('b'), Integer('c'))), "a ? ( b ) : ( c )")
-        self.assertEqual(str(ternary(Bool('a'), Bool('b'), Bool('c'))), "a ? ( b ) : ( c )")
+        self.assertEqual(str(ternary(False, 1.9, 1)), "0 ? {:e} : {:e}".format(1.9, 1))
+        self.assertEqual(str(ternary(True, 1, 2)), "1 ? 1 : 2")
+        self.assertEqual(str(ternary(False, True, False)), "0 ? 1 : 0")
+        self.assertEqual(str(ternary(Bool('a'), Real('b'), Real('c'))), "a ? b : c")
+        self.assertEqual(str(ternary(Bool('a'), Integer('b'), Integer('c'))), "a ? b : c")
+        self.assertEqual(str(ternary(Bool('a'), Bool('b'), Bool('c'))), "a ? b : c")
         
     ############################################################################
     # testElectrical

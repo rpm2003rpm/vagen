@@ -47,7 +47,7 @@ import re
 #-------------------------------------------------------------------------------
 def checkType(param, var, Type):
     assert type(var) == Type, \
-           f"{param} must be a {Type} but a {type(var)} was given instead"
+    f"{param} must be a {Type} but a {type(var)} was given instead"
 
 
 #-------------------------------------------------------------------------------
@@ -61,8 +61,8 @@ def checkType(param, var, Type):
 #-------------------------------------------------------------------------------
 def checkInstance(param, var, Type):
     assert isinstance(var, Type), \
-           (f"{param} must be an instance of {Type} but a {type(var)}"
-             " was given instead")
+           (f"{param} must be an instance of {Type} but a {type(var)} was given"
+             " instead")
 
 
 #-------------------------------------------------------------------------------
@@ -89,8 +89,9 @@ def parseReal(param, var):
     if isinstance(var, (Real, float, int)):
         return Real(var)
     else:
-        raise Exception((f"{param} must be an instance of 'Real', 'float', or "
-                         f"'int' but a '{type(var).__name__}' was given instead"))
+        raise Exception( (f"{param} must be an instance of 'Real', 'float', "
+                          f"'int', or 'bool' but a '{type(var).__name__}' was "
+                           "given instead") )
 
 
 #-------------------------------------------------------------------------------
@@ -102,8 +103,8 @@ def parseReal(param, var):
 #-------------------------------------------------------------------------------
 def checkReal(param, var):
     assert isinstance(var, (Real, float, int)), \
-           (f"{param} must be an instance of 'Real', 'float', or "
-            f"'int' but a '{type(var).__name__}' was given instead")
+           (f"{param} must be an instance of 'Real', 'float', 'int', or 'bool'"
+            f" but a '{type(var).__name__}' was given instead")
 
 
 #-------------------------------------------------------------------------------
@@ -117,8 +118,9 @@ def parseInteger(param, var):
     if isinstance(var, (Integer, int)):
         return Integer(var)
     else:
-        raise Exception((f"{param} must be an instance of 'Integer' or 'int' "
-                         f"but a '{type(var).__name__}' was given instead"))
+        raise Exception( (f"{param} must be an instance of 'Integer', 'int', or"
+                          f" 'bool' but a '{type(var).__name__}' was given "
+                           "instead") )
                  
                  
 #-------------------------------------------------------------------------------
@@ -130,7 +132,7 @@ def parseInteger(param, var):
 #-------------------------------------------------------------------------------
 def checkInteger(param, var):
     assert isinstance(var, (Integer, int)), \
-           (f"{param} must be an instance of 'Integer' or 'int' but a "
+           (f"{param} must be an instance of 'Integer', 'int', or 'bool' but a "
             f"'{type(var).__name__}' was given instead")
 
 
@@ -145,8 +147,8 @@ def parseBool(param, var):
     if isinstance(var, (Bool, bool)):
         return Bool(var)
     else:
-        raise Exception((f"{param} must be an instance of 'Bool' or 'bool' "
-                         f"but a '{type(var).__name__}' was given instead"))
+        raise Exception( (f"{param} must be an instance of 'Bool' or 'bool' "
+                          f"but a '{type(var).__name__}' was given instead") )
                         
                         
 #-------------------------------------------------------------------------------
@@ -177,9 +179,9 @@ def parseNumber(param, var):
     elif isinstance(var, (Real, float)):
         return Real(var)    
     else:
-        raise Exception((f"{param} must be an instance of 'Bool', 'bool', 'Real',"
-                         f" 'float', 'Integer', 'int' but a '{type(var).__name__}'"
-                         f" was given instead"))
+        raise Exception( (f"{param} must be an instance of 'Bool', 'bool', " 
+                          f"'Real', 'float', 'Integer' or 'int' but a "
+                          f"'{type(var).__name__}' was given instead") ) 
            
 
 #-------------------------------------------------------------------------------
@@ -191,9 +193,8 @@ def parseNumber(param, var):
 #-------------------------------------------------------------------------------                        
 def checkNumber(param, var):
     assert isinstance(var, (Real, Integer, Bool, float, int, bool)), \
-           (f"{param} must be an instance of 'Bool', 'bool', 'Real',"
-            f" 'float', 'Integer', 'int' but a '{type(var).__name__}'"
-            f" was given instead")
+           (f"{param} must be an instance of 'Bool', 'bool', 'Real', 'float', "
+            f"'Integer' or 'int' but a '{type(var).__name__}' was given instead")
            
 
 #-------------------------------------------------------------------------------
@@ -240,6 +241,97 @@ def blockComment(padding, message, align = "center"):
     result = result + "    "*padding + " " + '*'*(size - 2) + "/\n"
     return result 
          
+         
+#-------------------------------------------------------------------------------
+## precedence
+#
+#-------------------------------------------------------------------------------         
+opPrecedence = {'unary'   : {'+'  : 0, '-'  : 0, '!' : 0, '~' : 0},
+                'binary'  : {'*'  : 1, '/'  : 1, '%' : 1,
+                             '+'  : 2, '-'  : 2,
+                             '>>' : 3, '<<' : 3,
+                             '<=' : 4, '>=' : 4, '>' :4, '<' : 4,
+                             '==' : 5, '!=' : 5,
+                             '&'  : 6,
+                             '^'  : 7,
+                             '|'  : 8,
+                             '&&' : 9,
+                             '||' : 10},
+                'ternary' : {'?'  : 11 }}
+ 
+ 
+#-------------------------------------------------------------------------------
+## unary function (local use inside veriloga.py only)
+#  @param Type Real, Integer, or Bool
+#  @param op1 any Bool, Real, Integer, int, float or bool that represents the 
+#         expression when test is true
+#  @return Bool, Real or Inteter representing the binary operatation
+#
+#-------------------------------------------------------------------------------
+def unary(Type, op1, operator):
+    op1Str = f"{op1}"
+    if opPrecedence['unary'][operator] < op1.getPrecedence():
+        op1Str = f"( {op1Str} )"  
+    return Type(f"{operator}{op1Str}", opPrecedence['unary'][operator])
+    
+ 
+#-------------------------------------------------------------------------------
+## binary function (local use inside veriloga.py only)
+#  @param Type Real, Integer, or Bool
+#  @param op1 any Bool, Real, Integer, int, float or bool that represents the 
+#         expression when test is true
+#  @param op2 any Bool, Real, Integer, int, float or bool that represents the 
+#         expression when test is false
+#  @param operator string representing the operator
+#  @return Bool, Real or Inteter representing the binary operatation
+#
+#-------------------------------------------------------------------------------
+def binary(Type, op1, op2, operator):
+    op1Str = f"{op1}"
+    op2Str = f"{op2}"
+    oprStr = operator
+    if opPrecedence['binary'][operator] < op1.getPrecedence():
+        op1Str = f"( {op1Str} )"  
+    if opPrecedence['binary'][operator] < op2.getPrecedence():
+        op2Str = f"( {op2Str} )"   
+    if opPrecedence['binary'][operator] > 1:
+        oprStr = f" {operator} "
+    return Type(f"{op1Str}{oprStr}{op2Str}", opPrecedence['binary'][operator])
+    
+ 
+#-------------------------------------------------------------------------------
+## ternary function
+#  @param test Bool or bool representing the test
+#  @param op1 any Bool, Real, Integer, int, float or bool that represents the 
+#         expression when test is true
+#  @param op2 any Bool, Real, Integer, int, float or bool that represents the 
+#         expression when test is false
+#  @return Bool, Real or Inteter representing the ternary operator
+#
+#-------------------------------------------------------------------------------
+def ternary(test, op1, op2):
+    test = parseBool("test", test)
+    if isinstance(op1, (Bool, bool) ) and \
+       isinstance(op2, (Bool, bool) ):
+       op1 = parseBool("op1", op1)
+       op2 = parseBool("op2", op2)
+    elif isinstance(op1, (Integer, int) ) and \
+         isinstance(op2, (Integer, int) ):
+       op1 = parseInteger("op1", op1)
+       op2 = parseInteger("op2", op2)
+    elif isinstance(op1, (Real, float, int) ) and\
+         isinstance(op2, (Real, float, int) ):
+       op1 = parseReal("op1", op1)
+       op2 = parseReal("op2", op2)
+    else:
+        raise Exception( ("op1 and op2 must be Integer, Real, Bool, bool, "
+                          "float, or int with compatible types but got "
+                         f"{type(op1)} and {type(op2)} instead") )
+    Type = Real if isinstance(op1, Real) else \
+           Bool if isinstance(op1, Bool) else \
+           Integer
+    return Type(f"{test} ? {op1} : {op2}", opPrecedence['ternary']['?'])        
+         
 
 #-------------------------------------------------------------------------------
 ## Class of Real operators
@@ -252,20 +344,34 @@ class Real():
     #  @param self The object pointer.
     #  @param value String representing a Real expression, an Integer, a Bool,
     #  or a value that can be converted to Real.
+    #  @param precedence operator precedence.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, value):
+    def __init__(self, value, precedence = 0):
         if isinstance(value, Bool):
-            value = str(ternary(value, Real('1.0'), Real('0.0')))
+            value = ternary(value, 1.0, 0.0)
+            precedence = value.getPrecedence()
+            value = f"{value}"
         elif isinstance(value, (Real, Integer)):
-            value = str(value)
+            precedence = value.getPrecedence()
+            value = f"{value}"
         elif not isinstance(value, str):
             try:
                 value = "{:e}".format(value)
             except:
                 raise TypeError(f"Can't convert {value} to Real")
+        self.precedence = precedence
         self.value = value
-    
+
+    #---------------------------------------------------------------------------
+    ## Return the last operator precedence.
+    #  @param self The object pointer.
+    #  @return int representing the precedence
+    #
+    #---------------------------------------------------------------------------
+    def getPrecedence(self):
+        return self.precedence
+            
     #---------------------------------------------------------------------------
     ## Return the operator value.
     #  @param self The object pointer.
@@ -284,7 +390,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __add__(self, other):
         other = parseReal("other", other)
-        return Real("( " + str(self) + ' ) + ( ' + str(other) + " )")
+        return binary(Real, self, other, "+")
 
     #---------------------------------------------------------------------------
     ## Subtraction override.
@@ -295,8 +401,8 @@ class Real():
     #---------------------------------------------------------------------------
     def __sub__(self, other):
         other = parseReal("other", other)
-        return Real("( " + str(self) + ' ) - ( ' + str(other) + " )")
-
+        return binary(Real, self, other, "-")
+        
     #---------------------------------------------------------------------------
     ## Multiplication override.
     #  @param self Multiplicand object pointer.
@@ -306,7 +412,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __mul__(self, other):
         other = parseReal("other", other)
-        return Real('( '+ str(self) + ' )*( ' + str(other) + ' )')
+        return binary(Real, self, other, "*")
 
     #---------------------------------------------------------------------------
     ## Division override.
@@ -317,7 +423,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __truediv__(self, other):
         other = parseReal("other", other)
-        return Real('( '+ str(self) + ' )/( ' + str(other) + ' )')
+        return binary(Real, self, other, "/")
 
     #---------------------------------------------------------------------------
     ## Pow override.
@@ -328,7 +434,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __pow__(self, other):
         other = parseReal("other", other)
-        return Real('pow('+ str(self) + ', ' + str(other) + ')')
+        return Real(f'pow({self}, {other})')
 
     #---------------------------------------------------------------------------
     ## Greater than override
@@ -339,7 +445,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __gt__(self, other):
         other = parseReal("other", other)
-        return Bool('( '+ str(self) + ' ) > ( ' + str(other) + ' )')
+        return binary(Bool, self, other, ">")
 
     #---------------------------------------------------------------------------
     ## Less than override
@@ -350,7 +456,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __lt__(self, other):
         other = parseReal("other", other)
-        return Bool('( '+ str(self) + ' ) < ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "<")
 
     #---------------------------------------------------------------------------
     ## Less than equal override
@@ -361,7 +467,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __le__(self, other):
         other = parseReal("other", other)
-        return Bool('( '+ str(self) + ' ) <= ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "<=")
 
     #---------------------------------------------------------------------------
     ## Greater than equal override
@@ -372,7 +478,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __ge__(self, other):
         other = parseReal("other", other)
-        return Bool('( '+ str(self) + ' ) >= ( ' + str(other) + ' )')
+        return binary(Bool, self, other, ">=")
 
     #---------------------------------------------------------------------------
     ## Equal override
@@ -383,7 +489,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __eq__(self, other):
         other = parseReal("other", other)
-        return Bool('( '+ str(self) + ' ) == ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "==")
 
     #---------------------------------------------------------------------------
     ## Not equal override
@@ -394,7 +500,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __ne__(self, other):
         other = parseReal("other", other)
-        return Bool('( '+ str(self) + ' ) != ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "!=")
         
     #---------------------------------------------------------------------------
     ## Reverse addition override
@@ -405,7 +511,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __radd__(self, other):
         other = parseReal("other", other)
-        return Real("( " + str(other) + ' ) + ( ' + str(self) + " )")
+        return binary(Real, other, self, "+")
 
     #---------------------------------------------------------------------------
     ## Reverse subtraction override
@@ -416,7 +522,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __rsub__(self, other):
         other = parseReal("other", other)
-        return Real("( " + str(other) + ' ) - ( ' + str(self) + " )")
+        return binary(Real, other, self, "-")
 
     #---------------------------------------------------------------------------
     ## Reverse multiplication override.
@@ -427,7 +533,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __rmul__(self, other):
         other = parseReal("other", other)
-        return Real('( '+ str(other) + ' )*( ' + str(self) + ' )')
+        return binary(Real, other, self, "*")
 
     #---------------------------------------------------------------------------
     ## Reverse division override.
@@ -438,7 +544,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __rtruediv__(self, other):
         other = parseReal("other", other)
-        return Real('( '+ str(other) + ' )/( ' + str(self) + ' )')
+        return binary(Real, other, self, "/")
 
     #---------------------------------------------------------------------------
     ## Pow override.
@@ -449,7 +555,7 @@ class Real():
     #---------------------------------------------------------------------------
     def __rpow__(self, other):
         other = parseReal("other", other)
-        return Real('pow('+ str(other) + ', ' + str(self) + ')')
+        return Real(f'pow({other}, {self})')
         
     #---------------------------------------------------------------------------
     ## negation override
@@ -458,7 +564,7 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __neg__(self):
-        return Real('-( '+ str(self) + ' )')
+        return unary(Real, self, "-") 
     
     #---------------------------------------------------------------------------
     ## pos override
@@ -467,7 +573,7 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __pos__(self):
-        return Real(str(self))
+        return unary(Real, self, "+") 
 
     #---------------------------------------------------------------------------
     ## abs override
@@ -476,7 +582,7 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __abs__(self):
-        return Real('abs( '+ str(self) + ' )')
+        return Real(f"abs({self})") 
 
     #---------------------------------------------------------------------------
     ## str override
@@ -501,20 +607,31 @@ class Bool():
     #  or a value that can be converted to Bool.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, value):
-        if isinstance(value, Real):
-            value = str(value != 0.0)
-        elif isinstance(value, Integer):
-            value = str(value != 0)
+    def __init__(self, value, precedence = 0):
+        if isinstance(value, (Real, Integer)):
+            value = value != 0
+            precedence = value.getPrecedence()
+            value = f"{value}"
         elif isinstance(value, Bool):
-            value = str(value)
+            precedence = value.getPrecedence()
+            value = f"{value}"
         elif not isinstance(value, str):
             try:
-                value = str(int(bool(value)))
+                value = f"{int(bool(value))}"
             except:
-                raise TypeError(f"Can't convert {value} to bool")
+                raise TypeError(f"Can't convert {value} to Bool")
+        self.precedence = precedence
         self.value = value
-    
+
+    #---------------------------------------------------------------------------
+    ## Return the last operator precedence.
+    #  @param self The object pointer.
+    #  @return int representing the precedence
+    #
+    #---------------------------------------------------------------------------
+    def getPrecedence(self):
+        return self.precedence
+                 
     #---------------------------------------------------------------------------
     ## Return the operator value.
     #  @param Self The object pointer.
@@ -534,10 +651,10 @@ class Bool():
     def __and__(self, other):
         checkBool("other", other)
         if isinstance(other, Bool):
-            return Bool('( ' + str(self) + ' ) && ( ' + str(other) + ' )')
+            return binary(Bool, self, other, "&&")
         else:
             if other:
-                return Bool(str(self))
+                return Bool(self)
             else:  
                 return False
 
@@ -551,10 +668,10 @@ class Bool():
     def __rand__(self, other):
         checkBool("other", other)
         if isinstance(other, Bool):
-            return Bool('( ' + str(other) + ' ) && ( ' + str(self) + ' )')
+            return binary(Bool, other, self, "&&")
         else:
             if other:
-                return Bool(str(self))
+                return Bool(self)
             else:  
                 return False
         
@@ -568,12 +685,12 @@ class Bool():
     def __or__(self, other):
         checkBool("other", other)
         if isinstance(other, Bool):
-            return Bool('( ' + str(self) + ' ) || ( ' + str(other) + ' )')
+            return binary(Bool, self, other, "||")
         else:
             if other:
                 return True
             else:  
-                return Bool(str(self))
+                return Bool(self)
         
     #---------------------------------------------------------------------------
     ## Reverse or logic override
@@ -585,12 +702,12 @@ class Bool():
     def __ror__(self, other):
         checkBool("other", other)
         if isinstance(other, Bool):
-            return Bool('( ' + str(other) + ' ) || ( ' + str(self) + ' )')
+            return binary(Bool, other, self, "||")
         else:
             if other:
                 return True
             else:  
-                return Bool(str(self))
+                return Bool(self)
         
     #---------------------------------------------------------------------------
     ## Xor logic override
@@ -605,9 +722,9 @@ class Bool():
             return (self & ~other) | (~self & other)
         else:
             if other:
-                return Bool(str(~self))
+                return ~self
             else:  
-                return Bool(str(self))
+                return Bool(self)
 
     #---------------------------------------------------------------------------
     ## Reverse xor logic override
@@ -622,9 +739,9 @@ class Bool():
             return (other & ~self) | (~other & self)
         else:
             if other:
-                return Bool(str(~self))
+                return ~self
             else:  
-                return Bool(str(self))
+                return Bool(self)
                 
     #---------------------------------------------------------------------------
     ## Inversion override
@@ -633,7 +750,7 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __invert__(self):
-        return Bool('!( ' + str(self) + ' )')
+        return unary(Bool, self, "!")
         
     #---------------------------------------------------------------------------
     ## str override
@@ -653,7 +770,7 @@ class Bool():
     #---------------------------------------------------------------------------
     def __eq__(self, other):
         other = parseBool("other", other)
-        return Bool('( '+ str(self) + ' ) == ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "==") 
 
     #---------------------------------------------------------------------------
     ## Not equal override
@@ -664,7 +781,8 @@ class Bool():
     #---------------------------------------------------------------------------
     def __ne__(self, other):
         other = parseBool("other", other)
-        return Bool('( '+ str(self) + ' ) != ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "!=")
+        
         
 #-------------------------------------------------------------------------------
 ## Class of Integer operators
@@ -679,24 +797,39 @@ class Integer():
     #  or a value that can be converted to Integer.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, value):
+    def __init__(self, value, precedence = 0):
         if isinstance(value, Bool):
-            value = str(ternary(value, Integer('1'), Integer('0')))
+            value = ternary(value, 1, 0)
+            precedence = value.getPrecedence()
+            value = f"{value}"
         elif isinstance(value, Real):
-            value = str(ceil(value)) 
+            value = ceil(value)
+            precedence = value.getPrecedence()
+            value = f"{value}"
         elif isinstance(value, Integer):
-            value = str(value)
+            precedence = value.getPrecedence()
+            value = f"{value}"            
         elif not isinstance(value, str):
+            if isinstance(value, int):
+                assert value > -2147483648 and value < 2147483647, \
+                (f"Can't convert {value} to integer, because it is outside of"
+                  "the range [-2147483648, 2147483647]") 
             try:
-                if isinstance(value, int):
-                    assert value > -2147483648 and value < 2147483647, "Can't " +\
-                    "convert " +str(value)+ " to integer, because it is outside"+\
-                    " the range [-2147483648, 2147483647]" 
-                value = str(int(value))
+                value = f"{int(value)}"
             except:
-                raise TypeError("Can't convert " + str(value) + " to integer")
+                raise TypeError(f"Can't convert {value} to Integer")
+        self.precedence = precedence
         self.value = value
-    
+        
+    #---------------------------------------------------------------------------
+    ## Return the last operator precedence.
+    #  @param self The object pointer.
+    #  @return int representing the precedence
+    #
+    #---------------------------------------------------------------------------
+    def getPrecedence(self):
+        return self.precedence
+           
     #---------------------------------------------------------------------------
     ## Return the operator value.
     #  @param Self The object pointer.
@@ -715,7 +848,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __add__(self, other):
         other = parseInteger("other", other)
-        return Integer("( " + str(self) + ' ) + ( ' + str(other) + " )")
+        return binary(Integer, self, other, "+")
         
     #---------------------------------------------------------------------------
     ## Reverse addition override
@@ -726,7 +859,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __radd__(self, other):
         other = parseInteger("other", other)
-        return Integer("( " + str(other) + ' ) + ( ' + str(self) + " )")
+        return binary(Integer, other, self, "+")
         
     #---------------------------------------------------------------------------
     ## Subtraction override.
@@ -737,7 +870,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __sub__(self, other):
         other = parseInteger("other", other)
-        return Integer("( " + str(self) + ' ) - ( ' + str(other) + " )")
+        return binary(Integer, self, other, "-")
         
     #---------------------------------------------------------------------------
     ## Reverse subtraction override
@@ -748,7 +881,7 @@ class Integer():
     #--------------------------------------------------------------------------- 
     def __rsub__(self, other):
         other = parseInteger("other", other)
-        return Integer("( " + str(other) + ' ) - ( ' + str(self) + " )")
+        return binary(Integer, other, self, "-")
 
     #---------------------------------------------------------------------------
     ## Multiplication override.
@@ -759,7 +892,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __mul__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(self) + ' )*( ' + str(other) + ' )')
+        return binary(Integer, self, other, "*")
         
     #---------------------------------------------------------------------------
     ## Reverse multiplication override.
@@ -770,7 +903,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rmul__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(other) + ' )*( ' + str(self) + ' )')
+        return binary(Integer, other, self, "*")
 
     #---------------------------------------------------------------------------
     ## Division override.
@@ -781,7 +914,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __truediv__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(self) + ' )/( ' + str(other) + ' )')
+        return binary(Integer, self, other, "/")
 
     #---------------------------------------------------------------------------
     ## Reverse division override.
@@ -792,7 +925,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rtruediv__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(other) + ' )/( ' + str(self) + ' )')
+        return binary(Integer, other, self, "/")
         
     #---------------------------------------------------------------------------
     ## module override
@@ -803,7 +936,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __mod__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(self) + ' ) % ( ' + str(other) + ' )')
+        return binary(Integer, self, other, "%")
         
     #---------------------------------------------------------------------------
     ## reverse module override
@@ -814,7 +947,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rmod__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(other) + ' ) % ( ' + str(self) + ' )')
+        return binary(Integer, other, self, "%")
 
     #---------------------------------------------------------------------------
     ## Pow override.
@@ -825,7 +958,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __pow__(self, other):
         other = parseInteger("other", other)
-        return Integer('pow(' + str(self) + ', ' + str(other) + ')')
+        return Integer(f'pow({self}, {other})')
         
     #---------------------------------------------------------------------------
     ## Reverse pow override.
@@ -836,7 +969,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rpow__(self, other):
         other = parseInteger("other", other)
-        return Integer('pow(' + str(other) + ', ' + str(self) + ')')
+        return Integer(f'pow({other}, {self})')
         
     #---------------------------------------------------------------------------
     ## right shift override.
@@ -847,7 +980,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rshift__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(self) + ' ) >> ( ' + str(other) + ' )')
+        return binary(Integer, self, other, ">>")
 
     #---------------------------------------------------------------------------
     ## Reverse right shift override.
@@ -858,7 +991,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rrshift__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(other) + ' ) >> ( ' + str(self) + ' )')
+        return binary(Integer, other, self, ">>")
         
     #---------------------------------------------------------------------------
     ## left shift override.
@@ -869,7 +1002,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __lshift__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(self) + ' ) << ( ' + str(other) + ' )')
+        return binary(Integer, self, other, "<<")
         
     #---------------------------------------------------------------------------
     ## Reverse left shift override.
@@ -880,7 +1013,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rlshift__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(other) + ' ) << ( ' + str(self) + ' )')
+        return binary(Integer, other, self, "<<")
         
     #---------------------------------------------------------------------------
     ## Bitwise and logic
@@ -891,7 +1024,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __and__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(self) + ' ) & ( ' + str(other) + ' )')
+        return binary(Integer, self, other, "&")
 
     #---------------------------------------------------------------------------
     ## Reverse bitwise and logic
@@ -902,7 +1035,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rand__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(other) + ' ) & ( ' + str(self) + ' )')
+        return binary(Integer, other, self, "&")
         
     #---------------------------------------------------------------------------
     ## Bitwise or logic
@@ -913,7 +1046,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __or__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(self) + ' ) | ( ' + str(other) + ' )')
+        return binary(Integer, self, other, "|")
         
     #---------------------------------------------------------------------------
     ## Reverse bitwise or logic
@@ -924,7 +1057,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __ror__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(other) + ' ) | ( ' + str(self) + ' )')
+        return binary(Integer, other, self, "|")
 
     #---------------------------------------------------------------------------
     ## Bitwise xor logic
@@ -935,7 +1068,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __xor__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(self) + ' ) ^ ( ' + str(other) + ' )')
+        return binary(Integer, self, other, "^")
         
     #---------------------------------------------------------------------------
     ## Reverse bitwise xor logic
@@ -946,7 +1079,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rxor__(self, other):
         other = parseInteger("other", other)
-        return Integer('( ' + str(other) + ' ) ^ ( ' + str(self) + ' )')
+        return binary(Integer, other, self, "^")
         
     #---------------------------------------------------------------------------
     ## Less than override
@@ -957,7 +1090,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __lt__(self, other):
         other = parseInteger("other", other)
-        return Bool('( ' + str(self) + ' ) < ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "<")
     
     #---------------------------------------------------------------------------
     ## Greater than override
@@ -968,7 +1101,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __gt__(self, other):
         other = parseInteger("other", other)
-        return Bool('( ' + str(self) + ' ) > ( ' + str(other) + ' )')
+        return binary(Bool, self, other, ">")
 
     #---------------------------------------------------------------------------
     ## Less than equal override
@@ -979,7 +1112,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __le__(self, other):
         other = parseInteger("other", other)
-        return Bool('( ' + str(self) + ' ) <= ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "<=")
 
     #---------------------------------------------------------------------------
     ## Greater than equal override
@@ -990,7 +1123,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __ge__(self, other):
         other = parseInteger("other", other)
-        return Bool('( ' + str(self) + ' ) >= ( ' + str(other) + ' )')
+        return binary(Bool, self, other, ">=")
 
     #---------------------------------------------------------------------------
     ## Equal override
@@ -1001,7 +1134,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __eq__(self, other):
         other = parseInteger("other", other)
-        return Bool('( ' + str(self) + ' ) == ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "==")
 
     #---------------------------------------------------------------------------
     ## Not equal override
@@ -1012,7 +1145,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __ne__(self, other):
         other = parseInteger("other", other)
-        return Bool('( ' + str(self) + ' ) != ( ' + str(other) + ' )')
+        return binary(Bool, self, other, "!=")
         
     #---------------------------------------------------------------------------
     ## negation override
@@ -1021,7 +1154,7 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __neg__(self):
-        return Integer('-( ' + str(self) + ' )')
+        return unary(Integer, self, "-")
     
     #---------------------------------------------------------------------------
     ## abs override
@@ -1030,7 +1163,7 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __abs__(self):
-        return Integer('abs( ' + str(self) + ' )')
+        return Integer(f"abs({self})") 
 
     #---------------------------------------------------------------------------
     ## pos override
@@ -1039,7 +1172,7 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __pos__(self):
-        return Integer(str(self))
+        return unary(Integer, self, "+")
 
     #---------------------------------------------------------------------------
     ## invert override
@@ -1048,7 +1181,7 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __invert__(self):
-        return Integer('~( ' + str(self) + ' )')
+        return unary(Integer, self, "~")
         
     #---------------------------------------------------------------------------
     ## str override
@@ -1083,7 +1216,7 @@ class IntegerVar(Integer):
     #
     #---------------------------------------------------------------------------
     def inc(self):
-        return Cmd(self.getValue() + ' = ' + self.getValue() + " + 1")  
+        return Cmd(f"{self} = {self} + 1")  
         
     #---------------------------------------------------------------------------
     ## Decrement
@@ -1092,7 +1225,7 @@ class IntegerVar(Integer):
     #
     #---------------------------------------------------------------------------
     def dec(self):
-        return Cmd(self.getValue() + ' = ' + self.getValue() + " - 1")     
+        return Cmd(f"{self} = {self} - 1")    
                      
     #---------------------------------------------------------------------------
     ## Atribution
@@ -1103,7 +1236,7 @@ class IntegerVar(Integer):
     #---------------------------------------------------------------------------
     def eq(self, value):
         value = parseInteger("value", value)
-        return Cmd(self.getValue() + ' = ' + str(value))         
+        return Cmd(f"{self} = {value}")        
     
 
 #-------------------------------------------------------------------------------
@@ -1131,7 +1264,7 @@ class RealVar(Real):
     #---------------------------------------------------------------------------
     def eq(self, value):
         value = parseReal("value", value)
-        return Cmd(self.getValue() + ' = ' + str(value))      
+        return Cmd(f"{self} = {value}")     
         
         
 #-------------------------------------------------------------------------------
@@ -1157,7 +1290,7 @@ class BoolVar(Bool):
     #
     #---------------------------------------------------------------------------
     def toggle(self):
-        return Cmd(self.getValue() + ' = !' + self.getValue())  
+        return Cmd(f"{self} = !{self}")  
         
     #---------------------------------------------------------------------------
     ## Atribution
@@ -1168,7 +1301,7 @@ class BoolVar(Bool):
     #---------------------------------------------------------------------------
     def eq(self, value):
         value = parseBool("value", value)
-        return Cmd(self.getValue() + ' = ' + str(value))  
+        return Cmd(f"{self} = {value}") 
         
        
 #-------------------------------------------------------------------------------
@@ -1196,7 +1329,7 @@ class Event():
     #---------------------------------------------------------------------------
     def __or__(self, other):
         checkInstance("other", other, Event)
-        return Event(str(self) + ' or ' + str(other))
+        return Event(f"{self} or {other}")
 
     #---------------------------------------------------------------------------
     ## string representation
@@ -1245,10 +1378,8 @@ class Cmd:
     def getVA(self, padding):
         checkType("padding", padding, int)
         chunks = self.cmd.split("\n")
-        result = "    "*padding + chunks[0]
-        for item in chunks[1:]: 
-            result = result + "\n" + "    "*padding + item
-        result = result + ";\n"
+        result = '\n'.join([f"{'    '*padding}{l}" for l in chunks])
+        result = f"{result};\n"
         return result
 
 
@@ -1300,11 +1431,8 @@ class CmdList(list, Cmd):
     def append(self, *cmds):
         i = 0
         for cmd in cmds:
-            assert isinstance(cmd, Cmd) and \
-                   not isinstance(cmd, WaitAnalogEvent), "cmd[" + str(i) + "]"+\
-                   " must be an instance of Cmd and can't be and instance of "+\
-                   "WaitAnalogEvent, but a " + str(type(cmd)) +\
-                   " was given instead"
+            checkInstance(f"cmds[{i}]", cmd, Cmd)
+            checkNotInstance(f"cmds[{i}]", cmd, WaitAnalogEvent)
             super(CmdList, self).append(cmd)
             i = i + 1
         
@@ -1317,10 +1445,7 @@ class CmdList(list, Cmd):
     #---------------------------------------------------------------------------
     def getVA(self, padding):
         checkType("padding", padding, int)
-        result = ""
-        for item in self:
-            result = result + item.getVA(padding)
-        return result
+        return "".join([f"{l.getVA(padding)}" for l in self])
 
 
 #-------------------------------------------------------------------------------
@@ -1373,14 +1498,14 @@ class Block(CmdList):
         checkType("padding", padding, int)
         length = len(self.flat())
         if length > 1:
-            result = "    "*padding + self.header + " begin\n"
-            result = result + super(Block, self).getVA(padding + 1)
-            result = result + "    "*padding + "end\n"
+            result = (f"{'    '*padding}{self.header} begin\n"
+                      f"{super(Block, self).getVA(padding + 1)}"
+                      f"{'    '*padding }end\n")
         elif length == 1:
-            result = "    "*padding + self.header + "\n"
-            result = result + super(Block, self).getVA(padding + 1)            
+            result = (f"{'    '*padding}{self.header}\n"
+                      f"{super(Block, self).getVA(padding + 1)}")     
         else:
-            result = "    "*padding + self.header + ";\n"
+            result = f"{'    '*padding}{self.header};\n"
         return result
 
 
@@ -1410,7 +1535,7 @@ class WaitAnalogEvent(Block):
     #---------------------------------------------------------------------------
     def __init__(self, event, *cmds):
         checkInstance("event", event, Event)
-        super(WaitAnalogEvent, self).__init__('@( ' + str(event) + ' )', *cmds)
+        super(WaitAnalogEvent, self).__init__(f'@( {event} )', *cmds)
         
 
 #-------------------------------------------------------------------------------
@@ -1434,13 +1559,13 @@ class Cross(Event):
         checkType("edge", edge, str)
         mapping = {'rising': '1', 'falling': '-1', 'both': '0'}  
         assert edge in mapping.keys(), "Wrong value for edge"
-        params = [str(mapping[edge])]
+        params = [mapping[edge]]
 
         for par in pars:
             par = parseReal("timeTol or expTol", par)
             params.append(str(par))
         
-        evnt = "cross(" + str(expr) + ", " + ", ".join(params) + ")" 
+        evnt = f"cross({expr}, {', '.join(params)})" 
         super(Cross, self).__init__(evnt)
 
 
@@ -1467,7 +1592,7 @@ class Above(Event):
             par = parseReal("timeTol or expTol", par)
             params.append(str(par))
 
-        evnt = "above(" + ", ".join(params) + ")" 
+        evnt = f"above({', '.join(params)})" 
         super(Above, self).__init__(evnt)
 
 
@@ -1494,7 +1619,7 @@ class Timer(Event):
             par = parseReal("period or timeTol", par)
             params.append(str(par))
 
-        evnt = "timer(" + ", ".join(params) + ")" 
+        evnt = f"timer({', '.join(params)})" 
         super(Timer, self).__init__(evnt)
 
 
@@ -1527,10 +1652,9 @@ def unfoldSimTypes(*simTypes):
     i = 1
     for simType in simTypes:
         assert simType in anaTypes, \
-               "simType[" + str(i) + "] must be of of the following: " +\
-               str(anaTypes)
+               f"simType[{i}] must be of of the following: {anaTypes}"
         i = i + 1
-        ans.append('"'+ simType + '"')
+        ans.append(f'"{simType}"')
     return ", ".join(ans)
 
 
@@ -1550,7 +1674,7 @@ class InitialStep(Event):
         ans = "initial_step"
         simTypes = unfoldSimTypes(*simTypes)
         if simTypes != "":
-            ans = ans + '(' + simTypes + ')'
+            ans = f"{ans}({simTypes})"
         super(InitialStep, self).__init__(ans)
                                           
 
@@ -1570,7 +1694,7 @@ class FinalStep(Event):
         ans = "final_step"
         simTypes = unfoldSimTypes(*simTypes)
         if simTypes != "":
-            ans = ans + '(' + simTypes + ')'
+            ans = f"{ans}({simTypes})"
         super(FinalStep, self).__init__(ans)
   
    
@@ -1583,7 +1707,7 @@ class FinalStep(Event):
 def analysis(*simTypes):
     if simTypes == "":
         raise Exception("At least one simulation type must be specified")
-    return Bool('analysis(' + unfoldSimTypes(*simTypes) + ')')
+    return Bool(f'analysis({unfoldSimTypes(*simTypes)})')
 
 
 #-------------------------------------------------------------------------------
@@ -1596,12 +1720,10 @@ def analysis(*simTypes):
 #-------------------------------------------------------------------------------
 def acStim(mag, phase = 0, simType = "ac"):
     assert simType in anaTypes, \
-           "simType must be of of the following: " + str(anaTypes)
+           f"simType must be of of the following: {anaTypes}"
     mag = parseReal("mag", mag)
     phase = parseReal("phase", phase)
-    return Real('ac_stim("' + str(simType) + '", ' + \
-                              str(mag)     + ', ' + \
-                              str(phase) + ')')
+    return Real(f'ac_stim("{simType}", {mag}, {phase})')
     
                    
 #-------------------------------------------------------------------------------
@@ -1634,7 +1756,7 @@ class RepeatLoop(Block):
     def __init__(self, n, *cmds):
         n = parseInteger("n", n)
         self.n = n
-        super(RepeatLoop, self).__init__("repeat( " + str(n) + " )", *cmds)  
+        super(RepeatLoop, self).__init__(f"repeat( {n} )", *cmds)  
         
     #---------------------------------------------------------------------------
     ## Return the repeat count
@@ -1678,7 +1800,7 @@ class WhileLoop(Block):
     def __init__(self, cond, *cmds):
         cond = parseBool("cond", cond)
         self.cond = cond
-        super(WhileLoop, self).__init__("while( " + str(cond) + " )", *cmds)  
+        super(WhileLoop, self).__init__(f"while( {cond} )", *cmds)  
         
     #---------------------------------------------------------------------------
     ## Return the while loop condition
@@ -1724,13 +1846,13 @@ class ForLoop(Block):
     #---------------------------------------------------------------------------
     def __init__(self, start, cond, inc, *cmds):
         cond = parseBool("cond", cond)
-        assert type(start) == Cmd or type(start) == CmdList, +\
-               "start must be Cmd or CmdList but a " + str(type(start)) +\
-               " was given instead"
-        assert type(inc) == Cmd or type(inc) == CmdList, +\
-               "start must be Cmd or CmdList but a " + str(type(inc)) +\
-               " was given instead"
-        head = "for( " + str(start) + "; " + str(cond) + "; " + str(inc) + " )"
+        assert type(start) == Cmd or type(start) == CmdList, \
+               (f"start must be Cmd or CmdList but a {type(start)} was given "
+                 "instead")
+        assert type(inc) == Cmd or type(inc) == CmdList, \
+               (f"start must be Cmd or CmdList but a {type(inc)} was given "
+                 "instead")
+        head = f"for( {start}; {cond}; {inc} )"
         self.cond = cond
         self.start = start
         self.inc = inc 
@@ -1797,7 +1919,7 @@ class Cond(Cmd):
     #---------------------------------------------------------------------------
     def __init__(self, cond, *cmds):
         cond = parseBool("cond", cond)
-        trueHead  = "if( " + str(cond) + " )"
+        trueHead  = f"if( {cond} )"
         falseHead = "else"
         self.cond = cond
         self.cmdDict = {True:Block(trueHead, *cmds), \
@@ -1855,9 +1977,9 @@ class Cond(Cmd):
     #---------------------------------------------------------------------------
     def getVA(self, padding):
         checkType("padding", padding, int)
-        result = self.cmdDict[True].getVA(padding)
+        result = f"{self.cmdDict[True].getVA(padding)}" 
         if len(self.cmdDict[False]) > 0:
-            result = result + self.cmdDict[False].getVA(padding)
+            result = f"{result}{self.cmdDict[False].getVA(padding)}"
         return result
 
 
@@ -1912,34 +2034,29 @@ class CaseClass(Cmd):
     def append(self, *cmds):
         i = 0
         for tup in cmds:
-            assert type(tup) == tuple, "cmds[" + str(i) + "] must be tuple"
-            assert len(tup) > 1, "cmds[" + str(i) + "] length must > 1"
+            assert type(tup) == tuple, f"cmds[{i}] must be tuple"
+            assert len(tup) > 1, f"cmds[{i}] length must > 1"
             if not isinstance(tup[0], type(None)):
-                if isinstance(self.test, Integer) and \
-                   (isinstance(tup[0], Integer) or type(tup[0]) == int):
-                   test = parseInteger("cmds[" + str(i) + "][0]", tup[0])
+                if isinstance(self.test, Bool)  and \
+                   isinstance(tup[0], (Bool, bool)):
+                   test = parseBool(f"cmds[{i}][0]", tup[0])
+                elif isinstance(self.test, Integer)  and \
+                     isinstance(tup[0], (Integer, int)):
+                   test = parseInteger(f"cmds[{i}][0]", tup[0])
                 elif isinstance(self.test, Real)  and \
-                     (isinstance(tup[0], Real) or type(tup[0]) == float or\
-                      type(tup[0]) == int):
-                   test = parseReal("cmds[" + str(i) + "][0]", tup[0])
-                elif isinstance(self.test, Bool)  and \
-                     (isinstance(tup[0], Bool) or type(tup[0]) == bool):
-                   test = parseBool("cmds[" + str(i) + "][0]", tup[0])
+                     isinstance(tup[0], (Real, float, int)):
+                   test = parseReal(f"cmds[{i}][0]", tup[0])
                 else:
-                    raise Exception( "cmds[" + str(i) + "][0] must be " +\
-                          " compatible with " + str(type(self.test))    +\
-                          " but a " + str(type(tup[0])) + " was given " +\
-                          "instead.")
-                blockCmd = Block(str(test) + ":")
+                    raise Exception( (f"cmds[{i}][0] must be compatible with "  
+                          f"{type(self.test)} but a {type(tup[0])} was given "
+                           "instead."))
+                blockCmd = Block(f"{test}:")
             else:
                 blockCmd = Block("default:")  
             j = 1
             for cmd in tup[1:]:
-                assert isinstance(cmd, Cmd) and \
-                       not isinstance(cmd, WaitAnalogEvent), "cmds[" + str(i) +\
-                   "][" +str(j)+ "] must be an instance of Cmd and can't be " +\
-                   "an instance of WaitAnalogEvent, but a " + str(type(cmd))  +\
-                   " was given instead"
+                checkInstance(f"cmds[{i}][{j}]", cmd, Cmd)
+                checkNotInstance(f"cmds[{i}][{j}]", cmd, WaitAnalogEvent)
                 blockCmd.append(cmd)
                 j = j + 1
             self.cmds.append(blockCmd)
@@ -1954,10 +2071,9 @@ class CaseClass(Cmd):
     #---------------------------------------------------------------------------
     def getVA(self, padding):
         checkType("padding", padding, int)
-        result = "    "*padding + "case( " + str(self.test) + " )\n"
-        for item in self.cmds:
-            result = result + item.getVA(padding + 1)
-        result = result + "    "*padding + "endcase\n"
+        result = (f"{'    '*padding}case( {self.test} )\n"
+                  f"{''.join([l.getVA(padding+1) for l in self.cmds])}"
+                  f"{'    '*padding}endcase\n")
         return result
 
 
@@ -1969,11 +2085,11 @@ class CaseClass(Cmd):
 #-------------------------------------------------------------------------------
 def unfoldParams(*params):
     cmd = ""
-    i = 1
+    i = 0
     for param in params:
-        param = parseNumber("param[" + str(i) + "]", param)
+        param = parseNumber(f"param[i]", param)
+        cmd = f"{cmd}, {param}"
         i = i + 1
-        cmd = cmd + ", " + str(param)
     return cmd
 
 
@@ -1986,7 +2102,7 @@ def unfoldParams(*params):
 #-------------------------------------------------------------------------------
 def Strobe(msg, *params):
     checkType("msg", msg, str)
-    return Cmd('$strobe("' + msg + '"' + unfoldParams(*params) + ")")
+    return Cmd(f'$strobe("{msg}"{unfoldParams(*params)})')
 
 
 #-------------------------------------------------------------------------------
@@ -1998,9 +2114,9 @@ def Strobe(msg, *params):
 #-------------------------------------------------------------------------------
 def Write(msg, *params):
     checkType("msg", msg, str)
-    return Cmd('$write("' + msg + '"' + unfoldParams(*params) + ")")
+    return Cmd(f'$write("{msg}"{unfoldParams(*params)})')
 
-
+#TODO
 #-------------------------------------------------------------------------------
 ## Fopen
 #  @param fileName name of the file
@@ -2317,42 +2433,7 @@ def transition(x,
     riseTime = parseReal("riseTime", riseTime)
     fallTime = parseReal("fallTime", fallTime)
     return Real("transition(" + str(x) + ", " + str(delay) + ", " + \
-                  str(riseTime) + ", " + str(fallTime) + ")")
-
-
-#-------------------------------------------------------------------------------
-## ternary function
-#  @param test Bool or bool representing the test
-#  @param op1 any Bool, Real, Integer, int, float or bool that represents the 
-#         expression when test is true
-#  @param op2 any Bool, Real, Integer, int, float or bool that represents the 
-#         expression when test is false
-#  @return Bool, Real or Inteter representing the ternary operator
-#
-#-------------------------------------------------------------------------------
-def ternary(test, op1, op2):
-    test = parseBool("test", test)
-    if (isinstance(op1, Integer) or type(op1) == int) and \
-       (isinstance(op2, Integer) or type(op2) == int):
-       op1 = parseInteger("op1", op1)
-       op2 = parseInteger("op2", op2)
-    elif (isinstance(op1, Bool) or type(op1) == bool) and \
-         (isinstance(op2, Bool) or type(op2) == bool):
-       op1 = parseBool("op1", op1)
-       op2 = parseBool("op2", op2)
-    elif (isinstance(op1, Real) or type(op1) == float or type(op1) == int) and\
-         (isinstance(op2, Real) or type(op2) == float or type(op2) == int):
-       op1 = parseReal("op1", op1)
-       op2 = parseReal("op2", op2)
-    else:
-        raise Exception("op1 and op2 must be Integer, Real, Bool, bool, " +\
-                        "float or int with compatible types but got " +\
-                        str(type(op1)) + " and " + str(type(op2)) +\
-                        " instead")
-    Type = Real if isinstance(op1, Real) else \
-           Bool if isinstance(op1, Bool) else \
-           Integer
-    return Type(str(test) + " ? ( " + str(op1) + " ) : ( " + str(op2) + " )")    
+                  str(riseTime) + ", " + str(fallTime) + ")") 
 
 
 #-------------------------------------------------------------------------------
