@@ -47,8 +47,7 @@ import re
 #-------------------------------------------------------------------------------
 def checkType(param, var, Type):
     assert type(var) == Type, \
-           param + " must be a " + str(Type) + " but a " + \
-           str(type(var)) + " was given"
+           f"{param} must be a {Type} but a {type(var)} was given instead"
 
 
 #-------------------------------------------------------------------------------
@@ -62,8 +61,8 @@ def checkType(param, var, Type):
 #-------------------------------------------------------------------------------
 def checkInstance(param, var, Type):
     assert isinstance(var, Type), \
-           param + " must be a " + str(Type) + " but a " + \
-           str(type(var)) + " was given"
+           (f"{param} must be an instance of {Type} but a {type(var)}"
+             " was given instead")
 
 
 #-------------------------------------------------------------------------------
@@ -76,8 +75,7 @@ def checkInstance(param, var, Type):
 #
 #-------------------------------------------------------------------------------
 def checkNotInstance(param, var, Type):
-    assert not isinstance(var, Type), \
-           param + " can't be a " + str(Type)
+    assert not isinstance(var, Type), f"{param} can't be an instance of {Type}"
 
 
 #-------------------------------------------------------------------------------
@@ -88,13 +86,11 @@ def checkNotInstance(param, var, Type):
 #
 #-------------------------------------------------------------------------------
 def parseReal(param, var):
-    if isinstance(var, Real):
-        return var
-    elif type(var) == float or type(var) == int:
+    if isinstance(var, (Real, float, int)):
         return Real(var)
     else:
-        raise Exception(param + " must be a Real, float or int but a " +\
-                        str(type(var)) + " was given")
+        raise Exception((f"{param} must be an intance of 'Real', 'float', or "
+                         f"'int' but a '{type(var).__name__}' was given instead"))
 
 
 #-------------------------------------------------------------------------------
@@ -105,9 +101,9 @@ def parseReal(param, var):
 #
 #-------------------------------------------------------------------------------
 def checkReal(param, var):
-    assert isinstance(var, Real) or type(var) == float or type(var) == int, \
-           param + " must be a Real or float but a " + str(type(var)) +\
-           " was given"   
+    assert isinstance(var, (Real, float, int)), \
+           (f"{param} must be an intance of 'Real', 'float', or "
+            f"'int' but a '{type(var).__name__}' was given instead")
 
 
 #-------------------------------------------------------------------------------
@@ -118,13 +114,11 @@ def checkReal(param, var):
 #
 #-------------------------------------------------------------------------------
 def parseInteger(param, var):
-    if isinstance(var, Integer):
-        return var
-    elif type(var) == int:
+    if isinstance(var, (Integer, int)):
         return Integer(var)
     else:
-        raise Exception(param + " must be a Integer or int but a " +\
-                        str(type(var)) + " was given")
+        raise Exception((f"{param} must be an intance of 'Integer' or 'int' "
+                         f"but a '{type(var).__name__}' was given instead"))
                  
                  
 #-------------------------------------------------------------------------------
@@ -135,9 +129,9 @@ def parseInteger(param, var):
 #
 #-------------------------------------------------------------------------------
 def checkInteger(param, var):
-    assert isinstance(var, Integer) or type(var) == int, \
-           param + " must be a Integer or int but a " + str(type(var)) +\
-           " was given"
+    assert isinstance(var, (Integer, int)), \
+           (f"{param} must be an intance of 'Integer' or 'int' but a "
+            f"'{type(var).__name__}' was given instead")
 
 
 #-------------------------------------------------------------------------------
@@ -148,13 +142,11 @@ def checkInteger(param, var):
 #
 #-------------------------------------------------------------------------------
 def parseBool(param, var):
-    if isinstance(var, Bool):
-        return var
-    elif type(var) == bool:
+    if isinstance(var, (Bool, bool)):
         return Bool(var)
     else:
-        raise Exception(param + " must be a Bool or bool but a " +\
-                        str(type(var)) + " was given")
+        raise Exception((f"{param} must be an intance of 'Bool' or 'bool' "
+                         f"but a '{type(var).__name__}' was given instead"))
                         
                         
 #-------------------------------------------------------------------------------
@@ -165,9 +157,9 @@ def parseBool(param, var):
 #
 #-------------------------------------------------------------------------------
 def checkBool(param, var):
-    assert isinstance(var, Bool) or type(var) == bool, \
-           param + " must be a Bool or bool but a " + str(type(var)) +\
-           " was given"
+    assert isinstance(var, (Bool, bool)), \
+           (f"{param} must be an intance of 'Bool' or 'bool' but a "
+            f"'{type(var).__name__}' was given instead")
 
 
 #-------------------------------------------------------------------------------
@@ -178,21 +170,18 @@ def checkBool(param, var):
 #
 #-------------------------------------------------------------------------------                        
 def parseNumber(param, var):
-    if isinstance(var, Bool)    or \
-       isinstance(var, Integer) or \
-       isinstance(var, Real):
-        return var
-    elif type(var) == bool:
+    if isinstance(var, (Bool, bool)):
         return Bool(var)
-    elif type(var) == int:
+    elif isinstance(var, (Integer, int)):
         return Integer(var)
-    elif type(var) == float:
+    elif isinstance(var, (Real, float)):
         return Real(var)    
     else:
-        raise Exception(param + " must be Integer, Real, Bool, int, float, or"+\
-                        " bool, but a "+str(type(value))+ " was given instead")
-                        
+        raise Exception((f"{param} must be an intance of 'Bool', 'bool', 'Real',"
+                         f" 'float', 'Integer', 'int' but a '{type(var).__name__}'"
+                         f" was given instead"))
            
+
 #-------------------------------------------------------------------------------
 ## Check if the variable is a number or can be parsed to Bool.
 #  @param param String representing the name of the variable.
@@ -201,11 +190,10 @@ def parseNumber(param, var):
 #
 #-------------------------------------------------------------------------------                        
 def checkNumber(param, var):
-    assert isinstance(var, Integer) or isinstance(var, Bool) or  \
-           isinstance(var, Real) or type(var) == float or \
-           type(var) == int or type(var) == bool, str(param) + " must be " +\
-           "Integer, Real, Bool, int, float, or bool, but a "+str(type(value))+\
-           " was given instead" 
+    assert isinstance(var, (Real, Integer, Bool, float, int, bool)), \
+           (f"{param} must be an intance of 'Bool', 'bool', 'Real',"
+            f" 'float', 'Integer', 'int' but a '{type(var).__name__}'"
+            f" was given instead")
            
 
 #-------------------------------------------------------------------------------
@@ -269,13 +257,13 @@ class Real():
     def __init__(self, value):
         if isinstance(value, Bool):
             value = str(ternary(value, Real('1.0'), Real('0.0')))
-        elif isinstance(value, Real) or isinstance(value, Integer):
+        elif isinstance(value, (Real, Integer)):
             value = str(value)
-        elif type(value) != str:
+        elif not isinstance(value, str):
             try:
                 value = "{:e}".format(value)
             except:
-                raise TypeError("Can't convert " + str(value) + " to Real")
+                raise TypeError(f"Can't convert {value} to Real")
         self.value = value
     
     #---------------------------------------------------------------------------
@@ -520,11 +508,11 @@ class Bool():
             value = str(value != 0)
         elif isinstance(value, Bool):
             value = str(value)
-        elif type(value) != str:
+        elif not isinstance(value, str):
             try:
                 value = str(int(bool(value)))
             except:
-                raise TypeError("Can't convert " + str(value) + " to bool")
+                raise TypeError(f"Can't convert {value} to bool")
         self.value = value
     
     #---------------------------------------------------------------------------
@@ -698,7 +686,7 @@ class Integer():
             value = str(ceil(value)) 
         elif isinstance(value, Integer):
             value = str(value)
-        elif type(value) != str:
+        elif not isinstance(value, str):
             try:
                 if isinstance(value, int):
                     assert value > -2147483648 and value < 2147483647, "Can't " +\
