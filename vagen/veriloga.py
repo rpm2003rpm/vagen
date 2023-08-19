@@ -89,7 +89,7 @@ def parseReal(param, var):
     if isinstance(var, (Real, float, int)):
         return Real(var)
     else:
-        raise Exception((f"{param} must be an intance of 'Real', 'float', or "
+        raise Exception((f"{param} must be an instance of 'Real', 'float', or "
                          f"'int' but a '{type(var).__name__}' was given instead"))
 
 
@@ -102,7 +102,7 @@ def parseReal(param, var):
 #-------------------------------------------------------------------------------
 def checkReal(param, var):
     assert isinstance(var, (Real, float, int)), \
-           (f"{param} must be an intance of 'Real', 'float', or "
+           (f"{param} must be an instance of 'Real', 'float', or "
             f"'int' but a '{type(var).__name__}' was given instead")
 
 
@@ -117,7 +117,7 @@ def parseInteger(param, var):
     if isinstance(var, (Integer, int)):
         return Integer(var)
     else:
-        raise Exception((f"{param} must be an intance of 'Integer' or 'int' "
+        raise Exception((f"{param} must be an instance of 'Integer' or 'int' "
                          f"but a '{type(var).__name__}' was given instead"))
                  
                  
@@ -130,7 +130,7 @@ def parseInteger(param, var):
 #-------------------------------------------------------------------------------
 def checkInteger(param, var):
     assert isinstance(var, (Integer, int)), \
-           (f"{param} must be an intance of 'Integer' or 'int' but a "
+           (f"{param} must be an instance of 'Integer' or 'int' but a "
             f"'{type(var).__name__}' was given instead")
 
 
@@ -145,7 +145,7 @@ def parseBool(param, var):
     if isinstance(var, (Bool, bool)):
         return Bool(var)
     else:
-        raise Exception((f"{param} must be an intance of 'Bool' or 'bool' "
+        raise Exception((f"{param} must be an instance of 'Bool' or 'bool' "
                          f"but a '{type(var).__name__}' was given instead"))
                         
                         
@@ -158,7 +158,7 @@ def parseBool(param, var):
 #-------------------------------------------------------------------------------
 def checkBool(param, var):
     assert isinstance(var, (Bool, bool)), \
-           (f"{param} must be an intance of 'Bool' or 'bool' but a "
+           (f"{param} must be an instance of 'Bool' or 'bool' but a "
             f"'{type(var).__name__}' was given instead")
 
 
@@ -177,7 +177,7 @@ def parseNumber(param, var):
     elif isinstance(var, (Real, float)):
         return Real(var)    
     else:
-        raise Exception((f"{param} must be an intance of 'Bool', 'bool', 'Real',"
+        raise Exception((f"{param} must be an instance of 'Bool', 'bool', 'Real',"
                          f" 'float', 'Integer', 'int' but a '{type(var).__name__}'"
                          f" was given instead"))
            
@@ -191,7 +191,7 @@ def parseNumber(param, var):
 #-------------------------------------------------------------------------------                        
 def checkNumber(param, var):
     assert isinstance(var, (Real, Integer, Bool, float, int, bool)), \
-           (f"{param} must be an intance of 'Bool', 'bool', 'Real',"
+           (f"{param} must be an instance of 'Bool', 'bool', 'Real',"
             f" 'float', 'Integer', 'int' but a '{type(var).__name__}'"
             f" was given instead")
            
