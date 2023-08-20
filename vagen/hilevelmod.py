@@ -112,9 +112,9 @@ class Marker():
         riseFall = parseReal("riseFall", riseFall)
         self.name = name
         self.markList = []
-        self.markerPin  = hiLevelMod.electrical("MARK_" + name, \
-                                               direction = "output")
-        self.markSt     = hiLevelMod.var(Bool(False), "_$markSt_" + name)         
+        self.markerPin  = hiLevelMod.electrical(name = f"MARK_{name}",
+                                                direction = "output")
+        self.markSt     = hiLevelMod.var(Bool(False), f"_$markSt_{name}")         
         hiLevelMod.endAnalog(
             self.markerPin.vCont(transition(Real(self.markSt), 0, riseFall, 
                                                                   riseFall))
@@ -181,9 +181,9 @@ class Marker():
     def getEqs(self):
         ans = {}
         for i in range(0, len(self.markList)):
-            ans[self.markList[i]] = 'cross(getData("/MARK_' + self.name + '" '+\
-                                    '?result "tran") 0.5 ' +\
-                                    '{:d} "either" nil nil)'.format(i + 1)
+            ans[self.markList[i]] = (f'cross(getData("/MARK_{self.name}" '
+                                     f'?result "tran") 0.5 {i} "either" '
+                                     f'nil nil)')
         return ans
         
 
@@ -387,9 +387,9 @@ class Vdc(Electrical):
         fall = parseReal("fall", fall)
         super(Vdc, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
-        self.volt = hiLevelMod.var(value, prefix + "_$value$")
-        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
-        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        self.volt = hiLevelMod.var(value, f"{prefix}_$value$")
+        self.rise = hiLevelMod.var(rise,  f"{prefix}_$rise$")
+        self.fall = hiLevelMod.var(fall,  f"{prefix}_$fall$")
         if gnd == None:
             out = self
         else:
@@ -512,9 +512,9 @@ class Idc(Electrical):
         fall = parseReal("fall", fall)
         super(Idc, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
-        self.cur = hiLevelMod.var(value, prefix + "_$value$")
-        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
-        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        self.cur  = hiLevelMod.var(value, f"{prefix}_$value$")
+        self.rise = hiLevelMod.var(rise,  f"{prefix}_$rise$")
+        self.fall = hiLevelMod.var(fall,  f"{prefix}_$fall$")
         if gnd == None:
             out = self
         else:
@@ -638,18 +638,18 @@ class Smu(Electrical):
             checkNotInstance("gnd", gnd, Branch)
         super(Smu, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
-        self.volt     = hiLevelMod.var(volt, prefix + "_$volt$")
-        self.maxCur   = hiLevelMod.var(maxCur, prefix + "_$maxCur")
-        self.minCur   = hiLevelMod.var(minCur, prefix + "_$minCur$")
-        self.res      = hiLevelMod.var(res, prefix + "_$res$")
-        self.vDelay   = hiLevelMod.var(Real(0), prefix + "_$vDelay$")
-        self.iDelay   = hiLevelMod.var(Real(0), prefix + "_$iDelay$")
-        self.rDelay   = hiLevelMod.var(Real(0), prefix + "_$rDelay$")
-        self.riseFall = hiLevelMod.var(Real(1e-6), prefix + "_$riseFall$")
-        voltTran      = hiLevelMod.var(Real(0), prefix + "_$voltTran$") 
-        maxCurTran    = hiLevelMod.var(Real(0), prefix + "_$maxCurTran$")
-        minCurTran    = hiLevelMod.var(Real(0), prefix + "_$minCurTran$")
-        resTran       = hiLevelMod.var(Real(0), prefix + "_$resTran$")
+        self.volt     = hiLevelMod.var(volt, f"{prefix}_$volt$")
+        self.maxCur   = hiLevelMod.var(maxCur, f"{prefix}_$maxCur")
+        self.minCur   = hiLevelMod.var(minCur, f"{prefix}_$minCur$")
+        self.res      = hiLevelMod.var(res, f"{prefix}_$res$")
+        self.vDelay   = hiLevelMod.var(Real(0), f"{prefix}_$vDelay$")
+        self.iDelay   = hiLevelMod.var(Real(0), f"{prefix}_$iDelay$")
+        self.rDelay   = hiLevelMod.var(Real(0), f"{prefix}_$rDelay$")
+        self.riseFall = hiLevelMod.var(Real(1e-6), f"{prefix}_$riseFall$")
+        voltTran      = hiLevelMod.var(Real(0), f"{prefix}_$voltTran$") 
+        maxCurTran    = hiLevelMod.var(Real(0), f"{prefix}_$maxCurTran$")
+        minCurTran    = hiLevelMod.var(Real(0), f"{prefix}_$minCurTran$")
+        resTran       = hiLevelMod.var(Real(0), f"{prefix}_$resTran$")
         if gnd == None:
             out = self
         else:
@@ -875,11 +875,11 @@ class DigOut(Electrical):
         fall = parseReal("fall", fall)
         super(DigOut, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
-        self.st = hiLevelMod.var(state, prefix + "_$state$")
-        self.serRes = hiLevelMod.var(serRes, prefix + "_$serRes$")
-        self.delay = hiLevelMod.var(delay, prefix + "_$delay$")
-        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
-        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        self.st = hiLevelMod.var(state, f"{prefix}_$state$")
+        self.serRes = hiLevelMod.var(serRes, f"{prefix}_$serRes$")
+        self.delay = hiLevelMod.var(delay, f"{prefix}_$delay$")
+        self.rise = hiLevelMod.var(rise, f"{prefix}_$rise$")
+        self.fall = hiLevelMod.var(fall, f"{prefix}_$fall$")
         if gnd == None:
             out = self
             dm  = domain
@@ -997,7 +997,7 @@ class DigIn(Electrical):
         self.domain = domain
         self.gnd = gnd
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
-        self.inCap = hiLevelMod.var(inCap, prefix + "_$inCap$")
+        self.inCap = hiLevelMod.var(inCap, f"{prefix}_$inCap$")
         if self.gnd == None:
             out = self
             dm  = self.domain
@@ -1065,13 +1065,13 @@ class DigInOut(DigIn, DigOut):
         fall = parseReal("fall", fall)
         super(DigOut, self).__init__(name)
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
-        self.st = hiLevelMod.var(state, prefix + "_$state$")
-        self.serRes = hiLevelMod.var(serRes, prefix + "_$serRes$")
-        self.inCap = hiLevelMod.var(inCap, prefix + "_$inCap$")
-        self.res = hiLevelMod.var(serRes, prefix + "_$res$")
-        self.delay = hiLevelMod.var(delay, prefix + "_$delay$")
-        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
-        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        self.st = hiLevelMod.var(state, f"{prefix}_$state$")
+        self.serRes = hiLevelMod.var(serRes, f"{prefix}_$serRes$")
+        self.inCap = hiLevelMod.var(inCap, f"{prefix}_$inCap$")
+        self.res = hiLevelMod.var(serRes, f"{prefix}_$res$")
+        self.delay = hiLevelMod.var(delay, f"{prefix}_$delay$")
+        self.rise = hiLevelMod.var(rise, f"{prefix}_$rise$")
+        self.fall = hiLevelMod.var(fall, f"{prefix}_$fall$")
         self.domain = domain
         pin = hiLevelMod.electrical()
         conn = Branch(pin, self)
@@ -1307,9 +1307,9 @@ class Sw():
         fall = parseReal("fall", fall)
         prefix = "sw" + str(self.swCount)
         self.swCount = self.swCount + 1
-        self.cond = hiLevelMod.var(cond, prefix + "_$cond$")
-        self.rise = hiLevelMod.var(rise, prefix + "_$rise$")
-        self.fall = hiLevelMod.var(fall, prefix + "_$fall$")
+        self.cond = hiLevelMod.var(cond, f"{prefix}_$cond$")
+        self.rise = hiLevelMod.var(rise, f"{prefix}_$rise$")
+        self.fall = hiLevelMod.var(fall, f"{prefix}_$fall$")
         self.branch = Branch(pin1, pin2)
         hiLevelMod.endAnalog(
             self.branch.iCont(
@@ -1370,10 +1370,10 @@ class Clock():
         checkInstance("pin", pin, DigOut)
         prefix = "clk" + str(self.clockCount)
         self.clockCount = self.clockCount + 1
-        out = hiLevelMod.var(Bool(str(pin.st)), prefix + "_$out$")
-        self.isOn = hiLevelMod.var(Bool(0), prefix + "_$isOn$")
-        self.halfPeriod = hiLevelMod.var(Real(1000000), prefix + "_$halfPeriod$")
-        self.time = hiLevelMod.var(Real(1000000), prefix + "_$time$")
+        out = hiLevelMod.var(Bool(str(pin.st)), f"{prefix}_$out$")
+        self.isOn = hiLevelMod.var(Bool(0), f"{prefix}_$isOn$")
+        self.halfPeriod = hiLevelMod.var(Real(1000000), f"{prefix}_$halfPeriod$")
+        self.time = hiLevelMod.var(Real(1000000), f"{prefix}_$time$")
         self.at = CmdList(
                       out.toggle(),
                       pin.write(out),
@@ -1928,8 +1928,8 @@ class HiLevelMod(Module):
                                                        
             #Found a case
             elif isinstance(cmd, Mark):
-                raise Exception("You can't have conditional executed mark" +
-                                "or marks inside command lists")
+                raise Exception( ("You can't have conditional executed mark"
+                                  "or marks inside command lists") )
 
             #The commands doesn't require special handling. Add it to the list.
             else:
@@ -1947,10 +1947,10 @@ class HiLevelMod(Module):
     def seq(self, cond):
         def func(*args):
             self.nState   = 0
-            self.time     = self.var(Real(1e-9), "_$evntTime_" + str(self.nSeq)) 
-            self.state    = self.var(Integer(0), "_$state_"    + str(self.nSeq)) 
-            self.runSt    = self.var(Bool(False),"_$runSt_"    + str(self.nSeq)) 
-            self.eventId  = self.var(Integer(0), "_$eventId_"  + str(self.nSeq)) 
+            self.time     = self.var(Real(1e-9),  f"_$evntTime_{self.nSeq}") 
+            self.state    = self.var(Integer(0),  f"_$state_{self.nSeq}") 
+            self.runSt    = self.var(Bool(False), f"_$runSt_{self.nSeq}") 
+            self.eventId  = self.var(Integer(0),  f"_$eventId_{self.nSeq}") 
             self.pCase    = Case(self.state)()
             self.cond     = cond
             self.evntList = []
@@ -1974,9 +1974,9 @@ class HiLevelMod(Module):
             assert len(args) > 0, "Sequence can be empty"
             for cmd in args:
                 assert isinstance(cmd, Cmd) and \
-                       not isinstance(cmd, WaitAnalogEvent), "Command " +str(i)+\
-                       " must be an instance of Cmd and can't be and instance "+\
-                       "of WaitAnalogEvent"
+                       not isinstance(cmd, WaitAnalogEvent), (f"Command {i}"
+                       " must be an instance of Cmd and can't be and instance "
+                       "of WaitAnalogEvent")
                 i = i + 1
                 if isinstance(cmd, Mark):
                     cmds.append(cmd.getCmd())
@@ -1998,15 +1998,13 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def getEqs(self):
-        ans = "Test,Name,Type,Output,Plot,Save,Spec\n"
+        ans = ["Test,Name,Type,Output,Plot,Save,Spec"]
         for mark in self.markers:
             eqs = mark.getEqs()
             name = mark.getName()
             for key in eqs.keys():
-                ans = ans + "{:s},{:s},expr,{:s},t,,\n".format(name, 
-                                                               name + "_" + key, 
-                                                               eqs[key])
-        return ans 
+                ans.append(f"{name},{name}_{key},expr,{eqs[key]},t,,")
+        return "\n".join(ans) 
             
 
     #---------------------------------------------------------------------------
@@ -2015,13 +2013,13 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def getOcn(self):
-        ans = "session = axlGetWindowSession()\n"
+        ans = ["session = axlGetWindowSession()"]
         for mark in self.markers:
             eqs = mark.getEqs()
             name = mark.getName()
             for key in eqs.keys():
-                ans = ans + "axlAddOutputExpr(session " +\
-                      '"{:s}" "{:s}" ?expr "{:s}" ?plot t)\n'.format(name, 
-                      name + "_" + key, eqs[key].replace('"', '\\"'))
-        return ans 
+                eq = eqs[key].replace('"', '\\"')
+                ans.append( (f"axlAddOutputExpr(session {name} {name}_{key} "
+                             f"?expr {eq} ?plot t)") )
+        return "\n".join(ans) 
 

@@ -2116,7 +2116,7 @@ def Write(msg, *params):
     checkType("msg", msg, str)
     return Cmd(f'$write("{msg}"{unfoldParams(*params)})')
 
-#TODO
+
 #-------------------------------------------------------------------------------
 ## Fopen
 #  @param fileName name of the file
@@ -2125,7 +2125,7 @@ def Write(msg, *params):
 #-------------------------------------------------------------------------------
 def Fopen(fileName):
     checkType("msg", fileName, str)
-    return Integer('$fopen("' + fileName + '")') 
+    return Integer(f'$fopen("{fileName}")') 
 
 
 #-------------------------------------------------------------------------------
@@ -2136,7 +2136,7 @@ def Fopen(fileName):
 #-------------------------------------------------------------------------------
 def Fclose(desc):
     desc = parseInteger("desc", desc)
-    return Cmd('$fclose(' + str(desc) + ')') 
+    return Cmd(f'$fclose({desc})') 
 
 
 #-------------------------------------------------------------------------------
@@ -2150,9 +2150,7 @@ def Fclose(desc):
 def Fstrobe(desc, msg, *params):
     desc = parseInteger("desc", desc)
     checkType("msg", msg, str)
-    return Cmd('$fstrobe(' + str(desc) + ', "' + \
-                         msg + '"' + \
-                         unfoldParams(*params) + ")")
+    return Cmd(f'$fstrobe({desc}, "{msg}"{unfoldParams(*params)})')
 
 
 #-------------------------------------------------------------------------------
@@ -2166,9 +2164,7 @@ def Fstrobe(desc, msg, *params):
 def Fwrite(desc, msg, *params):
     desc = parseInteger("desc", desc)
     checkType("msg", msg, str)
-    return Cmd('$fwrite(' + str(desc) + ', "' + \
-                         msg + '"' + \
-                         unfoldParams(*params) + ")")
+    return Cmd(f'$fwrite({desc}, "{msg}"{unfoldParams(*params)})')
                          
 
 #-------------------------------------------------------------------------------
@@ -2180,7 +2176,7 @@ def Fwrite(desc, msg, *params):
 #-------------------------------------------------------------------------------
 def Discontinuity(degree = 0):
     degree = parseInteger("degree", degree)
-    return Cmd('$discontinuity(' + str(degree) + ')') 
+    return Cmd(f'$discontinuity({degree})') 
 
 
 #-------------------------------------------------------------------------------
@@ -2201,7 +2197,7 @@ def Finish():
 #-------------------------------------------------------------------------------
 def Error(msg, *params):
     checkType("msg", msg, str)
-    return Cmd('$error("' + msg + '"' + unfoldParams(*params) + ")")
+    return Cmd(f'$error("{msg}"{unfoldParams(*params)})')
 
 #-------------------------------------------------------------------------------
 ## fatal
@@ -2212,7 +2208,7 @@ def Error(msg, *params):
 #-------------------------------------------------------------------------------
 def Fatal(msg, *params):
     checkType("msg", msg, str)
-    return Cmd('$fatal(0, "' + msg + '"' + unfoldParams(*params) + ")")
+    return Cmd(f'$fatal(0, "{msg}"{unfoldParams(*params)})')
 
 #-------------------------------------------------------------------------------
 ## bond step
@@ -2222,7 +2218,7 @@ def Fatal(msg, *params):
 #-------------------------------------------------------------------------------
 def BoundStep(step):
     step = parseReal("step", step)
-    return Cmd('$bound_step(' + str(step) + ')') 
+    return Cmd(f'$bound_step({step})') 
 
 
 #-------------------------------------------------------------------------------
@@ -2240,8 +2236,7 @@ def lastCrossing(signal, threshold, edge = 'both'):
     checkType("edge", edge, str)
     mapping = {'rising': '1', 'falling': '-1', 'both': '0'}  
     assert edge in mapping.keys()
-    cross = "last_crossing(" + str(signal) + " - " + str(threshold) + ", " + \
-            mapping[edge] +")" 
+    cross = f"last_crossing({signal} - {threshold}, {mapping[edge]})" 
     return Real(cross) 
 
 
@@ -2253,7 +2248,7 @@ def lastCrossing(signal, threshold, edge = 'both'):
 #-------------------------------------------------------------------------------
 def random(seed):
     checkInstance("seed", seed, IntegerVar)
-    return Integer('$random(' + str(seed) + ')')
+    return Integer(f'$random({seed})')
 
 
 #-------------------------------------------------------------------------------
@@ -2268,8 +2263,7 @@ def uDistInt(seed, start, end):
     checkInstance("seed", seed, IntegerVar)
     start = parseInteger("start", start)
     end = parseInteger("end", end)
-    return Integer('$dist_uniform(' + str(seed) + ', ' + str(start) + ', ' + \
-                      str(end) + ')')
+    return Integer(f'$dist_uniform({seed}, {start}, {end})')
             
                       
 #-------------------------------------------------------------------------------
@@ -2284,8 +2278,7 @@ def uDistReal(seed, start, end):
     checkInstance("seed", seed, IntegerVar)
     start = parseReal("start", start)
     end = parseReal("end", end)
-    return Real('$rdist_uniform(' + str(seed) + ', ' + str(start) + ', ' + \
-                  str(end) + ')')
+    return Real(f'$rdist_uniform({seed}, {start}, {end})')
 
 
 #-------------------------------------------------------------------------------
@@ -2300,8 +2293,7 @@ def gaussDistInt(seed, mean, std):
     checkInstance("seed", seed, IntegerVar)
     mean = parseInteger("mean", mean)
     std = parseInteger("std", std)
-    return Integer('$dist_normal(' + str(seed) + ', ' + str(mean) + ', ' + \
-                      str(std) + ')')
+    return Integer(f'$dist_normal({seed}, {mean}, {std})')
         
         
 #-------------------------------------------------------------------------------
@@ -2316,8 +2308,7 @@ def gaussDistReal(seed, mean, std):
     checkInstance("seed", seed, IntegerVar)
     mean = parseReal("mean", mean)
     std = parseReal("std", std)
-    return Real('$rdist_normal(' + str(seed) + ', ' + str(mean) + ', ' + \
-                  str(std) + ')')
+    return Real(f'$rdist_normal({seed}, {mean}, {std})')
 
 #-------------------------------------------------------------------------------
 ## Exponential distribution random number generator
@@ -2329,7 +2320,7 @@ def gaussDistReal(seed, mean, std):
 def expDistInt(seed, mean):
     checkInstance("seed", seed, IntegerVar)
     mean = parseInteger("mean", mean)
-    return Integer('$dist_exponential(' + str(seed) + ', ' + str(mean) + ')')
+    return Integer(f'$dist_exponential({seed}, {mean})')
 
 
 #-------------------------------------------------------------------------------
@@ -2342,7 +2333,7 @@ def expDistInt(seed, mean):
 def expDistReal(seed, mean):
     checkInstance("seed", seed, IntegerVar)
     mean = parseReal("mean", mean)
-    return Real('$rdist_exponential(' + str(seed) + ', ' + str(mean) + ')')
+    return Real(f'$rdist_exponential({seed}, {mean})')
 
 
 #-------------------------------------------------------------------------------
@@ -2355,7 +2346,7 @@ def expDistReal(seed, mean):
 def poissonDistInt(seed, mean):
     checkInstance("seed", seed, IntegerVar)
     mean = parseInteger("mean", mean)
-    return Integer('$dist_poisson(' + str(seed) + ', ' + str(mean) + ')')
+    return Integer(f'$dist_poisson({seed}, {mean})')
 
 
 #-------------------------------------------------------------------------------
@@ -2368,7 +2359,7 @@ def poissonDistInt(seed, mean):
 def poissonDistReal(seed, mean):
     checkInstance("seed", seed, IntegerVar)
     mean = parseReal("mean", mean)
-    return Real('$rdist_poisson(' + str(seed) + ', ' + str(mean) + ')')
+    return Real(f'$rdist_poisson({seed}, {mean})')
 
 
 #-------------------------------------------------------------------------------
@@ -2388,7 +2379,7 @@ vt = Real("$vt")
 #-------------------------------------------------------------------------------
 def exp(x):
     x = parseReal("x", x)
-    return Real("exp(" + str(x) + ")")
+    return Real(f"exp({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2399,7 +2390,7 @@ def exp(x):
 #-------------------------------------------------------------------------------
 def limexp(x):
     x = parseReal("x", x)
-    return Real("limexp(" + str(x) + ")")
+    return Real(f"limexp({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2412,7 +2403,7 @@ def limexp(x):
 def absDelay(x, delay):
     x = parseReal("x", x)
     delay = parseReal("delay", delay)
-    return Real("absdelay(" + str(x) + ", " + str(delay) + ")")
+    return Real(f"absdelay({x}, {delay})")
 
 
 #-------------------------------------------------------------------------------
@@ -2432,10 +2423,34 @@ def transition(x,
     delay = parseReal("delay", delay)
     riseTime = parseReal("riseTime", riseTime)
     fallTime = parseReal("fallTime", fallTime)
-    return Real("transition(" + str(x) + ", " + str(delay) + ", " + \
-                  str(riseTime) + ", " + str(fallTime) + ")") 
+    return Real(f"transition({x}, {delay}, {riseTime}, {fallTime})") 
 
 
+#-------------------------------------------------------------------------------
+## smooth filter with hiperbolic tangend to avoid discontinuities. It goes from
+#         0.0001 to 0.9999. It never fully reaches 0 or 1.
+#  @param x Real, float or int input
+#  @param delay Real, float or int delay input. 
+#         actual delay will be delay + 2.048*[rise/fall]Time
+#  @param riseTime delay Real, float or int rise time from 10% to 90%
+#  @param fallTime delay Real, float or int fall time from 10% to 90%
+#  @return Real expressing the transition filter
+#
+#-------------------------------------------------------------------------------
+def smooth(x, 
+           delay = 0, 
+           riseTime = 1e-6, 
+           fallTime = 1e-6):
+    checkReal("x", x)
+    checkReal("delay", delay)
+    checkReal("riseTime", riseTime)
+    checkReal("fallTime", fallTime)
+    riseTime = riseTime/4.0961
+    fallTime = fallTime/4.0961
+    x = transition(parseReal("x", x), delay, riseTime, fallTime)
+    return tanh(9*x - 4.5)/2 + 0.5
+    
+    
 #-------------------------------------------------------------------------------
 ## slew filter
 #  @param x Real, float or int input
@@ -2448,10 +2463,7 @@ def slew(x, riseSlope = 10e-6, fallSlope = 10e-6):
     x = parseReal("x", x)
     riseSlope = parseReal("riseSlope", riseSlope)
     fallSlope = parseReal("fallSlope", fallSlope)
-    return Real("slew(" + \
-                  str(x) + ", " + \
-                  str(riseSlope) + ", " + \
-                  str(fallSlope) + ")")
+    return Real(f"slew({x}, {riseSlope}, {fallSlope})")
 
 
 #-------------------------------------------------------------------------------
@@ -2462,7 +2474,7 @@ def slew(x, riseSlope = 10e-6, fallSlope = 10e-6):
 #-------------------------------------------------------------------------------
 def ddt(x):
     x = parseReal("x", x)
-    return Real("ddt(" + str(x) + ")")
+    return Real(f"ddt({x})")
  
  
 #-------------------------------------------------------------------------------
@@ -2475,7 +2487,7 @@ def ddt(x):
 def idt(x, start = Real(0)):
     x = parseReal("x", x)
     start = parseReal("start", start)
-    return Real("idt(" + str(x) + ", " + str(start) + ")")
+    return Real(f"idt({x}, {start})")
 
 
 #-------------------------------------------------------------------------------
@@ -2486,7 +2498,7 @@ def idt(x, start = Real(0)):
 #-------------------------------------------------------------------------------
 def ceil(x):
     x = parseReal("x", x)
-    return Integer("ceil(" + str(x) + ")")
+    return Integer(f"ceil({x})")
       
 
 #-------------------------------------------------------------------------------
@@ -2497,7 +2509,7 @@ def ceil(x):
 #-------------------------------------------------------------------------------  
 def floor(x):
     x = parseReal("x", x)
-    return Integer("floor(" + str(x) + ")")
+    return Integer(f"floor({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2508,7 +2520,7 @@ def floor(x):
 #-------------------------------------------------------------------------------
 def ln(x):
     x = parseReal("x", x)
-    return Real("ln(" + str(x) + ")")
+    return Real(f"ln({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2519,7 +2531,7 @@ def ln(x):
 #-------------------------------------------------------------------------------
 def log(x):
     x = parseReal("x", x)
-    return Real("log(" + str(x) + ")")
+    return Real(f"log({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2530,7 +2542,7 @@ def log(x):
 #-------------------------------------------------------------------------------
 def sqrt(x):
     x = parseReal("x", x)
-    return Real("sqrt(" + str(x) + ")")
+    return Real(f"sqrt({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2541,7 +2553,7 @@ def sqrt(x):
 #-------------------------------------------------------------------------------
 def sin(x):
     x = parseReal("x", x)
-    return Real("sin(" + str(x) + ")")
+    return Real(f"sin({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2552,7 +2564,7 @@ def sin(x):
 #-------------------------------------------------------------------------------
 def cos(x):
     x = parseReal("x", x)
-    return Real("cos(" + str(x) + ")")
+    return Real(f"cos({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2563,7 +2575,7 @@ def cos(x):
 #-------------------------------------------------------------------------------
 def tan(x):
     x = parseReal("x", x)
-    return Real("tan(" + str(x) + ")")
+    return Real(f"tan({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2574,7 +2586,7 @@ def tan(x):
 #-------------------------------------------------------------------------------
 def asin(x):
     x = parseReal("x", x)
-    return Real("asin(" + str(x) + ")")
+    return Real(f"asin({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2585,7 +2597,7 @@ def asin(x):
 #-------------------------------------------------------------------------------
 def acos(x):
     x = parseReal("x", x)
-    return Real("acos(" + str(x) + ")")
+    return Real(f"acos({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2596,7 +2608,7 @@ def acos(x):
 #-------------------------------------------------------------------------------
 def atan(x):
     x = parseReal("x", x)
-    return Real("atan(" + str(x) + ")")
+    return Real(f"atan({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2609,7 +2621,7 @@ def atan(x):
 def atan2(x, y):
     x = parseReal("x", x)
     y = parseReal("y", y)
-    return Real("atan2(" + str(x) + ", " + str(y) + ")")
+    return Real(f"atan2({x}, {y})")
 
 
 #-------------------------------------------------------------------------------
@@ -2622,7 +2634,7 @@ def atan2(x, y):
 def hypot(x, y):
     x = parseReal("x", x)
     y = parseReal("y", y)
-    return Real("hypot(" + str(x) + ", " + str(y) + ")")
+    return Real(f"hypot({x}, {y})")
 
 
 #-------------------------------------------------------------------------------
@@ -2633,7 +2645,7 @@ def hypot(x, y):
 #-------------------------------------------------------------------------------
 def sinh(x):
     x = parseReal("x", x)
-    return Real("sinh(" + str(x) + ")")
+    return Real(f"sinh({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2644,7 +2656,7 @@ def sinh(x):
 #-------------------------------------------------------------------------------
 def cosh(x):
     x = parseReal("x", x)
-    return Real("cosh(" + str(x) + ")")
+    return Real(f"cosh({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2655,7 +2667,7 @@ def cosh(x):
 #-------------------------------------------------------------------------------
 def tanh(x):
     x = parseReal("x", x)
-    return Real("tanh(" + str(x) + ")")
+    return Real(f"tanh({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2666,7 +2678,7 @@ def tanh(x):
 #-------------------------------------------------------------------------------
 def asinh(x):
     x = parseReal("x", x)
-    return Real("asinh(" + str(x) + ")")
+    return Real(f"asinh({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2677,7 +2689,7 @@ def asinh(x):
 #-------------------------------------------------------------------------------
 def acosh(x):
     x = parseReal("x", x)
-    return Real("acosh(" + str(x) + ")")
+    return Real(f"acosh({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2688,7 +2700,7 @@ def acosh(x):
 #-------------------------------------------------------------------------------
 def atanh(x):
     x = parseReal("x", x)
-    return Real("atanh(" + str(x) + ")")
+    return Real(f"atanh({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -2706,8 +2718,8 @@ class Electrical():
     def __init__(self, name):
         checkType("name", name, str)
         self.name = name
-        self.v = Real("V(" + name + ")") 
-        self.i = Real("I(" + name + ")") 
+        self.v = Real(f"V({name})") 
+        self.i = Real(f"I({name})") 
         
     #---------------------------------------------------------------------------
     ## Return electrical name
@@ -2727,7 +2739,7 @@ class Electrical():
     #---------------------------------------------------------------------------
     def vCont(self, value):
         value = parseReal("value", value)
-        return Cmd('V(' + self.name + ') <+ ' + str(value))
+        return Cmd(f'V({self.name}) <+ {value}')
 
     #---------------------------------------------------------------------------
     ## Return a command representing current contribution
@@ -2738,7 +2750,7 @@ class Electrical():
     #---------------------------------------------------------------------------
     def iCont(self, value):
         value = parseReal("value", value)
-        return Cmd('I(' + self.name + ') <+ ' + str(value))
+        return Cmd(f'I({self.name}) <+ {value}')
 
     #---------------------------------------------------------------------------
     ## Return a command representing voltage attribution
@@ -2749,7 +2761,7 @@ class Electrical():
     #---------------------------------------------------------------------------
     def vAttr(self, value):
         value = parseReal("value", value)
-        return Cmd('V(' + self.name + ') = ' + str(value))
+        return Cmd(f'V({self.name}) = {value}')
 
     #---------------------------------------------------------------------------
     ## Return a command representing current attribution
@@ -2760,7 +2772,7 @@ class Electrical():
     #---------------------------------------------------------------------------
     def iAttr(self, value):
         value = parseReal("value", value)
-        return Cmd('I(' + self.name + ') = ' + str(value))
+        return Cmd(f'I({self.name}) = {value}')
 
     #---------------------------------------------------------------------------
     ## Return a command representing voltage indirect assigment (Voltage that
@@ -2772,7 +2784,7 @@ class Electrical():
     #---------------------------------------------------------------------------
     def vInd(self, value):
         value = parseBool("value", value)
-        return Cmd('V(' + self.name + ') : ' + str(value))
+        return Cmd(f'V({self.name}) : {value}')
 
     #---------------------------------------------------------------------------
     ## Return a command representing current indirect assigment (Current that
@@ -2784,7 +2796,7 @@ class Electrical():
     #---------------------------------------------------------------------------
     def iInd(self, value):
         value = parseBool("value", value)
-        return Cmd('I(' + self.name + ') : ' + str(value))
+        return Cmd(f'I({self.name}) : {value}')
  
 
 #-------------------------------------------------------------------------------
@@ -2805,7 +2817,7 @@ class Branch(Electrical):
         checkInstance("node2", node2, Electrical)
         checkNotInstance("node1", node1, Branch)
         checkNotInstance("node2", node2, Branch)
-        super(Branch, self).__init__(node1.getName() + ", " + node2.getName())
+        super(Branch, self).__init__(f"{node1.getName()}, {node2.getName()}")
 
 
 #-------------------------------------------------------------------------------
@@ -2857,10 +2869,10 @@ class Module:
         checkType("name", name, str)
         if name == "":
             self.nameCount = self.nameCount + 1
-            name = "_$" + str(self.nameCount)
-        assert re.match(r"[_a-zA-Z][_a-zA-Z$0-9]*", name), str(name) +\
-               " isn't a valid verilogA identifier"
-        assert not name in self.nameSpace, name + " is already taken"
+            name = f"_${self.nameCount}"
+        assert re.match(r"[_a-zA-Z][_a-zA-Z$0-9]*", name), \
+               f"{name} isn't a valid verilogA identifier"
+        assert not name in self.nameSpace, f"{name} is already taken"
         self.nameSpace.append(name)
         return name
 
@@ -2884,8 +2896,8 @@ class Module:
             vType = "real"
             ans   = RealVar(name)
         else:
-            raise TypeError("vType be Integer, Real, or Bool but "+\
-                            "a " + str(vType) + " was given") 
+            raise TypeError( (f"vType be Integer, Real, or Bool but a {vType}"
+                               " was given") ) 
         self.variables.append((name, vType)) 
         return ans
 
@@ -2908,8 +2920,8 @@ class Module:
             pType = "real"
             ans   = Real(name)
         else:
-            raise TypeError("value must be Integer or Real, but a "+\
-                            str(type(value)) + " was given") 
+            raise TypeError( ( "value must be Integer or Real, but a"
+                              f"{type(value)} was given" ) ) 
         self.parameters.append((name, pType, str(value))) 
         return ans
 
@@ -2922,9 +2934,9 @@ class Module:
     def analog(self, *args):
         i = 1
         for arg in args:
-            assert isinstance(arg, Cmd) and \
-                   "cmd[" + str(i) + "] must be an instance of Cmd and but a" +\
-                   str(type(arg)) + " was given instead"
+            assert isinstance(arg, Cmd), \
+                   (f"cmd[{i}] must be an instance of Cmd and but a {type(arg)}"
+                    f" was given instead")
             i = i + 1
             self.cmds.append(arg)
 
@@ -2937,9 +2949,9 @@ class Module:
     def beginningAnalog(self, *args):
         i = 1
         for arg in args:
-            assert isinstance(arg, Cmd) and \
-                   "cmd[" + str(i) + "] must be an instance of Cmd and but a" +\
-                   str(type(arg)) + " was given instead"
+            assert isinstance(arg, Cmd), \
+                   (f"cmd[{i}] must be an instance of Cmd and but a {type(arg)}"
+                    f" was given instead")
             i = i + 1
             self.beginningCmds.append(arg)
 
@@ -2952,9 +2964,9 @@ class Module:
     def endAnalog(self, *args):
         i = 1
         for arg in args:
-            assert isinstance(arg, Cmd) and \
-                   "cmd[" + str(i) + "] must be an instance of Cmd and but a" +\
-                   str(type(arg)) + " was given instead"
+            assert isinstance(arg, Cmd), \
+                   (f"cmd[{i}] must be an instance of Cmd and but a {type(arg)}"
+                    f" was given instead")
             i = i + 1
             self.endCmds.append(arg)
 
@@ -2998,7 +3010,7 @@ class Module:
         else:
             vector = list()
             for i in range(0, width):
-                vector.append(Electrical(name + "[" + str(i) + "]"))
+                vector.append(Electrical(f"{name}[{i}]"))
             return vector
 
     #---------------------------------------------------------------------------

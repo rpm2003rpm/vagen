@@ -829,7 +829,17 @@ class TestVA(unittest.TestCase):
         b = Write("b", Real('c'), 1.97, 4, True, Bool('d'), Integer('e'))
         self.assertEqual(type(a), Cmd)   
         self.assertEqual(str(a), '$write("a")')       
-        self.assertEqual(str(b), '$write("b", c, {:e}, 4, 1, d, e)'.format(1.97))     
+        self.assertEqual(str(b), '$write("b", c, {:e}, 4, 1, d, e)'.format(1.97))  
+        a = Error("a")
+        b = Error("b", Real('c'), 1.97, 4, True, Bool('d'), Integer('e'))
+        self.assertEqual(type(a), Cmd)   
+        self.assertEqual(str(a), '$error("a")')       
+        self.assertEqual(str(b), '$error("b", c, {:e}, 4, 1, d, e)'.format(1.97))    
+        a = Fatal("a")
+        b = Fatal("b", Real('c'), 1.97, 4, True, Bool('d'), Integer('e'))
+        self.assertEqual(type(a), Cmd)   
+        self.assertEqual(str(a), '$fatal(0, "a")')       
+        self.assertEqual(str(b), '$fatal(0, "b", c, {:e}, 4, 1, d, e)'.format(1.97))  
         a = Fopen("ab")   
         self.assertEqual(type(a), Integer)   
         self.assertEqual(str(a), '$fopen("ab")')   
@@ -988,7 +998,10 @@ class TestVA(unittest.TestCase):
                          "transition(a, {:e}, {:e}, {:e})".format(1, 2, 3))     
         self.assertEqual(str(transition(Real('a'), Real('b'), Real('c'), Real('d'))), 
                          "transition(a, b, c, d)")    
-                         
+        self.assertEqual(type(smooth(1.2)), Real)
+        self.assertEqual(str(smooth(1.2)), 
+        "tanh({:e}*transition({:e}, {:e}, {:e}, {:e}) - {:e})/{:e} + {:e}".format(9, 1.2, 0, 1e-6/4.0961, 1e-6/4.0961, 4.5, 2, 0.5))  
+                                                  
         self.assertEqual(type(absDelay(1.2, 0)), Real)
         self.assertEqual(str(absDelay(1.2, 0)), "absdelay({:e}, {:e})".format(1.2, 0))   
         self.assertEqual(str(absDelay(Real('a'), Real('b'))), "absdelay(a, b)")                          
