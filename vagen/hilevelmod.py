@@ -642,14 +642,14 @@ class Smu(Electrical):
         self.maxCur   = hiLevelMod.var(maxCur, f"{prefix}_$maxCur")
         self.minCur   = hiLevelMod.var(minCur, f"{prefix}_$minCur$")
         self.res      = hiLevelMod.var(res, f"{prefix}_$res$")
-        self.vDelay   = hiLevelMod.var(Real(0), f"{prefix}_$vDelay$")
-        self.iDelay   = hiLevelMod.var(Real(0), f"{prefix}_$iDelay$")
-        self.rDelay   = hiLevelMod.var(Real(0), f"{prefix}_$rDelay$")
-        self.riseFall = hiLevelMod.var(Real(1e-6), f"{prefix}_$riseFall$")
-        voltTran      = hiLevelMod.var(Real(0), f"{prefix}_$voltTran$") 
-        maxCurTran    = hiLevelMod.var(Real(0), f"{prefix}_$maxCurTran$")
-        minCurTran    = hiLevelMod.var(Real(0), f"{prefix}_$minCurTran$")
-        resTran       = hiLevelMod.var(Real(0), f"{prefix}_$resTran$")
+        self.vDelay   = hiLevelMod.var(0.0, f"{prefix}_$vDelay$")
+        self.iDelay   = hiLevelMod.var(0.0, f"{prefix}_$iDelay$")
+        self.rDelay   = hiLevelMod.var(0.0, f"{prefix}_$rDelay$")
+        self.riseFall = hiLevelMod.var(100e-9, f"{prefix}_$riseFall$")
+        voltTran      = hiLevelMod.var(0.0, f"{prefix}_$voltTran$") 
+        maxCurTran    = hiLevelMod.var(0.0, f"{prefix}_$maxCurTran$")
+        minCurTran    = hiLevelMod.var(0.0, f"{prefix}_$minCurTran$")
+        resTran       = hiLevelMod.var(0.0, f"{prefix}_$resTran$")
         if gnd == None:
             out = self
         else:
@@ -714,9 +714,8 @@ class Smu(Electrical):
             self.minCur.eq(-abs(limit)),
             self.res.eq(1e4/(abs(limit) + 1e-9)),
             self.vDelay.eq(0),
-            self.iDelay.eq(1e-6),
-            self.rDelay.eq(1e-6),
-            self.riseFall.eq(1e-6)
+            self.iDelay.eq(100e-9),
+            self.rDelay.eq(100e-9),
         )
 
     #---------------------------------------------------------------------------
@@ -738,10 +737,9 @@ class Smu(Electrical):
             self.maxCur.eq(0.5*(value + abs(value))),
             self.minCur.eq(0.5*(value - abs(value))),
             self.res.eq(1e4/(abs(value) + 1e-9)),
-            self.vDelay.eq(1e-6),
+            self.vDelay.eq(100e-9),
             self.iDelay.eq(0),
             self.rDelay.eq(0),
-            self.riseFall.eq(1e-6)
         )
 
     #---------------------------------------------------------------------------
@@ -758,10 +756,9 @@ class Smu(Electrical):
             self.maxCur.eq(0),
             self.minCur.eq(0),
             self.res.eq(value),
-            self.vDelay.eq(1e-6),
+            self.vDelay.eq(100e-9),
             self.iDelay.eq(0),
             self.rDelay.eq(0),
-            self.riseFall.eq(1e-6)
         )
 
 

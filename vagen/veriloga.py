@@ -2441,13 +2441,13 @@ def smooth(x,
            delay = 0, 
            riseTime = 1e-6, 
            fallTime = 1e-6):
-    checkReal("x", x)
+    checkBool("x", x)
     checkReal("delay", delay)
     checkReal("riseTime", riseTime)
     checkReal("fallTime", fallTime)
     riseTime = riseTime/4.0961
     fallTime = fallTime/4.0961
-    x = transition(parseReal("x", x), delay, riseTime, fallTime)
+    x = transition(Real(x), delay, riseTime, fallTime)
     return tanh(9*x - 4.5)/2 + 0.5
     
     
@@ -2704,7 +2704,7 @@ def atanh(x):
 
 
 #-------------------------------------------------------------------------------
-## Class of electrical signals
+## Class of Electrical signals
 #
 #-------------------------------------------------------------------------------
 class Electrical():
@@ -2712,7 +2712,7 @@ class Electrical():
     #---------------------------------------------------------------------------
     ## constructor
     #  @param self The object pointer.
-    #  @param name string representing the name of the electrical signal
+    #  @param name string representing the name of the Electrical signal
     # 
     #---------------------------------------------------------------------------
     def __init__(self, name):
@@ -2722,7 +2722,7 @@ class Electrical():
         self.i = Real(f"I({name})") 
         
     #---------------------------------------------------------------------------
-    ## Return electrical name
+    ## Return Electrical name
     #  @param self The object pointer.
     #  @return string representing the name of the signal
     # 
@@ -2973,8 +2973,8 @@ class Module:
     #---------------------------------------------------------------------------
     ## Add node
     #  @param self The object pointer.
-    #  @param name string representing the name of the electrical signal
-    #  @param width int representing the width of the electrical signal
+    #  @param name string representing the name of the Electrical signal
+    #  @param width int representing the width of the Electrical signal
     #  @param direction direction of the signal. It can be on the strings 
     #         "internal", "input", "output", or "inout"
     #  @return string with the name of the node
@@ -2993,13 +2993,13 @@ class Module:
         return name
 
     #---------------------------------------------------------------------------
-    ## Return electrical class
+    ## Return Electrical class
     #  @param self The object pointer.
-    #  @param name string representing the name of the electrical signal
-    #  @param width int representing the width of the electrical signal
+    #  @param name string representing the name of the Electrical signal
+    #  @param width int representing the width of the Electrical signal
     #  @param direction direction of the signal. It can be on the strings 
     #         "internal", "input", "output", or "inout"
-    #  @return list of electrical classes or an electrical class depending on 
+    #  @return list of Electrical classes or an Electrical class depending on 
     #          the width
     #
     #---------------------------------------------------------------------------
@@ -3060,7 +3060,7 @@ class Module:
             result = result + pin[0] + ";\n"
  
         #-----------------------------------------------------------------------
-        # Print all electrical
+        # Print all Electrical
         #-----------------------------------------------------------------------
         if len(self.nodes) > 0:
             result = result + '\n' + blockComment(0, "Disciplines")
