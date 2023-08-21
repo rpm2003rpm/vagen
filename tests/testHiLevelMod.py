@@ -176,7 +176,7 @@ class TestHiLevelMod(unittest.TestCase):
             WaitUs(Real(200)),            
             Finish()
         )
-        f = open("v1_ref.va", "r")
+        f = open("v1_ref.txt", "r")
         ref = f.read()
         f.close
         #f = open("v1_gen.va", "w")
@@ -328,7 +328,7 @@ class TestHiLevelMod(unittest.TestCase):
             Finish()
         )
         
-        f = open("v2_ref.va", "r")
+        f = open("v2_ref.txt", "r")
         ref = f.read()
         f.close
         #f = open("v2_gen.va", "w")

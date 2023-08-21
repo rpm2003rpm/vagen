@@ -2445,8 +2445,8 @@ def smooth(x,
     checkReal("delay", delay)
     checkReal("riseTime", riseTime)
     checkReal("fallTime", fallTime)
-    riseTime = riseTime/4.0961
-    fallTime = fallTime/4.0961
+    riseTime = riseTime*4.0961
+    fallTime = fallTime*4.0961
     x = transition(Real(x), delay, riseTime, fallTime)
     return tanh(9*x - 4.5)/2 + 0.5
     

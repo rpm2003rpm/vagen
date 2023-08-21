@@ -112,9 +112,9 @@ class Marker():
         riseFall = parseReal("riseFall", riseFall)
         self.name = name
         self.markList = []
-        self.markerPin  = hiLevelMod.electrical(name = f"MARK_{name}",
-                                                direction = "output")
-        self.markSt     = hiLevelMod.var(Bool(False), f"_$markSt_{name}")         
+        self.markerPin = hiLevelMod.electrical(name = f"MARK_{name}",
+                                               direction = "output")
+        self.markSt = hiLevelMod.var(Bool(False), f"_$markSt_{name}")
         hiLevelMod.endAnalog(
             self.markerPin.vCont(transition(Real(self.markSt), 0, riseFall, 
                                                                   riseFall))
@@ -182,7 +182,7 @@ class Marker():
         ans = {}
         for i in range(0, len(self.markList)):
             ans[self.markList[i]] = (f'cross(getData("/MARK_{self.name}" '
-                                     f'?result "tran") 0.5 {i} "either" '
+                                     f'?result "tran") 0.5 {i+1} "either" '
                                      f'nil nil)')
         return ans
         
@@ -1481,7 +1481,7 @@ class HiLevelMod(Module):
     #  @return Marker class.
     #
     #---------------------------------------------------------------------------
-    def marker(self, name, riseFall = 100e-12):
+    def marker(self, name, riseFall = 10e-12):
         markerObj = Marker(self, name, riseFall)
         self.markers.append(markerObj)
         return markerObj
@@ -1521,8 +1521,8 @@ class HiLevelMod(Module):
             serRes = 100.0, 
             gnd = None, 
             delay = 0,
-            rise = 1e-12,
-            fall = 1e-12):
+            rise = 10e-12,
+            fall = 10e-12):
         #Check the inputs
         checkInstance("domain", domain, Electrical)
         checkInteger("value", value)
@@ -1664,8 +1664,8 @@ class HiLevelMod(Module):
             direction = "internal", 
             value = 0,
             gnd = None,
-            rise = 0,
-            fall = 0):
+            rise = 1e-6,
+            fall = 1e-6):
         checkReal("value", value)
         checkReal("rise", rise)
         checkReal("fall", fall)
@@ -1705,8 +1705,8 @@ class HiLevelMod(Module):
             direction = "internal", 
             value = 0,
             gnd = None,
-            rise = 0,
-            fall = 0):
+            rise = 1e-6,
+            fall = 1e-6):
         checkReal("value", value)
         checkReal("rise", rise)
         checkReal("fall", fall)

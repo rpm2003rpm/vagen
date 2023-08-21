@@ -1000,7 +1000,7 @@ class TestVA(unittest.TestCase):
                          "transition(a, b, c, d)")    
         self.assertEqual(type(smooth(False)), Real)
         self.assertEqual(str(smooth(True)), 
-        "tanh({:e}*transition({:e}, {:e}, {:e}, {:e}) - {:e})/{:e} + {:e}".format(9, 1, 0, 1e-6/4.0961, 1e-6/4.0961, 4.5, 2, 0.5))  
+        "tanh({:e}*transition({:e}, {:e}, {:e}, {:e}) - {:e})/{:e} + {:e}".format(9, 1, 0, 1e-6*4.0961, 1e-6*4.0961, 4.5, 2, 0.5))  
                                                   
         self.assertEqual(type(absDelay(1.2, 0)), Real)
         self.assertEqual(str(absDelay(1.2, 0)), "absdelay({:e}, {:e})".format(1.2, 0))   
