@@ -1230,7 +1230,7 @@ class DigBusIn(Bus):
                 ans = ans - Integer(self[len(self)-1].read())*i
             else:
                 ans = ans + Integer(self[len(self)-1].read())*i
-        return ans            
+        return ans        
 
 
 #-------------------------------------------------------------------------------
@@ -1364,7 +1364,7 @@ class Clock():
         checkInstance("pin", pin, DigOut)
         hiLevelMod.clkCount += 1
         prefix = f"clk{hiLevelMod.clkCount}"
-        out = hiLevelMod.var(Bool(str(pin.st)), f"{prefix}_$out$")
+        out = hiLevelMod.var(Bool(pin.getST()), f"{prefix}_$out$")
         self.isOn = hiLevelMod.var(Bool(0), f"{prefix}_$isOn$")
         self.halfPeriod = hiLevelMod.var(Real(1000000), f"{prefix}_$halfPeriod$")
         self.time = hiLevelMod.var(Real(1000000), f"{prefix}_$time$")
