@@ -1279,8 +1279,6 @@ class DigBusInOut(DigBusIn, DigBusOut):
 #
 #-------------------------------------------------------------------------------
 class Sw():
-
-    swCount = 1
     
     #---------------------------------------------------------------------------
     ## Construtor
@@ -1302,8 +1300,8 @@ class Sw():
         cond = parseReal("cond", cond)
         rise = parseReal("rise", rise)
         fall = parseReal("fall", fall)
-        prefix = "sw" + str(self.swCount)
-        self.swCount = self.swCount + 1
+        hiLevelMod.swCount += 1
+        prefix = f"sw{hiLevelMod.swCount}"
         self.cond = hiLevelMod.var(cond, f"{prefix}_$cond$")
         self.rise = hiLevelMod.var(rise, f"{prefix}_$rise$")
         self.fall = hiLevelMod.var(fall, f"{prefix}_$fall$")
@@ -1353,7 +1351,6 @@ class Sw():
 #-------------------------------------------------------------------------------
 class Clock():
     
-    clockCount = 1
     
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1365,8 +1362,8 @@ class Clock():
     def __init__(self, hiLevelMod, pin):
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkInstance("pin", pin, DigOut)
-        prefix = "clk" + str(self.clockCount)
-        self.clockCount = self.clockCount + 1
+        hiLevelMod.clkCount += 1
+        prefix = f"clk{hiLevelMod.clkCount}"
         out = hiLevelMod.var(Bool(str(pin.st)), f"{prefix}_$out$")
         self.isOn = hiLevelMod.var(Bool(0), f"{prefix}_$isOn$")
         self.halfPeriod = hiLevelMod.var(Real(1000000), f"{prefix}_$halfPeriod$")
@@ -1437,6 +1434,8 @@ class HiLevelMod(Module):
         self.nSeq       = 1
         self.testSeqs   = CmdList()    
         self.var()   
+        self.swCount = 0
+        self.clkCount = 0
 
         if not isinstance(timeTol, type(None)):
             self.timeArgs = [0, parseReal("timeTol", timeTol)]

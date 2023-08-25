@@ -179,9 +179,9 @@ class TestHiLevelMod(unittest.TestCase):
         f = open("v1_ref.txt", "r")
         ref = f.read()
         f.close
-        #f = open("v1_gen.va", "w")
-        #f.write(mod.getVA())
-        #f.close   
+        f = open("v1_gen.va", "w")
+        f.write(mod.getVA())
+        f.close   
         self.maxDiff = None
         self.assertEqual(mod.getVA()[323:], ref[:-1])     
          
@@ -331,9 +331,9 @@ class TestHiLevelMod(unittest.TestCase):
         f = open("v2_ref.txt", "r")
         ref = f.read()
         f.close
-        #f = open("v2_gen.va", "w")
-        #f.write(mod.getVA())
-        #f.close    
+        f = open("v2_gen.va", "w")
+        f.write(mod.getVA())
+        f.close    
         self.maxDiff = None
         self.assertEqual(mod.getVA()[323:], ref[:-1])    
  
