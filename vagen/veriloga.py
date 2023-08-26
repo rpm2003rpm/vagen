@@ -246,18 +246,18 @@ def blockComment(padding, message, align = "center"):
 ## precedence
 #
 #-------------------------------------------------------------------------------         
-opPrecedence = {'unary'   : {'+'  : 0, '-'  : 0, '!' : 0, '~' : 0},
-                'binary'  : {'*'  : 1, '/'  : 1, '%' : 1,
-                             '+'  : 2, '-'  : 2,
-                             '>>' : 3, '<<' : 3,
-                             '<=' : 4, '>=' : 4, '>' :4, '<' : 4,
-                             '==' : 5, '!=' : 5,
-                             '&'  : 6,
-                             '^'  : 7,
-                             '|'  : 8,
-                             '&&' : 9,
-                             '||' : 10},
-                'ternary' : {'?'  : 11 }}
+#opPrecedence = {'unary'   : {'+'  : 0, '-'  : 0, '!'  : 0, '~'  : 0},
+#                'binary'  : {'*'  : 1, '/'  : 1, '%' : 1,
+#                             '+'  : 2, '-'  : 2,
+#                             '>>' : 3, '<<' : 3,
+#                             '<=' : 4, '>=' : 4, '>' :4, '<' : 4,
+#                             '==' : 5, '!=' : 5,
+#                             '&'  : 6,
+#                             '^'  : 7,
+#                             '|'  : 8,
+#                             '&&' : 9,
+#                             '||' : 10},
+#                'ternary' : {'?'  : 11 }}
  
  
 #-------------------------------------------------------------------------------
@@ -269,10 +269,7 @@ opPrecedence = {'unary'   : {'+'  : 0, '-'  : 0, '!' : 0, '~' : 0},
 #
 #-------------------------------------------------------------------------------
 def unary(Type, op1, operator):
-    op1Str = f"{op1}"
-    if opPrecedence['unary'][operator] < op1.getPrecedence():
-        op1Str = f"( {op1Str} )"  
-    return Type(f"{operator}{op1Str}", opPrecedence['unary'][operator])
+    return Type(f"{operator}( {op1} )")
     
  
 #-------------------------------------------------------------------------------
@@ -287,16 +284,7 @@ def unary(Type, op1, operator):
 #
 #-------------------------------------------------------------------------------
 def binary(Type, op1, op2, operator):
-    op1Str = f"{op1}"
-    op2Str = f"{op2}"
-    oprStr = operator
-    if opPrecedence['binary'][operator] < op1.getPrecedence():
-        op1Str = f"( {op1Str} )"  
-    if opPrecedence['binary'][operator] < op2.getPrecedence():
-        op2Str = f"( {op2Str} )"   
-    if opPrecedence['binary'][operator] > 1:
-        oprStr = f" {operator} "
-    return Type(f"{op1Str}{oprStr}{op2Str}", opPrecedence['binary'][operator])
+    return Type(f"( {op1} ){operator}( {op2} )")
     
  
 #-------------------------------------------------------------------------------
@@ -330,7 +318,7 @@ def ternary(test, op1, op2):
     Type = Real if isinstance(op1, Real) else \
            Bool if isinstance(op1, Bool) else \
            Integer
-    return Type(f"{test} ? {op1} : {op2}", opPrecedence['ternary']['?'])        
+    return Type(f"{test} ? {op1} : {op2}")        
          
 
 #-------------------------------------------------------------------------------
@@ -344,33 +332,19 @@ class Real():
     #  @param self The object pointer.
     #  @param value String representing a Real expression, an Integer, a Bool,
     #  or a value that can be converted to Real.
-    #  @param precedence operator precedence.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, value, precedence = 0):
+    def __init__(self, value):
         if isinstance(value, Bool):
-            value = ternary(value, 1.0, 0.0)
-            precedence = value.getPrecedence()
-            value = f"{value}"
+            value = f"{ternary(value, 1.0, 0.0)}"
         elif isinstance(value, (Real, Integer)):
-            precedence = value.getPrecedence()
             value = f"{value}"
         elif not isinstance(value, str):
             try:
                 value = "{:e}".format(value)
             except:
                 raise TypeError(f"Can't convert {value} to Real")
-        self.precedence = precedence
         self.value = value
-
-    #---------------------------------------------------------------------------
-    ## Return the last operator precedence.
-    #  @param self The object pointer.
-    #  @return int representing the precedence
-    #
-    #---------------------------------------------------------------------------
-    def getPrecedence(self):
-        return self.precedence
             
     #---------------------------------------------------------------------------
     ## Return the operator value.
@@ -607,31 +581,18 @@ class Bool():
     #  or a value that can be converted to Bool.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, value, precedence = 0):
+    def __init__(self, value):
         if isinstance(value, (Real, Integer)):
-            value = value != 0
-            precedence = value.getPrecedence()
-            value = f"{value}"
+            value = f"{value != 0}"
         elif isinstance(value, Bool):
-            precedence = value.getPrecedence()
             value = f"{value}"
         elif not isinstance(value, str):
             try:
                 value = f"{int(bool(value))}"
             except:
                 raise TypeError(f"Can't convert {value} to Bool")
-        self.precedence = precedence
         self.value = value
 
-    #---------------------------------------------------------------------------
-    ## Return the last operator precedence.
-    #  @param self The object pointer.
-    #  @return int representing the precedence
-    #
-    #---------------------------------------------------------------------------
-    def getPrecedence(self):
-        return self.precedence
-                 
     #---------------------------------------------------------------------------
     ## Return the operator value.
     #  @param Self The object pointer.
@@ -797,17 +758,12 @@ class Integer():
     #  or a value that can be converted to Integer.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, value, precedence = 0):
+    def __init__(self, value):
         if isinstance(value, Bool):
-            value = ternary(value, 1, 0)
-            precedence = value.getPrecedence()
-            value = f"{value}"
+            value = f"{ternary(value, 1, 0)}"
         elif isinstance(value, Real):
-            value = ceil(value)
-            precedence = value.getPrecedence()
-            value = f"{value}"
+            value = f"{ceil(value)}"
         elif isinstance(value, Integer):
-            precedence = value.getPrecedence()
             value = f"{value}"            
         elif not isinstance(value, str):
             if isinstance(value, int):
@@ -818,18 +774,8 @@ class Integer():
                 value = f"{int(value)}"
             except:
                 raise TypeError(f"Can't convert {value} to Integer")
-        self.precedence = precedence
         self.value = value
         
-    #---------------------------------------------------------------------------
-    ## Return the last operator precedence.
-    #  @param self The object pointer.
-    #  @return int representing the precedence
-    #
-    #---------------------------------------------------------------------------
-    def getPrecedence(self):
-        return self.precedence
-           
     #---------------------------------------------------------------------------
     ## Return the operator value.
     #  @param Self The object pointer.
