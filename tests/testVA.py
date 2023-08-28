@@ -221,7 +221,7 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(c), Integer)
         self.assertEqual(type(d), Integer)
         self.assertEqual(str(a), 'a')  
-        self.assertEqual(str(b), 'ceil(b)')         
+        self.assertEqual(str(b), '_rtoi(b)')         
         self.assertEqual(str(c), 'c ? 1 : 0')  
         self.assertEqual(str(d), '1')  
                                            
@@ -961,9 +961,9 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(ln(1.2)), Real)
         self.assertEqual(str(ln(1.1)), "ln({:e})".format(1.1))  
         
-        self.assertEqual(type(ceil(1.2)), Integer)
+        self.assertEqual(type(ceil(1.2)), Real)
         self.assertEqual(str(ceil(1.2)), "ceil({:e})".format(1.2))
-        self.assertEqual(type(floor(1.2)), Integer)
+        self.assertEqual(type(floor(1.2)), Real)
         self.assertEqual(str(floor(1.2)), "floor({:e})".format(1.2))
 
         self.assertEqual(type(idt(1.2)), Real)
@@ -1149,6 +1149,17 @@ input _$3;
  ******************************************************************************/
 electrical _$2;
 electrical _$3;
+
+/******************************************************************************
+ *                             Build-in functions                             * 
+ ******************************************************************************/
+analog function integer _rtoi;
+input in;
+real in;
+begin
+    _rtoi = (in >= 0? 1 : -1)*floor(abs(in) + 0.5);
+end
+endfunction
 
 /******************************************************************************
  *                                 Parameters                                 * 

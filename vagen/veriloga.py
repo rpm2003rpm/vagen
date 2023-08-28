@@ -762,7 +762,7 @@ class Integer():
         if isinstance(value, Bool):
             value = f"{ternary(value, 1, 0)}"
         elif isinstance(value, Real):
-            value = f"{ceil(value)}"
+            value = f"_rtoi({value})"
         elif isinstance(value, Integer):
             value = f"{value}"            
         elif not isinstance(value, str):
@@ -2444,7 +2444,7 @@ def idt(x, start = Real(0)):
 #-------------------------------------------------------------------------------
 def ceil(x):
     x = parseReal("x", x)
-    return Integer(f"ceil({x})")
+    return Real(f"ceil({x})")
       
 
 #-------------------------------------------------------------------------------
@@ -2455,7 +2455,7 @@ def ceil(x):
 #-------------------------------------------------------------------------------  
 def floor(x):
     x = parseReal("x", x)
-    return Integer(f"floor({x})")
+    return Real(f"floor({x})")
 
 
 #-------------------------------------------------------------------------------
@@ -3015,6 +3015,18 @@ class Module:
             if node[1] > 1:
                 result = result + "[" + str(int(node[1])-1) + ":0] " 
             result = result + node[0] + ";\n"
+
+        #-----------------------------------------------------------------------
+        # Build in analog function
+        #-----------------------------------------------------------------------
+        result = result + '\n' + blockComment(0, "Build-in functions")
+        result = result + ("analog function integer _rtoi;\n"
+                           "input in;\n"
+                           "real in;\n"
+                           "begin\n"
+                           "    _rtoi = (in >= 0? 1 : -1)*floor(abs(in) + 0.5);\n"
+                           "end\n"
+                           "endfunction\n")
 
         #-----------------------------------------------------------------------
         # Print all parameters
