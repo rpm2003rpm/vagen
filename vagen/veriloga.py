@@ -3024,7 +3024,7 @@ class Module:
                            "input in;\n"
                            "real in;\n"
                            "begin\n"
-                           "    _rtoi = (in >= 0? 1 : -1)*floor(abs(in) + 0.5);\n"
+                           "    _rtoi = floor(in + 0.5);\n"
                            "end\n"
                            "endfunction\n")
 

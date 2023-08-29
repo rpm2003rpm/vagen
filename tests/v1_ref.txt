@@ -72,7 +72,7 @@ analog function integer _rtoi;
 input in;
 real in;
 begin
-    _rtoi = (in >= 0? 1 : -1)*floor(abs(in) + 0.5);
+    _rtoi = floor(in + 0.5);
 end
 endfunction
 
