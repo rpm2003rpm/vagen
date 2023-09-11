@@ -35,6 +35,7 @@
 #-------------------------------------------------------------------------------
 from datetime import date
 import re
+import math as m
 
 #-------------------------------------------------------------------------------
 ## Check if the type of variable matches the Type. Raise an assertion error if
@@ -2374,13 +2375,12 @@ def transition(x,
 
 #-------------------------------------------------------------------------------
 ## smooth filter with hiperbolic tangend to avoid discontinuities. It goes from
-#         0.0001 to 0.9999. It never fully reaches 0 or 1.
+#         0.0 to 1.0
 #  @param x Real, float or int input
-#  @param delay Real, float or int delay input. 
-#         actual delay will be delay + 2.048*[rise/fall]Time
-#  @param riseTime delay Real, float or int rise time from 10% to 90%
-#  @param fallTime delay Real, float or int fall time from 10% to 90%
-#  @return Real expressing the transition filter
+#  @param delay Real, float or int delay input
+#  @param riseTime delay Real, float or int rise time from 5% to 95%
+#  @param fallTime delay Real, float or int fall time from 5% to 95%
+#  @return Real expressing the smooth filter
 #
 #-------------------------------------------------------------------------------
 def smooth(x, 
@@ -2391,10 +2391,15 @@ def smooth(x,
     checkReal("delay", delay)
     checkReal("riseTime", riseTime)
     checkReal("fallTime", fallTime)
-    riseTime = riseTime*4.0961
-    fallTime = fallTime*4.0961
+    gain = 6
+    minLim = 0.05
+    maxLim = 0.95
+    cte = 2*m.tanh(gain/2)
+    rfCte = gain/(m.atanh(cte*(maxLim - 0.5)) - m.atanh(cte*(minLim - 0.5)))
+    riseTime = riseTime*rfCte
+    fallTime = fallTime*rfCte
     x = transition(Real(x), delay, riseTime, fallTime)
-    return tanh(9*x - 4.5)/2 + 0.5
+    return tanh(gain*x - gain/2)/cte + 0.5
     
     
 #-------------------------------------------------------------------------------

@@ -116,8 +116,7 @@ class Marker():
                                                direction = "output")
         self.markSt = hiLevelMod.var(Bool(False), f"_$markSt_{name}")
         hiLevelMod.endAnalog(
-            self.markerPin.vCont(transition(Real(self.markSt), 0, riseFall, 
-                                                                  riseFall))
+            self.markerPin.vCont(smooth(self.markSt, 0, riseFall, riseFall))
         )
         
     #---------------------------------------------------------------------------
@@ -888,8 +887,8 @@ class DigOut(Electrical):
         self.diffHalfDomain = self.dv - dm.v/2
         hiLevelMod.endAnalog(
             out.vCont(
-                dm.v*transition(
-                    ternary(self.st, 1.0, 0.0), 
+                dm.v*smooth(
+                    self.st, 
                     self.delay, 
                     self.rise, 
                     self.fall
@@ -1084,8 +1083,8 @@ class DigInOut(DigIn, DigOut):
         self.diffHalfDomain = self.dv - dm.v/2
         hiLevelMod.endAnalog(
             pin.vCont(
-                dm.v*transition(
-                    ternary(self.st, 1.0, 0.0), 
+                dm.v*smooth(
+                    self.st, 
                     self.delay, 
                     self.rise, 
                     self.fall
@@ -1364,22 +1363,21 @@ class Clock():
         checkInstance("pin", pin, DigOut)
         hiLevelMod.clkCount += 1
         prefix = f"clk{hiLevelMod.clkCount}"
-        out = hiLevelMod.var(Bool(pin.getST()), f"{prefix}_$out$")
+        self.pin = pin
         self.isOn = hiLevelMod.var(Bool(0), f"{prefix}_$isOn$")
         self.halfPeriod = hiLevelMod.var(Real(1000000), f"{prefix}_$halfPeriod$")
         self.time = hiLevelMod.var(Real(1000000), f"{prefix}_$time$")
-        self.at = CmdList(
-                      out.toggle(),
-                      pin.write(out),
-                      If(self.isOn | out)(
-                          self.time.eq(abstime + self.halfPeriod)
-                      )
-                  )
+        _at = CmdList(
+                self.pin.toggle(),
+                If(self.isOn | self.pin.getST())(
+                    self.time.eq(abstime + self.halfPeriod)
+                )
+            )
                
         hiLevelMod.analog(
-           At(Timer(*([self.time] + hiLevelMod.timeArgs)))(
-               self.at
-           )
+            At(Timer(*([self.time] + hiLevelMod.timeArgs)))(
+                _at
+            )
         )
 
     #---------------------------------------------------------------------------
@@ -1391,10 +1389,11 @@ class Clock():
     def on(self, frequency):
         checkReal("frequency", frequency)
         return CmdList(
-                   self.halfPeriod.eq(0.5/frequency),
-                   self.isOn.eq(True),
-                   self.time.eq(abstime + 1e-9)
-               )
+            self.halfPeriod.eq(0.5/frequency),
+            self.isOn.eq(True),
+            self.pin.toggle(),
+            self.time.eq(abstime + self.halfPeriod)
+        )
 
     #---------------------------------------------------------------------------
     ## Turn the clock generator off
@@ -1480,7 +1479,7 @@ class HiLevelMod(Module):
     #  @return Marker class.
     #
     #---------------------------------------------------------------------------
-    def marker(self, name, riseFall = 10e-12):
+    def marker(self, name, riseFall = 50e-12):
         markerObj = Marker(self, name, riseFall)
         self.markers.append(markerObj)
         return markerObj
@@ -1517,11 +1516,11 @@ class HiLevelMod(Module):
             direction = "internal", 
             value = 0,
             inCap = 1e-14, 
-            serRes = 100.0, 
+            serRes = 10e3, 
             gnd = None, 
             delay = 0,
-            rise = 10e-12,
-            fall = 10e-12):
+            rise = 100e-12,
+            fall = 100e-12):
         #Check the inputs
         checkInstance("domain", domain, Electrical)
         checkInteger("value", value)
