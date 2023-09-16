@@ -1,0 +1,20 @@
+[build-system]
+requires=["setuptools >= 58.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vagen"
+version = "0.0.1"
+authors = [{name="Rodrigo Pedroso Mendes", email="roedroso@gmail.com"}]
+description = "Generates verilogA testbench for verification of analog IPs (VLSI design)"
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = ["regex>=2023.6.3", "datetime>=5.2"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/rpm2003rpm/vagen"
