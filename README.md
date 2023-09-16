@@ -35,10 +35,10 @@ mod = va.HiLevelMod("DCDC_STML")
 #Create pins
 VDD = mod.vdc(name = "VDD", width = 1, direction = "inout")
 OUT = mod.idc(name = "OUT", width = 1, direction = "inout")
-CLK = mod.clock(mod.dig(name = "CLK", domain = VDD, width = 1, direction = "output", rise = 100e-15, fall = 100e-15))
-RST = mod.dig(name = "RST", domain = VDD, width = 1, value = 0, direction = "output", rise = 100e-15, fall = 100e-15)
+CLK = mod.clock(mod.dig(name = "CLK", domain = VDD, width = 1, direction = "output", rise = 100e-12, fall = 100e-12))
+RST = mod.dig(name = "RST", domain = VDD, width = 1, value = 0, direction = "output", rise = 100e-12, fall = 100e-12)
 READY = mod.dig(name = "READY", domain = VDD, width = 1, direction = "input")
-CONFIG_VOUT = mod.dig(name = "CONFIG_VOUT", domain = VDD, width = 4, value = 0, direction = "output", rise = 100e-15, fall = 100e-15)
+CONFIG_VOUT = mod.dig(name = "CONFIG_VOUT", domain = VDD, width = 4, value = 0, direction = "output", rise = 100e-12, fall = 100e-12)
 
 #READY positive event
 EVNT_READY = va.Cross(READY.diffHalfDomain, "rising")
