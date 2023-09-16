@@ -102,7 +102,7 @@ mod = va.HiLevelMod("CONFIG_RES")
 VDD = mod.electrical(name = "VDD", width = 1, direction = "inout")
 IN1 = mod.electrical(name = "IN1", width = 1, direction = "inout")
 IN2 = mod.electrical(name = "IN2", width = 1, direction = "inout")
-CONFIG = mod.dig(name = "CONFIG", domain = VDD, width = 4, value = 0, inCap = 100e-15, direction = "input")
+CONFIG = mod.dig(name = "CONFIG", domain = VDD, width = 4, inCap = 100e-15, direction = "input")
 
 #Parameters
 alfa = mod.par(name = "alfa", value = 10.0)
