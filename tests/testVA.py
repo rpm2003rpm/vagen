@@ -299,10 +299,10 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(b**a), Integer)
         self.assertEqual(type(b**c), Integer)
         self.assertEqual(type(c**a), Integer)
-        self.assertEqual(str(a**b), 'pow(a, b)')
-        self.assertEqual(str(b**a), 'pow(b, a)')
-        self.assertEqual(str(b**c), 'pow(b, {:d})'.format(c))
-        self.assertEqual(str(c**a), 'pow({:d}, a)'.format(c))
+        self.assertEqual(str(a**b), '_rtoi(pow(a, b))')
+        self.assertEqual(str(b**a), '_rtoi(pow(b, a))')
+        self.assertEqual(str(b**c), '_rtoi(pow(b, {:d}))'.format(c))
+        self.assertEqual(str(c**a), '_rtoi(pow({:d}, a))'.format(c))
 
     def testIntegerRShift(self):
         a = Integer('a')

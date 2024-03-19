@@ -905,7 +905,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __pow__(self, other):
         other = parseInteger("other", other)
-        return Integer(f'pow({self}, {other})')
+        return Integer(f'_rtoi(pow({self}, {other}))')
         
     #---------------------------------------------------------------------------
     ## Reverse pow override.
@@ -916,7 +916,7 @@ class Integer():
     #---------------------------------------------------------------------------
     def __rpow__(self, other):
         other = parseInteger("other", other)
-        return Integer(f'pow({other}, {self})')
+        return Integer(f'_rtoi(pow({other}, {self}))')
         
     #---------------------------------------------------------------------------
     ## right shift override.
