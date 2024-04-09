@@ -19,7 +19,7 @@ Let's assume that a stimulus with the following sequence is required:
 * VDD must rise from 0 to 5.0V in 10us.
 * After 10us, the clock signal (CLK) must start with a frequency of 4MHz. CLK domain is VDD.
 * After 1us, RST must rise. RST domain is VDD.
-* Wait for the positive edge of the signal READY when it crosses half of the domain voltage. READY domain is VDD. 
+* Wait for the positive edge of the READY signal. READY domain is VDD. 
 * A current of 100mA must be drawn from the in OUT with a rise time of 100ns. 
 * After 10us, the bus CONFIG_VOUT[3:0] must be changed from 0 to 5. CONFIG_VOUT[3:0] domain is VDD.
 * After 20us, finishes the simulation. 
