@@ -2988,6 +2988,7 @@ class Module:
         # Module declaration
         #-----------------------------------------------------------------------
         result = result + "\n" + blockComment(0, "Module declaration")
+        result = result + "(*ignore_hidden_state*)\n"
         result = result + "module " + self.moduleName + "("
         padding = ",\n        " + " "*len(self.moduleName)
         first = True
