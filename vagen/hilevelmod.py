@@ -1923,18 +1923,23 @@ class HiLevelMod(Module):
     #  @param self The object pointer.
     #  @param tbName Name of the test bench.
     #  @param timeTol Time tolerances for the timer.
+    #  @param ignoreHiddenState ignore hiddel state pragma will be added if True
     #
     #---------------------------------------------------------------------------
-    def __init__(self, tbName, timeTol = None):
+    def __init__(self, tbName, timeTol = None, ignoreHiddenStates = False):
         """
         Initializes the HiLevelMod instance.
 
         Args:
             tbName (str): Name of the test bench.
             timeTol (float, optional): Time tolerance for the timer.
+            ignoreHiddenState (bool): Pragma will be added if True
         """
         
-        super(HiLevelMod, self).__init__(tbName)
+        super(HiLevelMod, self).__init__(
+            tbName, 
+            ignoreHiddenStates = ignoreHiddenStates
+        )
         self.dcCmdList  = CmdList()
         self.time       = None 
         self.state      = None

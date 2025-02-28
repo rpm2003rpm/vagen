@@ -192,7 +192,7 @@ class TestHiLevelMod(unittest.TestCase):
     def testCtes(self): 
     
         #Create a module     
-        mod = HiLevelMod("tb")
+        mod = HiLevelMod("tb", ignoreHiddenStates=True)
         #Create an integer variable that will be initialized to 9
         var1 = mod.var(9)
         #Create a real parameter called TEST_SEQ_PARAM. Initial value is 0.

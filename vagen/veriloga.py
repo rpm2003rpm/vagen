@@ -4363,13 +4363,15 @@ class Module:
     #  @param node1 Electrical signal representing the first node
     #  @param moduleName name of the module (the first word after module in the 
     #         va)
+    #  @param ignoreHiddenStates ignore hiddel state pragma will be added if True
     #
     #---------------------------------------------------------------------------
-    def __init__(self, moduleName):
+    def __init__(self, moduleName, ignoreHiddenStates = False):
         """Initialize a Module instance.
 
         Args:
             moduleName (str): The module's name.
+            ignoreHiddenStates (bool): Pragma will be added if True
         """
         checkType("moduleName", moduleName, str)
         self.moduleName = moduleName   
@@ -4382,6 +4384,7 @@ class Module:
         self.cmds       = []
         self.endCmds    = []
         self.beginningCmds = []
+        self.ignoreHiddenStates = ignoreHiddenStates 
 
     #---------------------------------------------------------------------------
     ## return module name
@@ -4437,7 +4440,8 @@ class Module:
         """Add a variable to the module.
 
         Args:
-            vType (type, optional): The variable type (Integer, Bool, or Real). Defaults to Integer.
+            vType (type, optional): The variable type (Integer, Bool, or Real). 
+                Defaults to Integer.
             name (str, optional): The variable's name. Defaults to "".
 
         Returns:
@@ -4644,7 +4648,8 @@ class Module:
         # Module declaration
         #-----------------------------------------------------------------------
         result = result + "\n" + blockComment(0, "Module declaration")
-        result = result + "(*ignore_hidden_state*)\n"
+        if self.ignoreHiddenStates:
+            result = result + "(*ignore_hidden_state*)\n"
         result = result + "module " + self.moduleName + "("
         padding = ",\n        " + " "*len(self.moduleName)
         first = True
