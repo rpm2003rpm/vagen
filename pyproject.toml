@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vagen"
-version = "0.1.0"
+version = "1.0.0"
 authors = [{name="Rodrigo Pedroso Mendes", email="roedroso@gmail.com"}]
 description = "Generates verilogA testbench for verification of analog IPs (VLSI design)"
 readme = "README.md"
