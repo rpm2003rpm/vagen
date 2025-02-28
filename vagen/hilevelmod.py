@@ -38,11 +38,15 @@ from vagen.veriloga import *
 #-------------------------------------------------------------------------------
 ## Mark command class
 #
-#  This class of commands are responsible for storing the command thar marks
+#  This class of commands are responsible for storing the command that marks
 #  an specific event
 #
 #-------------------------------------------------------------------------------
 class Mark(Cmd):
+    """Mark command class.
+    
+    This class is used to store a command that marks a specific event.
+    """
 
     #---------------------------------------------------------------------------
     ## Construtor
@@ -52,6 +56,11 @@ class Mark(Cmd):
     #
     #---------------------------------------------------------------------------
     def __init__(self, cmd):
+        """Initialize a Mark instance.
+
+        Args:
+            cmd (Cmd): The command to be stored as a marker.
+        """
         checkInstance("cmd", cmd, Cmd)
         self.cmd = cmd
 
@@ -63,6 +72,11 @@ class Mark(Cmd):
     #
     #---------------------------------------------------------------------------
     def getCmd(self):
+        """Return the stored command.
+
+        Returns:
+            Cmd: The command stored in this marker.
+        """
         return self.cmd
 
     #---------------------------------------------------------------------------
@@ -96,6 +110,11 @@ class Mark(Cmd):
 #
 #-------------------------------------------------------------------------------
 class Marker():
+    """Marker class.
+
+    Responsible for toggling a variable to mark events and generating cadence equations
+    that compute the event times.
+    """
 
     #---------------------------------------------------------------------------
     ## Construtor.
@@ -107,6 +126,13 @@ class Marker():
     #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, riseFall):
+        """Initialize a Marker.
+
+        Args:
+            hiLevelMod (HiLevelMod): The high-level model where the analog command is added.
+            name (str): The marker name.
+            riseFall (Real, float, or int): The rise/fall time for the marker pin.
+        """
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         riseFall = parseReal("riseFall", riseFall)
@@ -127,6 +153,11 @@ class Marker():
     #
     #---------------------------------------------------------------------------
     def getName(self):
+        """Return the marker's name.
+
+        Returns:
+            str: The marker name.
+        """
         return self.name
         
     #---------------------------------------------------------------------------
@@ -138,6 +169,14 @@ class Marker():
     #
     #---------------------------------------------------------------------------
     def mark(self, name):
+        """Mark an event by toggling the internal variable.
+
+        Args:
+            name (str): The name of the event.
+
+        Returns:
+            Mark: A Mark command representing the event mark.
+        """
         checkType("name", name, str)
         self.markList.append(name)
         return Mark(self.markSt.toggle())
@@ -153,7 +192,12 @@ class Marker():
     #  @return The Mark command.
     #
     #---------------------------------------------------------------------------
-    def low(self): 
+    def low(self):
+        """Force the internal variable low.
+
+        Returns:
+            Mark: A Mark command forcing the marker state to low.
+        """
         return Mark(self.markSt.eq(False))
 
     #---------------------------------------------------------------------------
@@ -168,6 +212,11 @@ class Marker():
     #
     #---------------------------------------------------------------------------
     def high(self):
+        """Force the internal variable high.
+
+        Returns:
+            Mark: A Mark command forcing the marker state to high.
+        """
         return Mark(self.markSt.eq(True))
 
     #---------------------------------------------------------------------------
@@ -178,6 +227,11 @@ class Marker():
     #
     #---------------------------------------------------------------------------
     def getEqs(self):
+        """Return a dictionary containing the cadence equations for each marked event.
+
+        Returns:
+            dict: Keys are event names, and values are cadence equations.
+        """
         ans = {}
         for i in range(0, len(self.markList)):
             ans[self.markList[i]] = (f'cross(getData("/MARK_{self.name}" '
@@ -194,6 +248,10 @@ class Marker():
 #
 #-------------------------------------------------------------------------------
 class WaitSignal(Cmd):
+    """WaitSignal command class.
+
+    This class is used to wait for a specific event before continuing a test sequence.
+    """
 
     #---------------------------------------------------------------------------
     ## Construtor.
@@ -203,6 +261,11 @@ class WaitSignal(Cmd):
     #
     #---------------------------------------------------------------------------
     def __init__(self, evnt):
+        """Initialize a WaitSignal instance.
+
+        Args:
+            evnt (Event): The event to wait for.
+        """
         checkInstance("evnt", evnt, Event)
         self.evnt = evnt
         super(WaitSignal, self).__init__("")
@@ -215,6 +278,11 @@ class WaitSignal(Cmd):
     #
     #---------------------------------------------------------------------------
     def getEvnt(self):
+        """Return the event that triggers the next state.
+
+        Returns:
+            Event: The event stored in this WaitSignal.
+        """
         return self.evnt
         
     #---------------------------------------------------------------------------
@@ -248,6 +316,10 @@ class WaitSignal(Cmd):
 #
 #-------------------------------------------------------------------------------
 class WaitUs(Cmd):
+    """WaitUs command class.
+
+    This command waits for a specific delay (in microseconds) before continuing.
+    """
 
     #---------------------------------------------------------------------------
     ## Construtor.
@@ -257,6 +329,11 @@ class WaitUs(Cmd):
     #
     #---------------------------------------------------------------------------
     def __init__(self, delay):
+        """Initialize a WaitUs instance.
+
+        Args:
+            delay (Real, float, or int): The delay time.
+        """
         checkReal("delay", delay)
         self.delay = delay
         super(WaitUs, self).__init__("")
@@ -269,6 +346,11 @@ class WaitUs(Cmd):
     #
     #---------------------------------------------------------------------------
     def getDelay(self):
+        """Return the delay value.
+
+        Returns:
+            Real, float, or int: The delay.
+        """
         return self.delay
         
     #---------------------------------------------------------------------------
@@ -302,6 +384,11 @@ class WaitUs(Cmd):
 #
 #-------------------------------------------------------------------------------
 class Bus(list):
+    """Bus class.
+
+    A list-based class representing a bus. It supports read/write operations and
+    custom slicing similar to a Verilog bus.
+    """
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -312,6 +399,12 @@ class Bus(list):
     #
     #---------------------------------------------------------------------------
     def __init__(self, Type, busType):
+        """Initialize a Bus instance.
+
+        Args:
+            Type (type): The expected type of the bus elements.
+            busType (type): The type used for the bus itself.
+        """
         super(Bus, self).__init__()
         self.Type = Type
         self.busType = busType
@@ -325,11 +418,19 @@ class Bus(list):
     #
     #---------------------------------------------------------------------------
     def __getitem__(self, key):
+        """Override slicing to return a bus slice in the format [msb:lsb:step].
+
+        Args:
+            key (slice or int): The index or slice.
+
+        Returns:
+            Bus or element: A new Bus if a slice is given, else a single element.
+        """
         if isinstance(key, slice):
             msb = key.start
             lsb = key.stop
             i = key.step
-            if i == None:
+            if i is None:
                 i = 1
             assert lsb != None, "lsb Index can't be empty" 
             assert msb != None, "msb Index can't be empty" 
@@ -352,6 +453,11 @@ class Bus(list):
     #
     #---------------------------------------------------------------------------
     def append(self, item):
+        """Append an item to the bus with type checking.
+
+        Args:
+            item: The item to append (must be an instance of self.Type).
+        """
         checkInstance("item", item, self.Type)
         super(Bus, self).append(item)
         
@@ -363,21 +469,35 @@ class Bus(list):
 #
 #-------------------------------------------------------------------------------
 class Vdc(Electrical):
-    
+    """Vdc class.
+
+    A subclass of Electrical that implements extra features for a voltage source.
+    """
+
     #---------------------------------------------------------------------------
     ## Construtor.
     #  @param self The object pointer.
     #  @param hiLeveMod Hi level model in which the analog command will be added.
     #  @param name Name of the voltage source electrical pin.
-    #  @param value Real expression holding the inital voltage.
+    #  @param value Real expression holding the initial voltage.
     #  @param gnd Electrical representing the ground reference.
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, hiLevelMod, name, value, gnd, rise, fall): 
+    def __init__(self, hiLevelMod, name, value, gnd, rise, fall):
+        """Initialize a Vdc instance.
+
+        Args:
+            hiLevelMod (HiLevelMod): High-level model for adding analog commands.
+            name (str): Name of the voltage source pin.
+            value (Real, float, or int): The initial voltage.
+            gnd (Electrical or None): Ground reference signal.
+            rise (Real, float, or int): Initial rise time.
+            fall (Real, float, or int): Initial fall time.
+        """
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
-        if gnd != None:
+        if not (gnd is None):
             checkType("gnd", gnd, Electrical)
             checkNotInstance("gnd", gnd, Branch)
         checkType("name", name, str)
@@ -389,7 +509,7 @@ class Vdc(Electrical):
         self.volt = hiLevelMod.var(value, f"{prefix}_$value$")
         self.rise = hiLevelMod.var(rise,  f"{prefix}_$rise$")
         self.fall = hiLevelMod.var(fall,  f"{prefix}_$fall$")
-        if gnd == None:
+        if gnd is None:
             out = self
         else:
             out = Branch(self, gnd)
@@ -412,6 +532,15 @@ class Vdc(Electrical):
     #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
+        """Set the rise and fall times for voltage changes.
+
+        Args:
+            rise (Real, float, or int): The new rise time.
+            fall (Real, float, or int): The new fall time.
+
+        Returns:
+            CmdList: A list of commands to update rise and fall times.
+        """
         checkReal("rise", rise)
         checkReal("fall", fall)
         return CmdList(
@@ -427,6 +556,14 @@ class Vdc(Electrical):
     #  
     #---------------------------------------------------------------------------
     def applyV(self, value):
+        """Change the voltage value of the source.
+
+        Args:
+            value (Real, float, or int): The new voltage value.
+
+        Returns:
+            Cmd: A command to update the voltage.
+        """
         checkReal("value", value)
         return self.volt.eq(value)
 
@@ -439,6 +576,10 @@ class Vdc(Electrical):
 #
 #-------------------------------------------------------------------------------
 class VdcBus(Bus):
+    """VdcBus class.
+
+    A bus of Vdc elements with additional methods for handling voltage source operations.
+    """
 
     #---------------------------------------------------------------------------
     ## Constructor.
@@ -446,6 +587,7 @@ class VdcBus(Bus):
     #
     #---------------------------------------------------------------------------
     def __init__(self):
+        """Initialize a VdcBus instance."""
         super(VdcBus, self).__init__(Vdc, VdcBus)
         
     #---------------------------------------------------------------------------
@@ -459,6 +601,15 @@ class VdcBus(Bus):
     #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
+        """Set the rise and fall times for all Vdc elements in the bus.
+
+        Args:
+            rise (Real, float, or int): The new rise time.
+            fall (Real, float, or int): The new fall time.
+
+        Returns:
+            CmdList: A list of commands to update the rise and fall times.
+        """
         checkReal("rise", rise)
         checkReal("fall", fall)
         ans = CmdList()
@@ -474,6 +625,14 @@ class VdcBus(Bus):
     #  
     #---------------------------------------------------------------------------
     def applyV(self, value):
+        """Change the voltage value for all Vdc elements in the bus.
+
+        Args:
+            value (Real, float, or int): The new voltage value.
+
+        Returns:
+            CmdList: A list of commands to update the voltage.
+        """
         checkReal("value", value)
         ans = CmdList()
         for pin in self:
@@ -488,23 +647,37 @@ class VdcBus(Bus):
 #
 #-------------------------------------------------------------------------------
 class Idc(Electrical):
-    
+    """Idc class.
+
+    A subclass of Electrical that implements features for a current source.
+    """
+
     #---------------------------------------------------------------------------
     ## Construtor.
     #  @param self The object pointer.
     #  @param hiLeveMod Hi level model in which the analog command will be added.
     #  @param name Name of the current source electrical pin.
-    #  @param value Real expression holding the inital voltage.
+    #  @param value Real expression holding the initial voltage.
     #  @param gnd Electrical representing the ground reference.
     #  @param rise Real expression holding the initial rise time.
     #  @param fall Real expression holding the initial fall time.
     #
     #---------------------------------------------------------------------------
-    def __init__(self, hiLevelMod, name, value, gnd, rise, fall): 
+    def __init__(self, hiLevelMod, name, value, gnd, rise, fall):
+        """Initialize an Idc instance.
+
+        Args:
+            hiLevelMod (HiLevelMod): High-level model for adding analog commands.
+            name (str): Name of the current source pin.
+            value (Real, float, or int): The initial current value.
+            gnd (Electrical or None): Ground reference signal.
+            rise (Real, float, or int): Initial rise time.
+            fall (Real, float, or int): Initial fall time.
+        """
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         value = parseReal("value", value)
-        if gnd != None:
+        if not (gnd is None):
             checkType("gnd", gnd, Electrical)
             checkNotInstance("gnd", gnd, Branch)
         rise = parseReal("rise", rise)
@@ -537,6 +710,15 @@ class Idc(Electrical):
     #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
+        """Set the rise and fall times for current changes.
+
+        Args:
+            rise (Real, float, or int): New rise time.
+            fall (Real, float, or int): New fall time.
+
+        Returns:
+            CmdList: A list of commands to update the rise and fall times.
+        """
         checkReal("rise", rise)
         checkReal("fall", fall)
         return CmdList(
@@ -552,6 +734,14 @@ class Idc(Electrical):
     #  
     #---------------------------------------------------------------------------
     def applyI(self, value):
+        """Change the current value of the source.
+
+        Args:
+            value (Real, float, or int): The new current value.
+
+        Returns:
+            Cmd: A command to update the current.
+        """
         checkReal("value", value)
         return self.cur.eq(value)
 
@@ -564,6 +754,11 @@ class Idc(Electrical):
 #
 #-------------------------------------------------------------------------------
 class IdcBus(Bus):
+    """IdcBus class.
+
+    A bus of Idc elements with additional methods to handle read and write operations,
+    including custom slicing similar to a Verilog bus.
+    """
 
     #---------------------------------------------------------------------------
     ## Constructor.
@@ -571,10 +766,11 @@ class IdcBus(Bus):
     #
     #---------------------------------------------------------------------------
     def __init__(self):
+        """Initialize an IdcBus instance."""
         super(IdcBus, self).__init__(Idc, IdcBus)
         
     #---------------------------------------------------------------------------
-    ## Set the rise and the fall times for changes in the voltage.
+    ## Set the rise and the fall times for changes in the current.
     #  @param self The object pointer.
     #  @param rise Real expression holding the rise time for changes in the 
     #         current.
@@ -584,6 +780,15 @@ class IdcBus(Bus):
     #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
+        """Set the rise and fall times for all Idc elements in the bus.
+
+        Args:
+            rise (Real, float, or int): The new rise time.
+            fall (Real, float, or int): The new fall time.
+
+        Returns:
+            CmdList: A list of commands to update the rise and fall times.
+        """
         checkReal("rise", rise)
         checkReal("fall", fall)
         ans = CmdList()
@@ -599,6 +804,14 @@ class IdcBus(Bus):
     #  
     #---------------------------------------------------------------------------
     def applyI(self, value):
+        """Change the current value for all Idc elements in the bus.
+
+        Args:
+            value (Real, float, or int): The new current value.
+
+        Returns:
+            CmdList: A list of commands to update the current.
+        """
         checkReal("value", value)
         ans = CmdList()
         for pin in self:
@@ -612,27 +825,44 @@ class IdcBus(Bus):
 #
 #-------------------------------------------------------------------------------
 class Smu(Electrical):
+    """Smu class.
+
+    A subclass of Electrical that implements additional features to work as a 
+    Source Measure Unit (SMU).
+    """
 
     #---------------------------------------------------------------------------
     ## Construtor.
     #  @param self The object pointer.
     #  @param hiLeveMod Hi level model in which the analog command will be added.
     #  @param name Name of the smu electrical pin.
-    #  @param volt Real expression holding the inital voltage.
-    #  @param minCur Real expression holding the inital minimum current.
-    #  @param maxCur Real expression holding the inital maximum current.
-    #  @param res Real expression holding the resitance.
+    #  @param volt Real expression holding the initial voltage.
+    #  @param minCur Real expression holding the initial minimum current.
+    #  @param maxCur Real expression holding the initial maximum current.
+    #  @param res Real expression holding the resistance.
     #  @param gnd Electrical representing the ground reference.
     #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, volt, minCur, maxCur, res, gnd): 
+
+        """Initialize a Smu instance.
+
+        Args:
+            hiLeveMod (HiLevelMod): High-level model where analog commands are added.
+            name (str): Name of the SMU pin.
+            volt (Real, float, or int): Initial voltage.
+            minCur (Real, float, or int): Initial minimum current.
+            maxCur (Real, float, or int): Initial maximum current.
+            res (Real, float, or int): Resistance value.
+            gnd (Electrical or None): Ground reference signal.
+        """
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         volt = parseReal("volt", volt)
         minCur = parseReal("minCur", minCur)
         maxCur = parseReal("maxCur", maxCur)
         res = parseReal("res", res)
-        if gnd != None:
+        if not (gnd is None):
             checkType("gnd", gnd, Electrical)
             checkNotInstance("gnd", gnd, Branch)
         super(Smu, self).__init__(name)
@@ -705,6 +935,15 @@ class Smu(Electrical):
     #
     #---------------------------------------------------------------------------
     def applyV(self, value, limit):
+        """Configure the SMU as a current-limited voltage source and apply a voltage.
+
+        Args:
+            value (Real, float, or int): Voltage to be applied.
+            limit (Real, float, or int): Current limit.
+
+        Returns:
+            CmdList: A list of commands to configure the SMU in voltage mode.
+        """
         checkReal("value", value)
         checkReal("limit", limit)
         return CmdList(
@@ -720,7 +959,7 @@ class Smu(Electrical):
     #---------------------------------------------------------------------------
     ## Configure the smu as voltage limited current source and apply the desired
     # current. Positive currents are sink current sources. The limit corresponds 
-    # to the uppper voltage when value < 0 and to the lower voltage when value > 
+    # to the upper voltage when value < 0 and to the lower voltage when value > 
     # 0.
     #  @param self The object pointer.
     #  @param value Real expression holding the current to be applied.
@@ -729,6 +968,15 @@ class Smu(Electrical):
     # 
     #---------------------------------------------------------------------------
     def applyI(self, value, limit):
+        """Configure the SMU as a voltage-limited current source and apply a current.
+
+        Args:
+            value (Real, float, or int): Current to be applied.
+            limit (Real, float, or int): Voltage limit.
+
+        Returns:
+            CmdList: A list of commands to configure the SMU in current mode.
+        """
         checkReal("value", value)
         checkReal("limit", limit)
         return CmdList(
@@ -749,6 +997,14 @@ class Smu(Electrical):
     # 
     #---------------------------------------------------------------------------
     def applyR(self, value):
+        """Configure the SMU as a resistive load.
+
+        Args:
+            value (Real, float, or int): The resistor value.
+
+        Returns:
+            CmdList: A list of commands to configure the SMU in resistance mode.
+        """
         checkReal("value", value)
         return CmdList(
             self.volt.eq(0),
@@ -763,12 +1019,16 @@ class Smu(Electrical):
 
 #-------------------------------------------------------------------------------
 ## SmuBus class. Child of a list. 
-#  It implements aditional methods to deal with read and write operations to 
+#  It implements additional methods to deal with read and write operations to 
 #  a bus. It also overrides the slice method, so it works similar to a slice 
 #  of a bus in verilog.
 #
 #-------------------------------------------------------------------------------
 class SmuBus(Bus):
+    """SmuBus class.
+
+    A bus of Smu elements with additional methods for handling SMU operations.
+    """
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -776,6 +1036,7 @@ class SmuBus(Bus):
     #
     #---------------------------------------------------------------------------
     def __init__(self):
+        """Initialize a SmuBus instance."""
         super(SmuBus, self).__init__(Smu, SmuBus)
       
 
@@ -791,6 +1052,15 @@ class SmuBus(Bus):
     # 
     #---------------------------------------------------------------------------
     def applyI(self, value, limit):
+        """Apply a current command to all SMU elements in the bus.
+
+        Args:
+            value (Real, float, or int): The current value.
+            limit (Real, float, or int): The voltage limit.
+
+        Returns:
+            CmdList: A list of commands to update each SMU in current mode.
+        """
         checkReal("value", value)
         checkReal("limit", limit)
         ans = CmdList()
@@ -808,6 +1078,15 @@ class SmuBus(Bus):
     #
     #---------------------------------------------------------------------------
     def applyV(self, value, limit):
+        """Apply a voltage command to all SMU elements in the bus.
+
+        Args:
+            value (Real, float, or int): The voltage value.
+            limit (Real, float, or int): The current limit.
+
+        Returns:
+            CmdList: A list of commands to update each SMU in voltage mode.
+        """
         checkReal("value", value)
         checkReal("limit", limit)
         ans = CmdList()
@@ -823,6 +1102,14 @@ class SmuBus(Bus):
     # 
     #---------------------------------------------------------------------------
     def applyR(self, value):
+        """Apply a resistive load command to all SMU elements in the bus.
+
+        Args:
+            value (Real, float, or int): The resistor value.
+
+        Returns:
+            CmdList: A list of commands to configure each SMU in resistance mode.
+        """
         checkReal("value", value)
         ans = CmdList()
         for pin in self:
@@ -831,24 +1118,28 @@ class SmuBus(Bus):
          
                 
 #-------------------------------------------------------------------------------
-## DigOut class. Child of Electrical implementing aditional features in order to 
+## DigOut class. Child of Electrical implementing additional features in order to 
 #  work as a digital output pin.
 #
 #-------------------------------------------------------------------------------
 class DigOut(Electrical):
-    
+    """DigOut class.
+
+    A subclass of Electrical that represents a digital output pin.
+    """
+
     #---------------------------------------------------------------------------
-    ## Construtor
-    #  @param self The object pointer
+    ## Constructor
+    #  @param self The object pointer.
     #  @param hiLeveMod Hi level model in which the analog command will be added.
     #  @param name Name of the electrical pin.
-    #  @param state Boolean expression holding the intial state of the digital 
+    #  @param state Boolean expression holding the initial state of the digital 
     #         pin.
-    #  @param domain electrical pin. The voltage across the digial pins will be
+    #  @param domain Electrical pin. The voltage across the digital pins will be
     #         equal to the domain when the logical state is 1.
     #  @param inCap Dummy parameter for consistency.  
     #  @param serRes Real expression holding the value of the series resistance.
-    #         This value will be set at the beggining of the simulation and 
+    #         This value will be set at the beginning of the simulation and 
     #         can't be changed afterwards.
     #  @param gnd Electrical representing the ground reference.
     #  @param delay Real expression holding the initial delay time.
@@ -858,12 +1149,26 @@ class DigOut(Electrical):
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, gnd, 
                  delay, rise, fall): 
+        """Initialize a DigOut instance.
+
+        Args:
+            hiLeveMod (HiLevelMod): The high-level model.
+            name (str): The pin name.
+            state (Bool or bool): The initial state.
+            domain (Electrical): The voltage domain.
+            inCap: Dummy parameter for consistency.
+            serRes (Real, float, or int): Series resistance.
+            gnd (Electrical or None): Ground reference.
+            delay (Real, float, or int): Initial delay.
+            rise (Real, float, or int): Initial rise time.
+            fall (Real, float, or int): Initial fall time.
+        """
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
         state = parseBool("state", state)
         serRes = parseReal("serRes", serRes)
-        if gnd != None:
+        if not (gnd is None):
             checkType("gnd", gnd, Electrical)
             checkNotInstance("gnd", gnd, Branch)
         delay = parseReal("delay", delay) 
@@ -876,7 +1181,7 @@ class DigOut(Electrical):
         self.delay = hiLevelMod.var(delay, f"{prefix}_$delay$")
         self.rise = hiLevelMod.var(rise, f"{prefix}_$rise$")
         self.fall = hiLevelMod.var(fall, f"{prefix}_$fall$")
-        if gnd == None:
+        if gnd is None:
             out = self
             dm  = domain
         else:
@@ -905,6 +1210,14 @@ class DigOut(Electrical):
     #
     #---------------------------------------------------------------------------
     def setDelay(self, delay):
+        """Set the delay for the digital output pin.
+
+        Args:
+            delay (Real, float, or int): The new delay time.
+
+        Returns:
+            Cmd: A command to update the delay.
+        """
         checkReal("delay", delay)
         return self.delay.eq(delay)
            
@@ -917,6 +1230,15 @@ class DigOut(Electrical):
     #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
+        """Set the rise and fall times for the digital output pin.
+
+        Args:
+            rise (Real, float, or int): New rise time.
+            fall (Real, float, or int): New fall time.
+
+        Returns:
+            CmdList: A list of commands to update the rise and fall times.
+        """
         checkReal("rise", rise)
         checkReal("fall", fall)
         return CmdList(
@@ -928,40 +1250,62 @@ class DigOut(Electrical):
     ## Write a state to the digital output.
     #  @param self The object pointer.
     #  @param value Boolean expression representing the state to be written.
-    #  @return The commands to change the stare of a digital pin.
+    #  @return The commands to change the state of the digital pin.
     #
     #---------------------------------------------------------------------------
     def write(self, value):
+        """Write a new state to the digital output pin.
+
+        Args:
+            value (Bool or bool): The state to write.
+
+        Returns:
+            Cmd: A command to update the state.
+        """
         checkBool("value", value)
         return self.st.eq(value)
         
     #---------------------------------------------------------------------------
     ## Return the state of the digital output.
     #  @param self The object pointer.
-    #  @return The commands to change the stare of a digital pin.
+    #  @return The commands to change the state of a digital pin.
     #
     #---------------------------------------------------------------------------
     def getST(self):
+        """Return the current state of the digital output pin.
+
+        Returns:
+            Bool: The state.
+        """
         return self.st
 
     #---------------------------------------------------------------------------
-    ## Toogle the state to the digital output.
+    ## Toggle the state of the digital output.
     #  @param self The object pointer.
-    #  @return The commands to change the stare of a digital pin.
+    #  @return The commands to change the state of a digital pin.
     #
     #---------------------------------------------------------------------------
     def toggle(self):
+        """Toggle the state of the digital output pin.
+
+        Returns:
+            Cmd: A command to toggle the state.
+        """
         return self.st.toggle()
 
 
 
 #-------------------------------------------------------------------------------
-## DigIn class. Child of Electrical implementing aditional features in order to 
+## DigIn class. Child of Electrical implementing additional features in order to 
 #  work as a digital input pin
 #
 #-------------------------------------------------------------------------------
 class DigIn(Electrical):
-    
+    """DigIn class.
+
+    A subclass of Electrical representing a digital input pin.
+    """
+
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self The object pointer.
@@ -982,11 +1326,23 @@ class DigIn(Electrical):
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, gnd, 
                  delay, rise, fall): 
+        """Initialize a DigIn instance.
+
+        Args:
+            hiLeveMod (HiLevelMod): The high-level model.
+            name (str): The pin name.
+            state: Dummy parameter (not used).
+            domain (Electrical): The voltage domain.
+            inCap (Real, float, or int): Input capacitance.
+            serRes: Dummy parameter.
+            gnd (Electrical or None): Ground reference.
+            delay, rise, fall: Dummy parameters.
+        """
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
         inCap = parseReal("inCap", inCap)
-        if gnd != None:
+        if not (gnd is None):
             checkType("gnd", gnd, Electrical)
             checkNotInstance("gnd", gnd, Branch)
         super(DigIn, self).__init__(name)
@@ -994,7 +1350,7 @@ class DigIn(Electrical):
         self.gnd = gnd
         prefix = name.replace("[", "_$").replace("]", "$").replace(", ", "_")
         self.inCap = hiLevelMod.var(inCap, f"{prefix}_$inCap$")
-        if self.gnd == None:
+        if self.gnd is None:
             out = self
             dm  = self.domain
         else:
@@ -1014,24 +1370,33 @@ class DigIn(Electrical):
     #
     #---------------------------------------------------------------------------   
     def read(self):
+        """Read the digital input state.
+
+        Returns:
+            Bool: An expression indicating whether the digital input is high.
+        """
         return self.diffHalfDomain > 0
 
 
 #-------------------------------------------------------------------------------
-## DigInOut class. Child of Electrical implementing aditional features in order 
+## DigInOut class. Child of Electrical implementing additional features in order 
 #  to work as a digital input/output pin
 #
 #-------------------------------------------------------------------------------
 class DigInOut(DigIn, DigOut):
-    
+    """DigInOut class.
+
+    A subclass that combines digital input and output functionalities.
+    """
+
     #---------------------------------------------------------------------------
-    ## Construtor
+    ## Constructor
     #  @param self The object pointer.
     #  @param hiLeveMod Hi level model in which the analog command will be added.
     #  @param name Name of the electrical pin.
-    #  @param state Boolean expression holding the intial state of the digital 
+    #  @param state Boolean expression holding the initial state of the digital 
     #         pin.
-    #  @param domain electrical pin. The voltage across the digial pins will be
+    #  @param domain Electrical pin. The voltage across the digital pins will be
     #         equal to the domain when the logical state is 1.
     #  @param inCap Real expression holding the value of the input capacitance. 
     #         This value will be set at the beggining of the simulation and can't 
@@ -1047,13 +1412,27 @@ class DigInOut(DigIn, DigOut):
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, gnd, 
                  delay, rise, fall): 
+        """Initialize a DigInOut instance.
+
+        Combines features of digital input and output.
+        
+        Args:
+            hiLeveMod (HiLevelMod): The high-level model.
+            name (str): The pin name.
+            state (Bool or bool): The initial state.
+            domain (Electrical): The voltage domain.
+            inCap (Real, float, or int): Input capacitance.
+            serRes (Real, float, or int): Series resistance.
+            gnd (Electrical or None): Ground reference.
+            delay, rise, fall (Real, float, or int): Timing parameters.
+        """
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkType("name", name, str)
         checkInstance("domain", domain, Electrical)
         state = parseBool("state", state)
         serRes = parseReal("serRes", serRes)
         inCap = parseReal("inCap", inCap) 
-        if gnd != None:
+        if not (gnd is None):
             checkType("gnd", gnd, Electrical)
             checkNotInstance("gnd", gnd, Branch)  
         delay = parseReal("delay", delay)     
@@ -1071,7 +1450,7 @@ class DigInOut(DigIn, DigOut):
         self.domain = domain
         pin = hiLevelMod.electrical()
         conn = Branch(pin, self)
-        if gnd == None:
+        if gnd is None:
             out = self
             dm  = domain
         else:
@@ -1097,12 +1476,17 @@ class DigInOut(DigIn, DigOut):
         ) 
 
     #---------------------------------------------------------------------------
-    ## Set the pin at hiz in order to use the read function.
+    ## Set the pin at hiZ in order to use the read function.
     #  @param self The object pointer.
     #  @return The commands to change the inOut pin to hiZ (input).
     #
     #---------------------------------------------------------------------------
     def hiZ(self):
+        """Set the pin to high impedance (hiZ) for input mode.
+
+        Returns:
+            Cmd: A command to set the pin to hiZ.
+        """
         return self.res.eq(1e12)
 
     #---------------------------------------------------------------------------
@@ -1112,6 +1496,11 @@ class DigInOut(DigIn, DigOut):
     #
     #---------------------------------------------------------------------------
     def lowZ(self):
+        """Set the pin to low impedance (lowZ) for output mode.
+
+        Returns:
+            Cmd: A command to set the pin to lowZ.
+        """
         return self.res.eq(self.serRes)
 
                
@@ -1122,6 +1511,11 @@ class DigInOut(DigIn, DigOut):
 #
 #-------------------------------------------------------------------------------
 class DigBusOut(Bus):
+    """DigBusOut class.
+    
+    A bus of digital output pins with additional methods for read/write operations,
+    and custom slicing similar to a Verilog bus.
+    """
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1129,6 +1523,7 @@ class DigBusOut(Bus):
     #
     #---------------------------------------------------------------------------
     def __init__(self):
+        """Initialize a DigBusOut instance."""
         super(DigBusOut, self).__init__(DigOut, DigBusOut)
  
  
@@ -1140,6 +1535,14 @@ class DigBusOut(Bus):
     #
     #---------------------------------------------------------------------------
     def setDelay(self, delay):
+        """Set the delay time for all digital output pins in the bus.
+
+        Args:
+            delay (Real, float, or int): The delay time.
+
+        Returns:
+            CmdList: A list of commands to update the delay times.
+        """
         checkReal("delay", delay)
         ans = CmdList()
         for pin in self:
@@ -1155,6 +1558,15 @@ class DigBusOut(Bus):
     #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
+        """Set the rise and fall times for all digital output pins in the bus.
+
+        Args:
+            rise (Real, float, or int): The new rise time.
+            fall (Real, float, or int): The new fall time.
+
+        Returns:
+            CmdList: A list of commands to update the rise and fall times.
+        """
         checkReal("rise", rise)
         checkReal("fall", fall)
         ans = CmdList()
@@ -1170,6 +1582,14 @@ class DigBusOut(Bus):
     #
     #---------------------------------------------------------------------------
     def write(self, value):
+        """Write a binary value to the digital output bus.
+
+        Args:
+            value (Integer or int): The value to be written.
+
+        Returns:
+            CmdList: A list of commands that write the binary value to the bus.
+        """
         checkInteger("value", value)
         assert len(self) <= 32 or not isinstance(value, Integer), \
                "Can't write an instance of integer to a bus wider than 32 bit"
@@ -1181,12 +1601,17 @@ class DigBusOut(Bus):
         return ans
 
     #---------------------------------------------------------------------------
-    ## Toogle all the states of a digital bus
+    ## Toggle all the states of a digital bus
     #  @param self The object pointer.
-    #  @return The commands to change the stare of a digital pin.
+    #  @return The commands to change the state of a digital pin.
     #
     #---------------------------------------------------------------------------
     def toggle(self):
+        """Toggle the state of all digital output pins in the bus.
+
+        Returns:
+            CmdList: A list of commands to toggle each pin.
+        """
         ans = CmdList()
         for pin in self:
             ans.append(pin.toggle())
@@ -1199,6 +1624,11 @@ class DigBusOut(Bus):
 #
 #-------------------------------------------------------------------------------
 class DigBusIn(Bus):
+    """DigBusIn class.
+    
+    A bus of digital input pins with methods to read binary values, and custom slicing
+    similar to a Verilog bus.
+    """
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1206,6 +1636,7 @@ class DigBusIn(Bus):
     #
     #---------------------------------------------------------------------------
     def __init__(self):  
+        """Initialize a DigBusIn instance."""
         super(DigBusIn, self).__init__(DigIn, DigBusIn)
             
     #---------------------------------------------------------------------------
@@ -1239,6 +1670,11 @@ class DigBusIn(Bus):
 #
 #-------------------------------------------------------------------------------
 class DigBusInOut(DigBusIn, DigBusOut):
+    """DigBusInOut class.
+    
+    A bus of digital input/output pins with methods to set pins to high impedance
+    (hiZ) or low impedance (lowZ) for input/output operations.
+    """
  
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1246,15 +1682,21 @@ class DigBusInOut(DigBusIn, DigBusOut):
     #
     #---------------------------------------------------------------------------
     def __init__(self):   
+        """Initialize a DigBusInOut instance."""
         super(DigBusOut, self).__init__(DigInOut, DigBusInOut)
 
     #---------------------------------------------------------------------------
-    ## Set the pins at hiz in order to use the read function.
+    ## Set the pins at hiZ in order to use the read function.
     #  @param self The object pointer.
     #  @return The commands to change the inOut pin to hiZ (input).
     #
     #---------------------------------------------------------------------------
     def hiZ(self):
+        """Set all digital I/O pins to high impedance (hiZ) for input mode.
+
+        Returns:
+            CmdList: A list of commands to set each pin to hiZ.
+        """
         ans = CmdList()
         for pin in self:
             ans.append(pin.hiZ())
@@ -1267,6 +1709,11 @@ class DigBusInOut(DigBusIn, DigBusOut):
     #
     #---------------------------------------------------------------------------
     def lowZ(self):
+        """Set all digital I/O pins to low impedance (lowZ) for output mode.
+
+        Returns:
+            CmdList: A list of commands to set each pin to lowZ.
+        """
         ans = CmdList()
         for pin in self:
             ans.append(pin.lowZ())
@@ -1278,9 +1725,14 @@ class DigBusInOut(DigBusIn, DigBusOut):
 #
 #-------------------------------------------------------------------------------
 class Sw():
+    """Sw class.
+    
+    Represents a switch between two nodes. It toggles conductance based on
+    a transition function.
+    """
     
     #---------------------------------------------------------------------------
-    ## Construtor
+    ## Constructor
     #  @param self The object pointer.
     #  @param hiLeveMod Hi level model in which the analog command will be added.
     #  @param pin1 First node
@@ -1293,6 +1745,16 @@ class Sw():
     #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, pin1, pin2, cond, rise, fall):
+        """Initialize a Sw instance representing a switch between two nodes.
+
+        Args:
+            hiLeveMod (HiLevelMod): The high-level model.
+            pin1 (Electrical): The first node.
+            pin2 (Electrical): The second node.
+            cond (Real, float, or int): Initial conductance.
+            rise (Real, float, or int): Rise time for conductance changes.
+            fall (Real, float, or int): Fall time for conductance changes.
+        """
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkInstance("pin1", pin1, Electrical)
         checkInstance("pin2", pin2, Electrical)
@@ -1317,7 +1779,7 @@ class Sw():
         )
 
     #---------------------------------------------------------------------------
-    ## Set the rise and the fall times of all digital output pin.
+    ## Set the rise and the fall times of the switch.
     #  @param self The object pointer.
     #  @param Rise Real expression holding the rise time.
     #  @param Fall Real expression holding the fall time.
@@ -1325,6 +1787,15 @@ class Sw():
     #
     #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
+        """Set the rise and fall times for the switch.
+
+        Args:
+            rise (Real, float, or int): New rise time.
+            fall (Real, float, or int): New fall time.
+
+        Returns:
+            CmdList: A list of commands to update the rise and fall times.
+        """
         checkReal("rise", rise)
         checkReal("fall", fall)
         return CmdList(
@@ -1340,6 +1811,14 @@ class Sw():
     #
     #---------------------------------------------------------------------------
     def setCond(self, cond):
+        """Set the conductance value of the switch.
+
+        Args:
+            cond (Real, float, or int): The new conductance.
+
+        Returns:
+            Cmd: A command to update the conductance.
+        """
         checkReal("cond", cond)
         return self.cond.eq(cond)
 
@@ -1349,7 +1828,10 @@ class Sw():
 # 
 #-------------------------------------------------------------------------------
 class Clock():
+    """Clock class.
     
+    Represents a clock generator that toggles a digital output pin at a specified frequency.
+    """
     
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1359,6 +1841,12 @@ class Clock():
     #
     #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, pin):
+        """Initialize a Clock instance.
+
+        Args:
+            hiLevelMod (HiLevelMod): The high-level model.
+            pin (DigOut): A digital output pin used for the clock signal.
+        """
         checkInstance("hiLevelMod", hiLevelMod, HiLevelMod)
         checkInstance("pin", pin, DigOut)
         hiLevelMod.clkCount += 1
@@ -1387,6 +1875,14 @@ class Clock():
     #
     #---------------------------------------------------------------------------
     def on(self, frequency):
+        """Turn on the clock generator.
+
+        Args:
+            frequency (Real, float, or int): The clock frequency.
+
+        Returns:
+            CmdList: A list of commands to start the clock.
+        """
         checkReal("frequency", frequency)
         return CmdList(
             self.halfPeriod.eq(0.5/frequency),
@@ -1401,6 +1897,11 @@ class Clock():
     #
     #---------------------------------------------------------------------------
     def off(self):
+        """Turn off the clock generator.
+
+        Returns:
+            Cmd: A command to turn off the clock.
+        """
         return self.isOn.eq(False)
 
 
@@ -1411,6 +1912,11 @@ class Clock():
 #
 #-------------------------------------------------------------------------------
 class HiLevelMod(Module):
+    """
+    HiLevelMod class extends the Module class in Verilog-A. 
+    It provides additional methods for handling digital buses, 
+    current sources, voltage sources, clocks, and switches.
+    """
   
     #---------------------------------------------------------------------------
     ## Constructor 
@@ -1420,6 +1926,14 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def __init__(self, tbName, timeTol = None):
+        """
+        Initializes the HiLevelMod instance.
+
+        Args:
+            tbName (str): Name of the test bench.
+            timeTol (float, optional): Time tolerance for the timer.
+        """
+        
         super(HiLevelMod, self).__init__(tbName)
         self.dcCmdList  = CmdList()
         self.time       = None 
@@ -1466,6 +1980,17 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def var(self, value = 0, name = ""):
+        """
+        Adds a variable to the module.
+
+        Args:
+            value (int, float, optional): Initial value. Default is 0.
+            name (str, optional): Name of the variable.
+        
+        Returns:
+            Variable: A variable instance.
+        """
+        
         value = parseNumber("value", value)
         ans = super(HiLevelMod, self).var(type(value), name)           
         self.dcCmdList.append(ans.eq(value))
@@ -1480,6 +2005,16 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def marker(self, name, riseFall = 50e-12):
+        """
+        Returns a marker object.
+
+        Args:
+            name (str): Name of the marker.
+            riseFall (float, optional): Rise and fall times of the marker pin. Default is 50ps.
+        
+        Returns:
+            Marker: Marker class instance.
+        """
         markerObj = Marker(self, name, riseFall)
         self.markers.append(markerObj)
         return markerObj
@@ -1521,6 +2056,25 @@ class HiLevelMod(Module):
             delay = 0,
             rise = 100e-12,
             fall = 100e-12):
+        """
+        Returns a digital pin or a digital bus.
+
+        Args:
+            domain (Electrical): Electrical pin that defines the voltage when logical state is 1.
+            name (str, optional): Name of the electrical pin.
+            width (int, optional): Bus width. If greater than 1, a bus is returned.
+            direction (str, optional): Direction (internal, input, output, inout).
+            value (int, optional): Initial value of the digital pin.
+            inCap (float, optional): Input capacitance.
+            serRes (float, optional): Series resistance.
+            gnd (Electrical, optional): Ground reference.
+            delay (float, optional): Initial delay time.
+            rise (float, optional): Initial rise time.
+            fall (float, optional): Initial fall time.
+
+        Returns:
+            DigIn, DigOut, DigInOut, DigBusIn, DigBusOut, or DigBusInOut: The corresponding digital pin or bus object.
+        """
         #Check the inputs
         checkInstance("domain", domain, Electrical)
         checkInteger("value", value)
@@ -1595,6 +2149,15 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def clock(self, pin):
+        """
+        Builds a clock model using a digital pin.
+
+        Args:
+            pin (DigOut): Digital output pin.
+
+        Returns:
+            Clock: Clock object.
+        """
         checkInstance("pin", pin, DigOut)
         return Clock(self, pin)
 
@@ -1621,6 +2184,22 @@ class HiLevelMod(Module):
             maxCur = 0, 
             res = 1e12,
             gnd = None): 
+        """
+        Return a Smu object or a SmuBus object if width > 1.
+
+        Args:
+            name (str): Name of the smu electrical pin.
+            width (int): If width is greater than 1, it returns a SmuBus.
+            direction (str): Direction of the signal (internal, input, output, inout).
+            volt (float): Real expression holding the initial voltage.
+            minCur (float): Real expression holding the initial minimum current.
+            maxCur (float): Real expression holding the initial maximum current.
+            res (float): Real expression holding the resistance.
+            gnd (optional): Electrical reference for the ground.
+
+        Returns:
+            Smu or SmuBus: Depending on the width, returns a single Smu or a vector of Smu objects.
+        """
         checkReal("volt", volt)
         checkReal("minCur", minCur)
         checkReal("maxCur", maxCur)
@@ -1664,6 +2243,21 @@ class HiLevelMod(Module):
             gnd = None,
             rise = 1e-6,
             fall = 1e-6):
+        """
+        Return a Vdc object or a VdcBus object if width > 1.
+
+        Args:
+            name (str): Name of the voltage source.
+            width (int): If width is greater than 1, it returns a list of Vdc objects.
+            direction (str): Direction of the signal (internal, input, output, inout).
+            value (float): Real expression holding the initial voltage value.
+            gnd (optional): Electrical reference for the ground.
+            rise (float): Initial rise time of the voltage.
+            fall (float): Initial fall time of the voltage.
+
+        Returns:
+            Vdc or VdcBus: Depending on the width, returns a single Vdc or a vector of Vdc objects.
+        """
         checkReal("value", value)
         checkReal("rise", rise)
         checkReal("fall", fall)
@@ -1705,6 +2299,21 @@ class HiLevelMod(Module):
             gnd = None,
             rise = 1e-6,
             fall = 1e-6):
+        """
+        Return an Idc object or an IdcBus object if width > 1.
+
+        Args:
+            name (str): Name of the current source.
+            width (int): If width is greater than 1, it returns a list of Idc objects.
+            direction (str): Direction of the signal (internal, input, output, inout).
+            value (float): Real expression holding the initial current value.
+            gnd (optional): Electrical reference for the ground.
+            rise (float): Initial rise time of the current.
+            fall (float): Initial fall time of the current.
+
+        Returns:
+            Idc or IdcBus: Depending on the width, returns a single Idc or a vector of Idc objects.
+        """
         checkReal("value", value)
         checkReal("rise", rise)
         checkReal("fall", fall)
@@ -1732,6 +2341,15 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def seqNested(self, cmdsIn):
+        """
+        Sequence. Do not use it! Use Seq instead.
+
+        Args:
+            cmdsIn (list): List of commands to be processed.
+
+        Returns:
+            CmdList: The list of remaining commands to be processed.
+        """
         cmdsIn = cmdsIn.flat()
         cmds = CmdList()
         for cmd in cmdsIn:
@@ -1940,6 +2558,15 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def seq(self, cond):
+        """
+        Sequence
+
+        Args:
+            cond (bool): Condition to run the sequence.
+
+        Returns:
+            func: Function that accepts a variable number of commands to be added to the sequence.
+        """
         def func(*args):
             self.nState   = 0
             self.time     = self.var(Real(1e-9),  f"_$evntTime_{self.nSeq}") 
@@ -1993,6 +2620,12 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def getEqs(self):
+        """
+        Return the equations in a format that can be imported by the maestro view.
+
+        Returns:
+            str: Equations in a string format for the maestro view.
+        """
         ans = ["Test,Name,Type,Output,Plot,Save,Spec"]
         for mark in self.markers:
             eqs = mark.getEqs()
@@ -2008,6 +2641,12 @@ class HiLevelMod(Module):
     #
     #---------------------------------------------------------------------------
     def getOcn(self):
+        """
+        Return an ocean script that adds equations to the opened session of adexl.
+
+        Returns:
+            str: Ocean script for adding equations to adexl.
+        """
         ans = ["session = axlGetWindowSession()"]
         for mark in self.markers:
             eqs = mark.getEqs()

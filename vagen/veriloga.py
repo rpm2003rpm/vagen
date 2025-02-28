@@ -43,10 +43,20 @@ import math as m
 #  @param param String representing the name of the variable.
 #  @param var Variable.
 #  @param Type Type that the variable should match.
-#  @return True if it matches the type or False otherwise.
+#  @return None.
 #
 #-------------------------------------------------------------------------------
 def checkType(param, var, Type):
+    """Check if the type of variable matches the specified Type.
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to check.
+        Type (type): Expected type.
+
+    Returns:
+        None; An AssertionError is raised.
+    """
     assert type(var) == Type, \
     f"{param} must be a {Type} but a {type(var)} was given instead"
 
@@ -57,10 +67,20 @@ def checkType(param, var, Type):
 #  @param param String representing the name of the variable.
 #  @param var Variable.
 #  @param Type Type that the variable should match.
-#  @return True if it is an instance or False otherwise.
+#  @return None.
 #
 #-------------------------------------------------------------------------------
 def checkInstance(param, var, Type):
+    """Check if the variable is an instance of the specified Type.
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to check.
+        Type (type): Expected type.
+
+    Returns:
+        None; An AssertionError is raised.
+    """
     assert isinstance(var, Type), \
            (f"{param} must be an instance of {Type} but a {type(var)} was given"
              " instead")
@@ -72,12 +92,21 @@ def checkInstance(param, var, Type):
 #  @param param String representing the name of the variable.
 #  @param var Variable.
 #  @param Type Type that the variable should match.
-#  @return False if it is an instance or True otherwise.
+#  @return None.
 #
 #-------------------------------------------------------------------------------
 def checkNotInstance(param, var, Type):
-    assert not isinstance(var, Type), f"{param} can't be an instance of {Type}"
+    """Check that the variable is not an instance of the specified Type.
 
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to check.
+        Type (type): Type that must not match.
+
+    Returns:
+        None; An AssertionError is raised.
+    """
+    assert not isinstance(var, Type), f"{param} can't be an instance of {Type}"
 
 #-------------------------------------------------------------------------------
 ## Return a Real instance.
@@ -87,6 +116,18 @@ def checkNotInstance(param, var, Type):
 #
 #-------------------------------------------------------------------------------
 def parseReal(param, var):
+    """Return a Real instance constructed from var.
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to be parsed.
+
+    Returns:
+        Real: The parsed Real object.
+
+    Raises:
+        Exception: If var is not an instance of Real, float, or int.
+    """
     if isinstance(var, (Real, float, int)):
         return Real(var)
     else:
@@ -99,10 +140,19 @@ def parseReal(param, var):
 ## Check if the var is Real or it can be parsed to Real.
 #  @param param String representing the name of the variable.
 #  @param var Variable.
-#  @return True if it can be parsed to Real or False otherwise.
+#  @return None.
 #
 #-------------------------------------------------------------------------------
 def checkReal(param, var):
+    """Check if the variable is of type Real (or compatible with Real).
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to check.
+
+    Returns:
+        None; An AssertionError is raised.
+    """
     assert isinstance(var, (Real, float, int)), \
            (f"{param} must be an instance of 'Real', 'float', 'int', or 'bool'"
             f" but a '{type(var).__name__}' was given instead")
@@ -116,6 +166,18 @@ def checkReal(param, var):
 #
 #-------------------------------------------------------------------------------
 def parseInteger(param, var):
+    """Return an Integer instance constructed from var.
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to be parsed.
+
+    Returns:
+        Integer: The parsed Integer object.
+
+    Raises:
+        Exception: If var is not an instance of Integer or int.
+    """
     if isinstance(var, (Integer, int)):
         return Integer(var)
     else:
@@ -128,10 +190,19 @@ def parseInteger(param, var):
 ## Check if the variable is Integer or can be parsed to Integer.
 #  @param param String representing the name of the variable.
 #  @param var Variable.
-#  @return True if it can be parsed to Integer or False otherwise.
+#  @return None.
 #
 #-------------------------------------------------------------------------------
 def checkInteger(param, var):
+    """Check if the variable is of type Integer (or compatible with Integer).
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to check.
+
+    Returns:
+        None; An AssertionError is raised.
+    """
     assert isinstance(var, (Integer, int)), \
            (f"{param} must be an instance of 'Integer', 'int', or 'bool' but a "
             f"'{type(var).__name__}' was given instead")
@@ -145,6 +216,18 @@ def checkInteger(param, var):
 #
 #-------------------------------------------------------------------------------
 def parseBool(param, var):
+    """Return a Bool instance constructed from var.
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to be parsed.
+
+    Returns:
+        Bool: The parsed Bool object.
+
+    Raises:
+        Exception: If var is not an instance of Bool or bool.
+    """
     if isinstance(var, (Bool, bool)):
         return Bool(var)
     else:
@@ -156,10 +239,19 @@ def parseBool(param, var):
 ## Check if the variable is Bool or can be parsed to Bool.
 #  @param param String representing the name of the variable.
 #  @param var Variable.
-#  @return True if it can be parsed to Bool or False otherwise.
+#  @return None.
 #
 #-------------------------------------------------------------------------------
 def checkBool(param, var):
+    """Check if the variable is of type Bool (or compatible with Bool).
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to check.
+
+    Returns:
+        None; An AssertionError is raised.
+    """
     assert isinstance(var, (Bool, bool)), \
            (f"{param} must be an instance of 'Bool' or 'bool' but a "
             f"'{type(var).__name__}' was given instead")
@@ -173,6 +265,18 @@ def checkBool(param, var):
 #
 #-------------------------------------------------------------------------------                        
 def parseNumber(param, var):
+    """Return a Real, Integer, or Bool instance constructed from var.
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to be parsed.
+
+    Returns:
+        Real, Integer, or Bool: The parsed numeric object.
+
+    Raises:
+        Exception: If var is not of a compatible type.
+    """
     if isinstance(var, (Bool, bool)):
         return Bool(var)
     elif isinstance(var, (Integer, int)):
@@ -189,10 +293,19 @@ def parseNumber(param, var):
 ## Check if the variable is a number or can be parsed to Bool.
 #  @param param String representing the name of the variable.
 #  @param var Variable.
-#  @return True if it can be parsed to number or False otherwise.
+#  @return None.
 #
 #-------------------------------------------------------------------------------                        
 def checkNumber(param, var):
+    """Check if the variable is a numeric type (Real, Integer, or Bool).
+
+    Args:
+        param (str): Name of the variable.
+        var (any): Variable to check.
+
+    Returns:
+        None; An AssertionError is raised.
+    """
     assert isinstance(var, (Real, Integer, Bool, float, int, bool)), \
            (f"{param} must be an instance of 'Bool', 'bool', 'Real', 'float', "
             f"'Integer' or 'int' but a '{type(var).__name__}' was given instead")
@@ -207,6 +320,17 @@ def checkNumber(param, var):
 #
 #-------------------------------------------------------------------------------
 def blockComment(padding, message, align = "center"):
+    """Creates a formatted comment block.
+
+    Args:
+        padding (int): Number of tabs for left alignment.
+        message (str): The comment text.
+        align (str, optional): Alignment of the text 
+            ('center', 'left', or 'right'). Defaults to "center".
+
+    Returns:
+        str: The formatted comment block.
+    """
     #assertions 
     checkType("padding", padding, int)
     checkType("message", message, str)
@@ -270,6 +394,16 @@ def blockComment(padding, message, align = "center"):
 #
 #-------------------------------------------------------------------------------
 def unary(Type, op1, operator):
+    """Generate a unary expression of the form: operator(op1).
+
+    Args:
+        Type (type): The type constructor (Real, Integer, or Bool).
+        op1 (any): Operand for the unary operation.
+        operator (str): String representing the unary operator.
+
+    Returns:
+        An instance of Type representing the unary operation.
+    """
     return Type(f"{operator}( {op1} )")
     
  
@@ -285,6 +419,18 @@ def unary(Type, op1, operator):
 #
 #-------------------------------------------------------------------------------
 def binary(Type, op1, op2, operator):
+    """Generate a binary expression combining op1 and op2 with the given 
+    operator.
+
+    Args:
+        Type (type): The type constructor (Real, Integer, or Bool).
+        op1 (any): The left-hand operand.
+        op2 (any): The right-hand operand.
+        operator (str): The binary operator as a string.
+
+    Returns:
+        An instance of Type representing the binary operation.
+    """
     return Type(f"( {op1} ){operator}( {op2} )")
     
  
@@ -299,6 +445,19 @@ def binary(Type, op1, op2, operator):
 #
 #-------------------------------------------------------------------------------
 def ternary(test, op1, op2):
+    """Generate a ternary expression based on a test condition.
+
+    Args:
+        test (Bool or bool): The test condition.
+        op1 (any): Expression if test is true.
+        op2 (any): Expression if test is false.
+
+    Returns:
+        An instance (Real, Integer, or Bool) representing the ternary operation.
+
+    Raises:
+        Exception: If op1 and op2 are not of compatible types.
+    """
     test = parseBool("test", test)
     if isinstance(op1, (Bool, bool) ) and \
        isinstance(op2, (Bool, bool) ):
@@ -327,6 +486,7 @@ def ternary(test, op1, op2):
 #
 #-------------------------------------------------------------------------------
 class Real():
+    """Real operator class representing a Real expression."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -336,6 +496,12 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __init__(self, value):
+        """Initialize a Real instance.
+
+        Args:
+            value (str, Real, Integer, Bool, or numeric): 
+            The value to convert into a Real expression.
+        """
         if isinstance(value, Bool):
             value = f"{ternary(value, 1.0, 0.0)}"
         elif isinstance(value, (Real, Integer)):
@@ -354,6 +520,11 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def getValue(self):
+        """Return the Real expression as a string.
+
+        Returns:
+            str: The expression stored in this Real instance.
+        """
         return self.value
     
     #---------------------------------------------------------------------------
@@ -364,6 +535,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __add__(self, other):
+        """Override the addition operator for Real objects.
+
+        Args:
+            other (Real, int, float): The operand to add.
+
+        Returns:
+            Real: A new Real instance representing the addition.
+        """
         other = parseReal("other", other)
         return binary(Real, self, other, "+")
 
@@ -375,6 +554,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __sub__(self, other):
+        """Override the subtraction operator for Real objects.
+
+        Args:
+            other (Real, int, float): The operand to subtract.
+
+        Returns:
+            Real: A new Real instance representing the subtraction.
+        """
         other = parseReal("other", other)
         return binary(Real, self, other, "-")
         
@@ -386,6 +573,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __mul__(self, other):
+        """Override the multiplication operator for Real objects.
+
+        Args:
+            other (Real, int, float): The operand to multiply.
+
+        Returns:
+            Real: A new Real instance representing the multiplication.
+        """
         other = parseReal("other", other)
         return binary(Real, self, other, "*")
 
@@ -397,6 +592,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __truediv__(self, other):
+        """Override the division operator for Real objects.
+
+        Args:
+            other (Real, int, float): The divisor.
+
+        Returns:
+            Real: A new Real instance representing the division.
+        """
         other = parseReal("other", other)
         return binary(Real, self, other, "/")
 
@@ -408,6 +611,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __pow__(self, other):
+        """Override the power operator for Real objects.
+
+        Args:
+            other (Real, int, float): The exponent.
+
+        Returns:
+            Real: A new Real instance representing the power operation.
+        """
         other = parseReal("other", other)
         return Real(f'pow({self}, {other})')
 
@@ -419,6 +630,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __gt__(self, other):
+        """Override the greater-than operator for Real objects.
+
+        Args:
+            other (Real, int, float): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the comparison result.
+        """
         other = parseReal("other", other)
         return binary(Bool, self, other, ">")
 
@@ -430,6 +649,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __lt__(self, other):
+        """Override the less-than operator for Real objects.
+
+        Args:
+            other (Real, int, float): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the comparison result.
+        """
         other = parseReal("other", other)
         return binary(Bool, self, other, "<")
 
@@ -441,6 +668,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __le__(self, other):
+        """Override the less-than-or-equal operator for Real objects.
+
+        Args:
+            other (Real, int, float): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the comparison result.
+        """
         other = parseReal("other", other)
         return binary(Bool, self, other, "<=")
 
@@ -452,6 +687,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __ge__(self, other):
+        """Override the greater-than-or-equal operator for Real objects.
+
+        Args:
+            other (Real, int, float): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the comparison result.
+        """
         other = parseReal("other", other)
         return binary(Bool, self, other, ">=")
 
@@ -463,6 +706,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __eq__(self, other):
+        """Override the equality operator for Real objects.
+
+        Args:
+            other (Real, int, float): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the equality result.
+        """
         other = parseReal("other", other)
         return binary(Bool, self, other, "==")
 
@@ -474,6 +725,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __ne__(self, other):
+        """Override the inequality operator for Real objects.
+
+        Args:
+            other (Real, int, float): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the inequality result.
+        """
         other = parseReal("other", other)
         return binary(Bool, self, other, "!=")
         
@@ -485,6 +744,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __radd__(self, other):
+        """Override the reverse addition operator for Real objects.
+
+        Args:
+            other (Real, int, float): The left-hand operand.
+
+        Returns:
+            Real: A new Real instance representing the addition.
+        """
         other = parseReal("other", other)
         return binary(Real, other, self, "+")
 
@@ -496,6 +763,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __rsub__(self, other):
+        """Override the reverse subtraction operator for Real objects.
+
+        Args:
+            other (Real, int, float): The left-hand operand.
+
+        Returns:
+            Real: A new Real instance representing the subtraction.
+        """
         other = parseReal("other", other)
         return binary(Real, other, self, "-")
 
@@ -507,6 +782,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __rmul__(self, other):
+        """Override the reverse multiplication operator for Real objects.
+
+        Args:
+            other (Real, int, float): The left-hand operand.
+
+        Returns:
+            Real: A new Real instance representing the multiplication.
+        """
         other = parseReal("other", other)
         return binary(Real, other, self, "*")
 
@@ -518,6 +801,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __rtruediv__(self, other):
+        """Override the reverse division operator for Real objects.
+
+        Args:
+            other (Real, int, float): The left-hand operand.
+
+        Returns:
+            Real: A new Real instance representing the division.
+        """
         other = parseReal("other", other)
         return binary(Real, other, self, "/")
 
@@ -529,6 +820,14 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __rpow__(self, other):
+        """Override the reverse power operator for Real objects.
+
+        Args:
+            other (Real, int, float): The base.
+
+        Returns:
+            Real: A new Real instance representing the power.
+        """
         other = parseReal("other", other)
         return Real(f'pow({other}, {self})')
         
@@ -539,6 +838,11 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __neg__(self):
+        """Override the unary negation operator for Real objects.
+
+        Returns:
+            Real: A new Real instance representing the negated expression.
+        """
         return unary(Real, self, "-") 
     
     #---------------------------------------------------------------------------
@@ -548,6 +852,11 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __pos__(self):
+        """Override the unary plus operator for Real objects.
+
+        Returns:
+            Real: A new Real instance that is a copy of this object.
+        """
         return unary(Real, self, "+") 
 
     #---------------------------------------------------------------------------
@@ -557,6 +866,11 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __abs__(self):
+        """Override the abs() function for Real objects.
+
+        Returns:
+            Real: A new Real instance representing the absolute value.
+        """
         return Real(f"abs({self})") 
 
     #---------------------------------------------------------------------------
@@ -566,6 +880,11 @@ class Real():
     #
     #---------------------------------------------------------------------------
     def __str__(self):
+        """Return the string representation of the Real expression.
+
+        Returns:
+            str: The Real expression as a string.
+        """
         return self.value
 
 
@@ -574,6 +893,7 @@ class Real():
 #
 #-------------------------------------------------------------------------------
 class Bool():
+    """Bool operator class representing a Boolean expression."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -583,6 +903,12 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __init__(self, value):
+        """Initialize a Bool instance.
+
+        Args:
+            value (str, Real, Integer, Bool, or any convertible type): 
+            The value to convert into a Bool expression.
+        """
         if isinstance(value, (Real, Integer)):
             value = f"{value != 0}"
         elif isinstance(value, Bool):
@@ -601,6 +927,11 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def getValue(self):
+        """Return the Bool expression as a string.
+
+        Returns:
+            str: The expression stored in this Bool instance.
+        """
         return self.value
 
     #---------------------------------------------------------------------------
@@ -611,6 +942,15 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __and__(self, other):
+        """Override the logical AND operator for Bool objects.
+
+        Args:
+            other (Bool or bool): The operand for the AND operation.
+
+        Returns:
+            Bool: A new Bool instance representing the result of the AND 
+                operation.
+        """
         checkBool("other", other)
         if isinstance(other, Bool):
             return binary(Bool, self, other, "&&")
@@ -628,6 +968,15 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __rand__(self, other):
+        """Override the reverse logical AND operator for Bool objects.
+
+        Args:
+            other (Bool or bool): The left-hand operand for the AND operation.
+
+        Returns:
+            Bool: A new Bool instance representing the result of the AND 
+                operation.
+        """
         checkBool("other", other)
         if isinstance(other, Bool):
             return binary(Bool, other, self, "&&")
@@ -645,6 +994,15 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __or__(self, other):
+        """Override the logical OR operator for Bool objects.
+
+        Args:
+            other (Bool or bool): The operand for the OR operation.
+
+        Returns:
+            Bool: A new Bool instance representing the result of the OR 
+                operation.
+        """
         checkBool("other", other)
         if isinstance(other, Bool):
             return binary(Bool, self, other, "||")
@@ -662,6 +1020,15 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __ror__(self, other):
+        """Override the reverse logical OR operator for Bool objects.
+
+        Args:
+            other (Bool or bool): The left-hand operand for the OR operation.
+
+        Returns:
+            Bool: A new Bool instance representing the result of the OR 
+                 operation.
+        """
         checkBool("other", other)
         if isinstance(other, Bool):
             return binary(Bool, other, self, "||")
@@ -679,6 +1046,15 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __xor__(self, other):
+        """Override the logical XOR operator for Bool objects.
+
+        Args:
+            other (Bool or bool): The operand for the XOR operation.
+
+        Returns:
+            Bool: A new Bool instance representing the result of the XOR 
+                operation.
+        """
         checkBool("other", other)
         if isinstance(other, Bool):
             return (self & ~other) | (~self & other)
@@ -696,6 +1072,15 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __rxor__(self, other):
+        """Override the reverse logical XOR operator for Bool objects.
+
+        Args:
+            other (Bool or bool): The left-hand operand for the XOR operation.
+
+        Returns:
+            Bool: A new Bool instance representing the result of the XOR 
+                operation.
+        """
         checkBool("other", other)
         if isinstance(other, Bool):
             return (other & ~self) | (~other & self)
@@ -712,6 +1097,12 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __invert__(self):
+        """Override the bitwise inversion operator for Bool objects.
+
+        Returns:
+            Bool: A new Bool instance representing the logical NOT of the 
+                operand.
+        """
         return unary(Bool, self, "!")
         
     #---------------------------------------------------------------------------
@@ -721,6 +1112,11 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __str__(self):
+        """Return the string representation of the Bool expression.
+
+        Returns:
+            str: The Bool expression as a string.
+        """
         return self.value
 
     #---------------------------------------------------------------------------
@@ -731,6 +1127,14 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __eq__(self, other):
+        """Override the equality operator for Bool objects.
+
+        Args:
+            other (Bool or bool): The operand to compare.
+
+        Returns:
+            Bool: A new Bool instance representing the equality result.
+        """
         other = parseBool("other", other)
         return binary(Bool, self, other, "==") 
 
@@ -742,6 +1146,14 @@ class Bool():
     #
     #---------------------------------------------------------------------------
     def __ne__(self, other):
+        """Override the inequality operator for Bool objects.
+
+        Args:
+            other (Bool or bool): The operand to compare.
+
+        Returns:
+            Bool: A new Bool instance representing the inequality result.
+        """
         other = parseBool("other", other)
         return binary(Bool, self, other, "!=")
         
@@ -751,6 +1163,7 @@ class Bool():
 #
 #-------------------------------------------------------------------------------
 class Integer():
+    """Integer operator class representing an Integer expression."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -760,6 +1173,12 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __init__(self, value):
+        """Initialize an Integer instance.
+
+        Args:
+            value (str, Integer, Real, Bool, or convertible type): The value to 
+                convert into an Integer expression.
+        """
         if isinstance(value, Bool):
             value = f"{ternary(value, 1, 0)}"
         elif isinstance(value, Real):
@@ -784,6 +1203,11 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def getValue(self):
+        """Return the Integer expression as a string.
+
+        Returns:
+            str: The expression stored in this Integer instance.
+        """
         return self.value
 
     #---------------------------------------------------------------------------
@@ -794,6 +1218,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __add__(self, other):
+        """Override the addition operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand to add.
+
+        Returns:
+            Integer: A new Integer instance representing the addition.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, "+")
         
@@ -805,6 +1237,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __radd__(self, other):
+        """Override the reverse addition operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the addition.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, "+")
         
@@ -816,6 +1256,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __sub__(self, other):
+        """Override the subtraction operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand to subtract.
+
+        Returns:
+            Integer: A new Integer instance representing the subtraction.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, "-")
         
@@ -827,6 +1275,14 @@ class Integer():
     #
     #--------------------------------------------------------------------------- 
     def __rsub__(self, other):
+        """Override the reverse subtraction operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the subtraction.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, "-")
 
@@ -838,6 +1294,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __mul__(self, other):
+        """Override the multiplication operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand to multiply.
+
+        Returns:
+            Integer: A new Integer instance representing the multiplication.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, "*")
         
@@ -849,6 +1313,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __rmul__(self, other):
+        """Override the reverse multiplication operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the multiplication.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, "*")
 
@@ -860,6 +1332,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __truediv__(self, other):
+        """Override the division operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The divisor.
+
+        Returns:
+            Integer: A new Integer instance representing the division.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, "/")
 
@@ -871,6 +1351,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __rtruediv__(self, other):
+        """Override the reverse division operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the division.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, "/")
         
@@ -878,10 +1366,18 @@ class Integer():
     ## module override
     #  @param self Dividend.
     #  @param other Quotient. 
-    #  @return expression representing the mdule.
+    #  @return expression representing the module.
     #
     #---------------------------------------------------------------------------
     def __mod__(self, other):
+        """Override the modulus operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The divisor.
+
+        Returns:
+            Integer: A new Integer instance representing the modulus.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, "%")
         
@@ -889,10 +1385,18 @@ class Integer():
     ## reverse module override
     #  @param self Quotient. 
     #  @param other Dividend.
-    #  @return expression representing the mdule.
+    #  @return expression representing the module.
     #
     #---------------------------------------------------------------------------
     def __rmod__(self, other):
+        """Override the reverse modulus operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the modulus.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, "%")
 
@@ -904,6 +1408,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __pow__(self, other):
+        """Override the power operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The exponent.
+
+        Returns:
+            Integer: A new Integer instance representing the power operation.
+        """
         other = parseInteger("other", other)
         return Integer(f'_rtoi(pow({self}, {other}))')
         
@@ -915,6 +1427,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __rpow__(self, other):
+        """Override the reverse power operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The base.
+
+        Returns:
+            Integer: A new Integer instance representing the power operation.
+        """
         other = parseInteger("other", other)
         return Integer(f'_rtoi(pow({other}, {self}))')
         
@@ -926,6 +1446,15 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __rshift__(self, other):
+        """Override the right shift operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The number of times to 
+                shift.
+
+        Returns:
+            Integer: A new Integer instance representing the right shift.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, ">>")
 
@@ -937,6 +1466,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __rrshift__(self, other):
+        """Override the reverse right shift operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the right shift.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, ">>")
         
@@ -948,6 +1485,15 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __lshift__(self, other):
+        """Override the left shift operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The number of times to 
+                shift.
+
+        Returns:
+            Integer: A new Integer instance representing the left shift.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, "<<")
         
@@ -959,6 +1505,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __rlshift__(self, other):
+        """Override the reverse left shift operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the left shift.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, "<<")
         
@@ -970,6 +1524,15 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __and__(self, other):
+        """Override the bitwise AND operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand for the AND 
+                operation.
+
+        Returns:
+            Integer: A new Integer instance representing the bitwise AND.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, "&")
 
@@ -981,6 +1544,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __rand__(self, other):
+        """Override the reverse bitwise AND operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the bitwise AND.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, "&")
         
@@ -992,6 +1563,15 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __or__(self, other):
+        """Override the bitwise OR operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand for the OR 
+                operation.
+
+        Returns:
+            Integer: A new Integer instance representing the bitwise OR.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, "|")
         
@@ -1003,6 +1583,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __ror__(self, other):
+        """Override the reverse bitwise OR operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the bitwise OR.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, "|")
 
@@ -1014,6 +1602,15 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __xor__(self, other):
+        """Override the bitwise XOR operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand for the XOR 
+                operation.
+
+        Returns:
+            Integer: A new Integer instance representing the bitwise XOR.
+        """
         other = parseInteger("other", other)
         return binary(Integer, self, other, "^")
         
@@ -1025,6 +1622,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __rxor__(self, other):
+        """Override the reverse bitwise XOR operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The left-hand operand.
+
+        Returns:
+            Integer: A new Integer instance representing the bitwise XOR.
+        """
         other = parseInteger("other", other)
         return binary(Integer, other, self, "^")
         
@@ -1036,6 +1641,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __lt__(self, other):
+        """Override the less-than operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the comparison.
+        """
         other = parseInteger("other", other)
         return binary(Bool, self, other, "<")
     
@@ -1047,6 +1660,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __gt__(self, other):
+        """Override the greater-than operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the comparison.
+        """
         other = parseInteger("other", other)
         return binary(Bool, self, other, ">")
 
@@ -1058,6 +1679,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __le__(self, other):
+        """Override the less-than-or-equal operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the comparison.
+        """
         other = parseInteger("other", other)
         return binary(Bool, self, other, "<=")
 
@@ -1069,6 +1698,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __ge__(self, other):
+        """Override the greater-than-or-equal operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the comparison.
+        """
         other = parseInteger("other", other)
         return binary(Bool, self, other, ">=")
 
@@ -1080,6 +1717,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __eq__(self, other):
+        """Override the equality operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the equality.
+        """
         other = parseInteger("other", other)
         return binary(Bool, self, other, "==")
 
@@ -1091,6 +1736,14 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __ne__(self, other):
+        """Override the inequality operator for Integer objects.
+
+        Args:
+            other (Integer, int, or convertible type): The operand to compare.
+
+        Returns:
+            Bool: A Bool instance representing the inequality.
+        """
         other = parseInteger("other", other)
         return binary(Bool, self, other, "!=")
         
@@ -1101,6 +1754,11 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __neg__(self):
+        """Override the unary negation operator for Integer objects.
+
+        Returns:
+            Integer: A new Integer instance representing the negated expression.
+        """
         return unary(Integer, self, "-")
     
     #---------------------------------------------------------------------------
@@ -1110,6 +1768,11 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __abs__(self):
+        """Override the abs() function for Integer objects.
+
+        Returns:
+            Integer: A new Integer instance representing the absolute value.
+        """
         return Integer(f"abs({self})") 
 
     #---------------------------------------------------------------------------
@@ -1119,6 +1782,11 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __pos__(self):
+        """Override the unary plus operator for Integer objects.
+
+        Returns:
+            Integer: A new Integer instance that is a copy of this object.
+        """
         return unary(Integer, self, "+")
 
     #---------------------------------------------------------------------------
@@ -1128,6 +1796,12 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __invert__(self):
+        """Override the bitwise inversion operator for Integer objects.
+
+        Returns:
+            Integer: A new Integer instance representing the bitwise NOT of the 
+                operand.
+        """
         return unary(Integer, self, "~")
         
     #---------------------------------------------------------------------------
@@ -1137,6 +1811,11 @@ class Integer():
     #
     #---------------------------------------------------------------------------
     def __str__(self):
+        """Return the string representation of the Integer expression.
+
+        Returns:
+            str: The Integer expression as a string.
+        """
         return self.value
 
         
@@ -1145,6 +1824,7 @@ class Integer():
 #
 #-------------------------------------------------------------------------------
 class IntegerVar(Integer):
+    """Class representing an Integer variable with additional operations."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1153,6 +1833,11 @@ class IntegerVar(Integer):
     #
     #---------------------------------------------------------------------------
     def __init__(self, value):
+        """Initialize an IntegerVar instance.
+
+        Args:
+            value (str): A string representing the value.
+        """
         checkType("value", value, str)
         super(IntegerVar, self).__init__(value)
 
@@ -1163,6 +1848,11 @@ class IntegerVar(Integer):
     #
     #---------------------------------------------------------------------------
     def inc(self):
+        """Generate a command to increment the IntegerVar.
+
+        Returns:
+            Cmd: A command representing the increment operation.
+        """
         return Cmd(f"{self} = {self} + 1")  
         
     #---------------------------------------------------------------------------
@@ -1172,6 +1862,11 @@ class IntegerVar(Integer):
     #
     #---------------------------------------------------------------------------
     def dec(self):
+        """Generate a command to decrement the IntegerVar.
+
+        Returns:
+            Cmd: A command representing the decrement operation.
+        """
         return Cmd(f"{self} = {self} - 1")    
                      
     #---------------------------------------------------------------------------
@@ -1182,6 +1877,14 @@ class IntegerVar(Integer):
     #
     #---------------------------------------------------------------------------
     def eq(self, value):
+        """Generate a command to assign a new value to the IntegerVar.
+
+        Args:
+            value (Integer, int, or convertible type): The value to assign.
+
+        Returns:
+            Cmd: A command representing the assignment.
+        """
         value = parseInteger("value", value)
         return Cmd(f"{self} = {value}")        
     
@@ -1191,6 +1894,7 @@ class IntegerVar(Integer):
 #
 #-------------------------------------------------------------------------------
 class RealVar(Real):
+    """Class representing a Real variable with additional operations."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1199,6 +1903,11 @@ class RealVar(Real):
     #
     #---------------------------------------------------------------------------
     def __init__(self, value):
+        """Initialize a RealVar instance.
+
+        Args:
+            value (str): A string representing the value.
+        """
         checkType("value", value, str)
         super(RealVar, self).__init__(value)
 
@@ -1210,6 +1919,14 @@ class RealVar(Real):
     #
     #---------------------------------------------------------------------------
     def eq(self, value):
+        """Generate a command to assign a new value to the RealVar.
+
+        Args:
+            value (Real, float, int, or convertible type): The value to assign.
+
+        Returns:
+            Cmd: A command representing the assignment.
+        """
         value = parseReal("value", value)
         return Cmd(f"{self} = {value}")     
         
@@ -1219,6 +1936,7 @@ class RealVar(Real):
 #
 #-------------------------------------------------------------------------------
 class BoolVar(Bool):
+    """Class representing a Boolean variable with additional operations."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1227,16 +1945,26 @@ class BoolVar(Bool):
     #
     #---------------------------------------------------------------------------
     def __init__(self, value):
+        """Initialize a BoolVar instance.
+
+        Args:
+            value (str): A string representing the value.
+        """
         checkType("value", value, str)
         super(BoolVar, self).__init__(value)
 
     #---------------------------------------------------------------------------
-    ## Toogle
+    ## Toggle
     #  @param self object pointer
     #  @return  Return a command representing the state toggle
     #
     #---------------------------------------------------------------------------
     def toggle(self):
+        """Generate a command to toggle the Boolean variable.
+
+        Returns:
+            Cmd: A command representing the toggle operation.
+        """
         return Cmd(f"{self} = !{self}")  
         
     #---------------------------------------------------------------------------
@@ -1247,6 +1975,14 @@ class BoolVar(Bool):
     #
     #---------------------------------------------------------------------------
     def eq(self, value):
+        """Generate a command to assign a new value to the BoolVar.
+
+        Args:
+            value (Bool, bool, or convertible type): The value to assign.
+
+        Returns:
+            Cmd: A command representing the assignment.
+        """
         value = parseBool("value", value)
         return Cmd(f"{self} = {value}") 
         
@@ -1256,6 +1992,7 @@ class BoolVar(Bool):
 #
 #-------------------------------------------------------------------------------
 class Event():
+    """Class representing an event in the system."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1264,6 +2001,11 @@ class Event():
     #
     #---------------------------------------------------------------------------
     def __init__(self, value):
+        """Initialize an Event instance.
+
+        Args:
+            value (str): A string representing the event.
+        """
         checkType("value", value, str)
         self.value = value
 
@@ -1275,17 +2017,30 @@ class Event():
     #
     #---------------------------------------------------------------------------
     def __or__(self, other):
+        """Override the logical OR operator for Event objects.
+
+        Args:
+            other (Event): Another Event instance.
+
+        Returns:
+            Event: A new Event instance representing the logical OR of the 
+                events.
+        """
         checkInstance("other", other, Event)
         return Event(f"{self} or {other}")
 
     #---------------------------------------------------------------------------
     ## string representation
     #  @param self object pointer
-    #  @param other pointer to another Event object
     #  @return The string representation of the Event
     #
     #---------------------------------------------------------------------------
     def __str__(self):
+        """Return the string representation of the Event.
+
+        Returns:
+            str: The event as a string.
+        """
         return self.value
                
                
@@ -1294,6 +2049,7 @@ class Event():
 #
 #-------------------------------------------------------------------------------
 class Cmd:
+    """Class representing a command in the system."""
     
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1302,6 +2058,11 @@ class Cmd:
     #
     #---------------------------------------------------------------------------
     def __init__(self, cmd):
+        """Initialize a Cmd instance.
+
+        Args:
+            cmd (str): The command string.
+        """
         checkType("cmd", cmd, str)
         self.cmd = cmd
 
@@ -1312,6 +2073,11 @@ class Cmd:
     #
     #---------------------------------------------------------------------------
     def __str__(self):
+        """Return the string representation of the command.
+
+        Returns:
+            str: The command as a string.
+        """
         return self.cmd
 
     #---------------------------------------------------------------------------
@@ -1323,6 +2089,14 @@ class Cmd:
     #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
+        """Return the VA Verilog command with the specified padding.
+
+        Args:
+            padding (int): The number of tabs for right shift.
+
+        Returns:
+            str: The formatted Verilog command.
+        """
         checkType("padding", padding, int)
         chunks = self.cmd.split("\n")
         result = '\n'.join([f"{'    '*padding}{l}" for l in chunks])
@@ -1335,6 +2109,7 @@ class Cmd:
 #
 #-------------------------------------------------------------------------------
 class CmdList(list, Cmd):
+    """Command list class that combines list behavior with Cmd functionality."""
     
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1343,6 +2118,11 @@ class CmdList(list, Cmd):
     #
     #---------------------------------------------------------------------------
     def __init__(self, *cmds):
+        """Initialize a CmdList instance and append the provided commands.
+
+        Args:
+            *cmds: Variable number of commands to add.
+        """
         super(CmdList, self).__init__()
         self.append(*cmds)
         
@@ -1353,15 +2133,26 @@ class CmdList(list, Cmd):
     #
     #---------------------------------------------------------------------------
     def __str__(self):
+        """Return a comma-separated string representation of the command list.
+
+        Returns:
+            str: The string representation.
+        """
         return ", ".join([str(x) for x in self])
         
     #---------------------------------------------------------------------------
     ## Return a flat command list Fatten
     #  @param self object pointer
-    #  @return flat command list. Only imediate CmdLists will be open.
+    #  @return flat command list. Only immediate CmdLists will be open.
     #
     #---------------------------------------------------------------------------
     def flat(self):
+        """Return a flat list of commands, recursively flattening any CmdList 
+        items.
+
+        Returns:
+            list: A flat list of commands.
+        """
         ans = []
         for item in self:
             if type(item) == CmdList:   
@@ -1376,6 +2167,11 @@ class CmdList(list, Cmd):
     #
     #---------------------------------------------------------------------------
     def append(self, *cmds):
+        """Override the append method to add commands with type checking.
+
+        Args:
+            *cmds: Variable number of commands to append.
+        """
         i = 0
         for cmd in cmds:
             checkInstance(f"cmds[{i}]", cmd, Cmd)
@@ -1391,6 +2187,15 @@ class CmdList(list, Cmd):
     #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
+        """Return the concatenated VA Verilog commands with the specified 
+        padding.
+
+        Args:
+            padding (int): Number of indentation tabs.
+
+        Returns:
+            str: The formatted Verilog command string.
+        """
         checkType("padding", padding, int)
         return "".join([f"{l.getVA(padding)}" for l in self])
 
@@ -1402,7 +2207,15 @@ class CmdList(list, Cmd):
 #
 #-----------------------------------------------------------------------------
 def block(header):
-    def func (*cmds):
+    """Return a function that creates a Block with the given header.
+
+    Args:
+        header (str): The header for the block.
+
+    Returns:
+        function: A function that accepts commands and returns a Block.
+    """
+    def func(*cmds):
         return Block(header, *cmds)
     return func
     
@@ -1412,6 +2225,7 @@ def block(header):
 #
 #-------------------------------------------------------------------------------
 class Block(CmdList):
+    """Command Block class for grouping commands under a header."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1421,17 +2235,28 @@ class Block(CmdList):
     #
     #---------------------------------------------------------------------------
     def __init__(self, header, *cmds):
+        """Initialize a Block instance with a header and commands.
+
+        Args:
+            header (str): Header of the block.
+            *cmds: Variable number of commands or CmdLists.
+        """
         checkType("header", header, str)
-        self.header  = header
+        self.header = header
         super(Block, self).__init__(*cmds)
         
     #---------------------------------------------------------------------------
     ## Return the header of a block command
     #  @param self object pointer
-    #  @return header o the block 
+    #  @return header of the block 
     # 
     #---------------------------------------------------------------------------
     def getHeader(self):
+        """Return the header of the block.
+
+        Returns:
+            str: The block header.
+        """
         return self.header
                 
     #---------------------------------------------------------------------------
@@ -1442,12 +2267,20 @@ class Block(CmdList):
     #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
+        """Return the formatted VA Verilog command for the block with padding.
+
+        Args:
+            padding (int): Number of indentation tabs.
+
+        Returns:
+            str: The formatted Verilog command string.
+        """
         checkType("padding", padding, int)
         length = len(self.flat())
         if length > 1:
             result = (f"{'    '*padding}{self.header} begin\n"
                       f"{super(Block, self).getVA(padding + 1)}"
-                      f"{'    '*padding }end\n")
+                      f"{'    '*padding}end\n")
         elif length == 1:
             result = (f"{'    '*padding}{self.header}\n"
                       f"{super(Block, self).getVA(padding + 1)}")     
@@ -1463,7 +2296,15 @@ class Block(CmdList):
 #
 #-------------------------------------------------------------------------------
 def At(event):
-    def func (*cmds):
+    """Return a function that creates a WaitAnalogEvent for the given event.
+
+    Args:
+        event (Event): An Event instance representing the analog event.
+
+    Returns:
+        function: A function that accepts commands and returns a WaitAnalogEvent.
+    """
+    def func(*cmds):
         return WaitAnalogEvent(event, *cmds)
     return func
     
@@ -1473,6 +2314,8 @@ def At(event):
 #
 #-------------------------------------------------------------------------------
 class WaitAnalogEvent(Block):
+    """Class representing a wait for an analog event."""
+    
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
@@ -1481,6 +2324,12 @@ class WaitAnalogEvent(Block):
     #
     #---------------------------------------------------------------------------
     def __init__(self, event, *cmds):
+        """Initialize a WaitAnalogEvent instance.
+
+        Args:
+            event (Event): The event to wait for.
+            *cmds: Variable number of commands or CmdLists.
+        """
         checkInstance("event", event, Event)
         super(WaitAnalogEvent, self).__init__(f'@( {event} )', *cmds)
         
@@ -1490,17 +2339,29 @@ class WaitAnalogEvent(Block):
 #
 #-------------------------------------------------------------------------------
 class Cross(Event):
+    """Class representing a cross event."""
 
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
-    #  @param exp Real class or build-in real representing the expression
+    #  @param expr Real class or build-in real representing the expression
     #  @param edge It can be rising, falling or both
     #  @param *pars optional Real or build-in real parameters timeTol and expTol
     #         in this order
     #
     #---------------------------------------------------------------------------
     def __init__(self, expr, edge, *pars):
+        """Initialize a Cross event instance.
+
+        Args:
+            expr (Real or numeric): The expression for the cross event.
+            edge (str): The edge type ('rising', 'falling', or 'both').
+            *pars: Optional parameters (timeTol and expTol).
+
+        Raises:
+            AssertionError: If an invalid edge value is provided or wrong number 
+                of parameters.
+        """
         assert len(pars) >= 0 and len(pars) <= 2, "Wrong number of parameters"
         expr = parseReal("expr", expr)
         checkType("edge", edge, str)
@@ -1521,6 +2382,7 @@ class Cross(Event):
 #
 #-------------------------------------------------------------------------------
 class Above(Event):
+    """Class representing an above event."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1531,6 +2393,12 @@ class Above(Event):
     #
     #---------------------------------------------------------------------------
     def __init__(self, expr, *pars):
+        """Initialize an Above event instance.
+
+        Args:
+            expr (Real or numeric): The expression for the above event.
+            *pars: Optional parameters (timeTol and expTol).
+        """
         assert len(pars) >= 0 and len(pars) <= 2, "Wrong number of parameters"
         expr = parseReal("expr", expr)
         params = [str(expr)] 
@@ -1548,6 +2416,7 @@ class Above(Event):
 #
 #-------------------------------------------------------------------------------
 class Timer(Event):
+    """Class representing a timer event."""
     
     #----------------------------------------------------------------------------
     ## Constructor
@@ -1558,6 +2427,15 @@ class Timer(Event):
     #
     #----------------------------------------------------------------------------
     def __init__(self, startTime, *pars):
+        """Initialize a Timer event instance.
+
+        Args:
+            startTime (Real or numeric): The start time for the timer.
+            *pars: Optional parameters (period or timeTol, expTol).
+
+        Raises:
+            AssertionError: If wrong number of parameters is provided.
+        """
         assert len(pars) >= 0 and len(pars) <= 2, "Wrong number of parameters"
         startTime = parseReal("startTime", startTime)
         params = [str(startTime)] 
@@ -1595,6 +2473,17 @@ anaTypes = ["ac",
 #
 #-------------------------------------------------------------------------------
 def unfoldSimTypes(*simTypes):
+    """Unfold a variable number of simulation types into a comma-separated string.
+
+    Args:
+        *simTypes: Simulation type strings.
+
+    Returns:
+        str: A comma-separated string of simulation types enclosed in quotes.
+
+    Raises:
+        AssertionError: If any provided simulation type is not in anaTypes.
+    """
     ans = []
     i = 1
     for simType in simTypes:
@@ -1610,6 +2499,7 @@ def unfoldSimTypes(*simTypes):
 #
 #-------------------------------------------------------------------------------
 class InitialStep(Event):
+    """Class representing an initial step event."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1618,6 +2508,11 @@ class InitialStep(Event):
     #
     #---------------------------------------------------------------------------
     def __init__(self, *simTypes):
+        """Initialize an InitialStep event.
+
+        Args:
+            *simTypes: Optional simulation type parameters.
+        """
         ans = "initial_step"
         simTypes = unfoldSimTypes(*simTypes)
         if simTypes != "":
@@ -1630,6 +2525,7 @@ class InitialStep(Event):
 #
 #-------------------------------------------------------------------------------
 class FinalStep(Event):
+    """Class representing a final step event."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1638,6 +2534,11 @@ class FinalStep(Event):
     #
     #---------------------------------------------------------------------------
     def __init__(self, *simTypes):
+        """Initialize a FinalStep event.
+
+        Args:
+            *simTypes: Optional simulation type parameters.
+        """
         ans = "final_step"
         simTypes = unfoldSimTypes(*simTypes)
         if simTypes != "":
@@ -1652,6 +2553,17 @@ class FinalStep(Event):
 #
 #-------------------------------------------------------------------------------
 def analysis(*simTypes):
+    """Return a Bool expression that tests for the specified analysis type(s).
+
+    Args:
+        *simTypes: One or more simulation type strings.
+
+    Returns:
+        Bool: A Bool expression representing the analysis test.
+
+    Raises:
+        Exception: If no simulation type is specified.
+    """
     if simTypes == "":
         raise Exception("At least one simulation type must be specified")
     return Bool(f'analysis({unfoldSimTypes(*simTypes)})')
@@ -1665,7 +2577,20 @@ def analysis(*simTypes):
 #  @return Real expression representing the ac stimulus command
 #
 #-------------------------------------------------------------------------------
-def acStim(mag, phase = 0, simType = "ac"):
+def acStim(mag, phase=0, simType="ac"):
+    """Return a Real expression representing an AC stimulus command.
+
+    Args:
+        mag (Real or numeric): The magnitude.
+        phase (Real or numeric, optional): The phase (default is 0).
+        simType (str, optional): The simulation type (default is "ac").
+
+    Returns:
+        Real: A Real expression for the AC stimulus command.
+
+    Raises:
+        AssertionError: If simType is not in the list of allowed analysis types.
+    """
     assert simType in anaTypes, \
            f"simType must be of of the following: {anaTypes}"
     mag = parseReal("mag", mag)
@@ -1681,7 +2606,15 @@ def acStim(mag, phase = 0, simType = "ac"):
 #
 #-------------------------------------------------------------------------------
 def Repeat(n):
-    def func (*cmds):
+    """Return a function that creates a RepeatLoop with the specified repeat count.
+
+    Args:
+        n (Integer, int, or convertible type): Number of times to repeat.
+
+    Returns:
+        function: A function that accepts commands and returns a RepeatLoop.
+    """
+    def func(*cmds):
         return RepeatLoop(n, *cmds)
     return func
 
@@ -1691,6 +2624,7 @@ def Repeat(n):
 #
 #-------------------------------------------------------------------------------
 class RepeatLoop(Block):
+    """Class representing a loop that repeats a block of commands."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1701,6 +2635,12 @@ class RepeatLoop(Block):
     #
     #---------------------------------------------------------------------------
     def __init__(self, n, *cmds):
+        """Initialize a RepeatLoop instance.
+
+        Args:
+            n (Integer, int, or convertible type): The repeat count.
+            *cmds: Variable number of commands or CmdLists.
+        """
         n = parseInteger("n", n)
         self.n = n
         super(RepeatLoop, self).__init__(f"repeat( {n} )", *cmds)  
@@ -1713,6 +2653,11 @@ class RepeatLoop(Block):
     #
     #---------------------------------------------------------------------------
     def getN(self):
+        """Return the repeat count.
+
+        Returns:
+            Integer: The number of repetitions.
+        """
         return self.n
         
 
@@ -1724,16 +2669,24 @@ class RepeatLoop(Block):
 # 
 #-------------------------------------------------------------------------------
 def While(cond):
-    def func (*cmds):
+    """Return a function that creates a WhileLoop with the given condition.
+
+    Args:
+        cond (Bool or bool): The condition for the while loop.
+
+    Returns:
+        function: A function that accepts commands and returns a WhileLoop.
+    """
+    def func(*cmds):
         return WhileLoop(cond, *cmds)
     return func
-
 
 #-------------------------------------------------------------------------------
 ## WhileLoop class
 #
 #-------------------------------------------------------------------------------
 class WhileLoop(Block):
+    """Class representing a while loop block."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1745,6 +2698,12 @@ class WhileLoop(Block):
     # 
     #---------------------------------------------------------------------------
     def __init__(self, cond, *cmds):
+        """Initialize a WhileLoop instance.
+
+        Args:
+            cond (Bool or bool): The condition to control the loop.
+            *cmds: Variable number of commands or command lists to execute.
+        """
         cond = parseBool("cond", cond)
         self.cond = cond
         super(WhileLoop, self).__init__(f"while( {cond} )", *cmds)  
@@ -1757,12 +2716,17 @@ class WhileLoop(Block):
     #
     #---------------------------------------------------------------------------
     def getCond(self):
+        """Return the loop condition.
+
+        Returns:
+            Bool: The condition controlling the while loop.
+        """
         return self.cond   
     
     
 #-------------------------------------------------------------------------------
 ## Returns the pointer to a function that add commands to a ForLoop
-#  @param start command executed at the beggining
+#  @param start command executed at the beginning
 #  @param cond condition that must be satisfied in order repeat the sequence of 
 #         commands in the block
 #  @param inc command executed at the end of each step
@@ -1770,7 +2734,17 @@ class WhileLoop(Block):
 #
 #-------------------------------------------------------------------------------
 def For(start, cond, inc):
-    def func (*cmds):
+    """Return a function that creates a ForLoop instance.
+
+    Args:
+        start (Cmd or CmdList): The initialization command.
+        cond (Bool or bool): The loop condition.
+        inc (Cmd or CmdList): The increment command.
+
+    Returns:
+        function: A function that accepts commands and returns a ForLoop.
+    """
+    def func(*cmds):
         return ForLoop(start, cond, inc, *cmds)
     return func
     
@@ -1780,11 +2754,12 @@ def For(start, cond, inc):
 #
 #-------------------------------------------------------------------------------
 class ForLoop(Block):
+    """Class representing a for loop block."""
 
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
-    #  @param start command executed at the beggining
+    #  @param start command executed at the beginning
     #  @param cond condition that must be satisfied in order repeat the sequence
     #         of commands in the block
     #  @param inc command executed at the end of each step
@@ -1792,6 +2767,14 @@ class ForLoop(Block):
     #
     #---------------------------------------------------------------------------
     def __init__(self, start, cond, inc, *cmds):
+        """Initialize a ForLoop instance.
+
+        Args:
+            start (Cmd or CmdList): The initialization command.
+            cond (Bool or bool): The loop condition.
+            inc (Cmd or CmdList): The increment command.
+            *cmds: Additional commands to execute inside the loop.
+        """
         cond = parseBool("cond", cond)
         assert type(start) == Cmd or type(start) == CmdList, \
                (f"start must be Cmd or CmdList but a {type(start)} was given "
@@ -1813,6 +2796,11 @@ class ForLoop(Block):
     #
     #---------------------------------------------------------------------------
     def getCond(self):
+        """Return the for loop condition.
+
+        Returns:
+            Bool: The condition controlling the for loop.
+        """
         return self.cond
         
     #---------------------------------------------------------------------------
@@ -1822,16 +2810,26 @@ class ForLoop(Block):
     #
     #---------------------------------------------------------------------------
     def getStart(self):
-        return self.start  
+        """Return the for loop's start command.
+
+        Returns:
+            Cmd or CmdList: The initialization command.
+        """
+        return self.start
         
     #---------------------------------------------------------------------------
     ## Return the Forloop increment
     #  @param self object pointer
     #  @return Cmd class representing the increment command run at each 
-    #          iteraction
+    #          iteration
     #
     #---------------------------------------------------------------------------
     def getInc(self):
+        """Return the for loop's increment command.
+
+        Returns:
+            Cmd or CmdList: The increment command.
+        """
         return self.inc   
         
         
@@ -1843,10 +2841,18 @@ class ForLoop(Block):
 #
 #-------------------------------------------------------------------------------
 def If(cond):
-    def ifFunc (*cmds):
+    """Return a function that creates a conditional block.
+
+    Args:
+        cond (Bool or bool): The condition for the 'if' structure.
+
+    Returns:
+        function: A function that accepts commands and returns a Cond instance.
+    """
+    def ifFunc(*cmds):
         ans = Cond(cond, *cmds)
         return ans
-    return ifFunc    
+    return ifFunc
 
 
 #-------------------------------------------------------------------------------
@@ -1855,6 +2861,7 @@ def If(cond):
 #
 #-------------------------------------------------------------------------------
 class Cond(Cmd):
+    """Class representing a conditional (if-else) block."""
 
     #---------------------------------------------------------------------------
     ## Constructor
@@ -1865,6 +2872,12 @@ class Cond(Cmd):
     #
     #---------------------------------------------------------------------------
     def __init__(self, cond, *cmds):
+        """Initialize a Cond instance.
+
+        Args:
+            cond (Bool or bool): The condition for the 'if' branch.
+            *cmds: Commands to execute when the condition is true.
+        """
         cond = parseBool("cond", cond)
         trueHead  = f"if( {cond} )"
         falseHead = "else"
@@ -1876,10 +2889,15 @@ class Cond(Cmd):
     ## Return the Cond condition
     #  @param self object pointer
     #  @return Bool class representing the condition that must be satisfied in 
-    #          order run the sequence of commands in the block
+    #          order to run the sequence of commands in the block
     #
     #---------------------------------------------------------------------------
     def getCond(self):
+        """Return the condition for the if branch.
+
+        Returns:
+            Bool: The condition.
+        """
         return self.cond
         
     #---------------------------------------------------------------------------
@@ -1889,7 +2907,16 @@ class Cond(Cmd):
     #  @return block of commands for True and False conditions
     #
     #---------------------------------------------------------------------------
-    def getBlock(self, state = True):
+    def getBlock(self, state=True):
+        """Return the command block corresponding to a state.
+
+        Args:
+            state (bool, optional): True for 'if', False for 'else'. 
+                Defaults to True.
+
+        Returns:
+            Block: The command block for the given state.
+        """
         checkType("state", state, bool)
         return self.cmdDict[state]
                 
@@ -1901,6 +2928,12 @@ class Cond(Cmd):
     #
     #---------------------------------------------------------------------------
     def append(self, state, *cmds):
+        """Append commands to the block corresponding to the given state.
+
+        Args:
+            state (bool): True for 'if' branch, False for 'else' branch.
+            *cmds: Commands to append.
+        """
         checkType("state", state, bool)
         self.cmdDict[state].append(*cmds)
 
@@ -1912,6 +2945,14 @@ class Cond(Cmd):
     # 
     #---------------------------------------------------------------------------
     def Else(self, *cmds):
+        """Append commands to the 'else' branch.
+
+        Args:
+            *cmds: Commands to append.
+
+        Returns:
+            Cond: The current instance.
+        """
         self.cmdDict[False].append(*cmds)
         return self
 
@@ -1923,6 +2964,14 @@ class Cond(Cmd):
     #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
+        """Return the VA Verilog command string for the conditional block.
+
+        Args:
+            padding (int): Number of indentation tabs.
+
+        Returns:
+            str: The formatted Verilog command.
+        """
         checkType("padding", padding, int)
         result = f"{self.cmdDict[True].getVA(padding)}" 
         if len(self.cmdDict[False]) > 0:
@@ -1937,6 +2986,14 @@ class Cond(Cmd):
 #  
 #-------------------------------------------------------------------------------
 def Case(test):
+    """Return a function that creates a case structure.
+
+    Args:
+        test (Integer, Bool, or Real): The variable under test.
+
+    Returns:
+        function: A function that accepts command tuples and returns a CaseClass.
+    """
     def caseFunc(*cmds):
         return CaseClass(test, *cmds)
     return caseFunc
@@ -1948,16 +3005,24 @@ def Case(test):
 #
 #-------------------------------------------------------------------------------
 class CaseClass(Cmd):
+    """Class representing a case structure with multiple conditional branches."""
 
     #---------------------------------------------------------------------------
     ## Constructor
     #  @param self object pointer
     #  @param test Must be Integer, Bool, or Real
-    #  @param *cmds variable number of tupples containing a condition and a 
+    #  @param *cmds variable number of tuples containing a condition and a 
     #         command
     #
     #---------------------------------------------------------------------------
     def __init__(self, test, *cmds):
+        """Initialize a CaseClass instance.
+
+        Args:
+            test (Integer, Bool, or Real): The test expression.
+            *cmds: Tuples where each tuple contains a condition and corresponding 
+                commands.
+        """
         self.test = parseNumber("test", test)
         self.cmds = []
         self.append(*cmds)
@@ -1969,16 +3034,27 @@ class CaseClass(Cmd):
     #
     #---------------------------------------------------------------------------
     def getBlockList(self):
+        """Return the list of command blocks for each case branch.
+
+        Returns:
+            list: A list of Block instances.
+        """
         return self.cmds
                       
     #---------------------------------------------------------------------------
     ## Add command
     #  @param self object pointer
-    #  @param *cmds variable number of tupples containing a condition and a 
+    #  @param *cmds variable number of tuples containing a condition and a 
     #         command
     #
     #---------------------------------------------------------------------------
     def append(self, *cmds):
+        """Append tuples of condition and commands to the case structure.
+
+        Args:
+            *cmds: Tuples where the first element is the case condition 
+                   (or None for default) followed by one or more commands.
+        """
         i = 0
         for tup in cmds:
             assert type(tup) == tuple, f"cmds[{i}] must be tuple"
@@ -2017,6 +3093,14 @@ class CaseClass(Cmd):
     #  
     #---------------------------------------------------------------------------
     def getVA(self, padding):
+        """Return the VA Verilog command string for the case structure.
+
+        Args:
+            padding (int): Number of indentation tabs.
+
+        Returns:
+            str: The formatted Verilog command.
+        """
         checkType("padding", padding, int)
         result = (f"{'    '*padding}case( {self.test} )\n"
                   f"{''.join([l.getVA(padding+1) for l in self.cmds])}"
@@ -2027,10 +3111,18 @@ class CaseClass(Cmd):
 #-------------------------------------------------------------------------------
 ## Unfold variable number of parameters
 #  @param *params variable number of parameters
-#  @return string representing the parameters separeted by comma
+#  @return string representing the parameters separated by comma
 #
 #-------------------------------------------------------------------------------
 def unfoldParams(*params):
+    """Unfold a variable number of parameters into a comma-separated string.
+
+    Args:
+        *params: Parameters to be unfolded.
+
+    Returns:
+        str: A string with the parameters separated by commas.
+    """
     cmd = ""
     i = 0
     for param in params:
@@ -2048,6 +3140,15 @@ def unfoldParams(*params):
 #
 #-------------------------------------------------------------------------------
 def Strobe(msg, *params):
+    """Return a command representing a strobe operation.
+
+    Args:
+        msg (str): The message to be printed.
+        *params: Additional parameters for the strobe.
+
+    Returns:
+        Cmd: A command for the strobe.
+    """
     checkType("msg", msg, str)
     return Cmd(f'$strobe("{msg}"{unfoldParams(*params)})')
 
@@ -2060,6 +3161,15 @@ def Strobe(msg, *params):
 #
 #-------------------------------------------------------------------------------
 def Write(msg, *params):
+    """Return a command representing a write operation.
+
+    Args:
+        msg (str): The message to be printed.
+        *params: Additional parameters for the write.
+
+    Returns:
+        Cmd: A command for the write.
+    """
     checkType("msg", msg, str)
     return Cmd(f'$write("{msg}"{unfoldParams(*params)})')
 
@@ -2071,6 +3181,14 @@ def Write(msg, *params):
 #
 #-------------------------------------------------------------------------------
 def Fopen(fileName):
+    """Return an Integer representing the file descriptor from opening a file.
+
+    Args:
+        fileName (str): The name of the file.
+
+    Returns:
+        Integer: The file descriptor.
+    """
     checkType("msg", fileName, str)
     return Integer(f'$fopen("{fileName}")') 
 
@@ -2082,6 +3200,14 @@ def Fopen(fileName):
 #
 #-------------------------------------------------------------------------------
 def Fclose(desc):
+    """Return a command to close a file.
+
+    Args:
+        desc (Integer or int): The file descriptor.
+
+    Returns:
+        Cmd: A command to close the file.
+    """
     desc = parseInteger("desc", desc)
     return Cmd(f'$fclose({desc})') 
 
@@ -2095,6 +3221,16 @@ def Fclose(desc):
 #
 #-------------------------------------------------------------------------------
 def Fstrobe(desc, msg, *params):
+    """Return a command representing a file strobe operation.
+
+    Args:
+        desc (Integer or int): The file descriptor.
+        msg (str): The message to be written.
+        *params: Additional parameters.
+
+    Returns:
+        Cmd: A command for the file strobe.
+    """
     desc = parseInteger("desc", desc)
     checkType("msg", msg, str)
     return Cmd(f'$fstrobe({desc}, "{msg}"{unfoldParams(*params)})')
@@ -2109,6 +3245,16 @@ def Fstrobe(desc, msg, *params):
 #
 #-------------------------------------------------------------------------------
 def Fwrite(desc, msg, *params):
+    """Return a command representing a file write operation.
+
+    Args:
+        desc (Integer or int): The file descriptor.
+        msg (str): The message to be written.
+        *params: Additional parameters.
+
+    Returns:
+        Cmd: A command for the file write.
+    """
     desc = parseInteger("desc", desc)
     checkType("msg", msg, str)
     return Cmd(f'$fwrite({desc}, "{msg}"{unfoldParams(*params)})')
@@ -2121,9 +3267,18 @@ def Fwrite(desc, msg, *params):
 #  @return Cmd representing the discontinuity
 #
 #-------------------------------------------------------------------------------
-def Discontinuity(degree = 0):
+def Discontinuity(degree=0):
+    """Return a command representing a discontinuity in the derivative.
+
+    Args:
+        degree (Integer, int, or numeric, optional): The degree of discontinuity. 
+            Defaults to 0.
+
+    Returns:
+        Cmd: A command for the discontinuity.
+    """
     degree = parseInteger("degree", degree)
-    return Cmd(f'$discontinuity({degree})') 
+    return Cmd(f'$discontinuity({degree})')
 
 
 #-------------------------------------------------------------------------------
@@ -2132,7 +3287,12 @@ def Discontinuity(degree = 0):
 #
 #-------------------------------------------------------------------------------
 def Finish():
-    return Cmd('$finish') 
+    """Return a command representing finish.
+
+    Returns:
+        Cmd: A finish command.
+    """
+    return Cmd('$finish')
 
 
 #-------------------------------------------------------------------------------
@@ -2143,6 +3303,15 @@ def Finish():
 #
 #-------------------------------------------------------------------------------
 def Error(msg, *params):
+    """Return a command representing an error message.
+
+    Args:
+        msg (str): The error message.
+        *params: Additional parameters.
+
+    Returns:
+        Cmd: A command for the error.
+    """
     checkType("msg", msg, str)
     return Cmd(f'$error("{msg}"{unfoldParams(*params)})')
 
@@ -2154,6 +3323,15 @@ def Error(msg, *params):
 #
 #-------------------------------------------------------------------------------
 def Fatal(msg, *params):
+    """Return a command representing a fatal error.
+
+    Args:
+        msg (str): The error message.
+        *params: Additional parameters.
+
+    Returns:
+        Cmd: A command for the fatal error.
+    """
     checkType("msg", msg, str)
     return Cmd(f'$fatal(0, "{msg}"{unfoldParams(*params)})')
 
@@ -2164,12 +3342,20 @@ def Fatal(msg, *params):
 #
 #-------------------------------------------------------------------------------
 def BoundStep(step):
+    """Return a command representing a bond step.
+
+    Args:
+        step (Real, float, or int): The step value.
+
+    Returns:
+        Cmd: A command for the bond step.
+    """
     step = parseReal("step", step)
     return Cmd(f'$bound_step({step})') 
 
 
 #-------------------------------------------------------------------------------
-## last time a signal crossed a treshold
+## last time a signal crossed a threshold
 #  @param signal Real, float or int representing the signal
 #  @param threshold Real, float or int representing the threshold that must be 
 #         crossed
@@ -2177,14 +3363,26 @@ def BoundStep(step):
 #  @return Real class representing the last crossing.
 #
 #-------------------------------------------------------------------------------
-def lastCrossing(signal, threshold, edge = 'both'):
+def lastCrossing(signal, threshold, edge='both'):
+    """Return a Real expression representing the last time a signal crossed a 
+    threshold.
+
+    Args:
+        signal (Real, float, or int): The signal value.
+        threshold (Real, float, or int): The threshold value.
+        edge (str, optional): The edge type ("rising", "falling", or "both"). 
+            Defaults to 'both'.
+
+    Returns:
+        Real: A Real expression for the last crossing.
+    """
     signal = parseReal("signal", signal)
     threshold = parseReal("threshold", threshold)
     checkType("edge", edge, str)
-    mapping = {'rising': '1', 'falling': '-1', 'both': '0'}  
+    mapping = {'rising': '1', 'falling': '-1', 'both': '0'}
     assert edge in mapping.keys()
-    cross = f"last_crossing({signal} - {threshold}, {mapping[edge]})" 
-    return Real(cross) 
+    cross = f"last_crossing({signal} - {threshold}, {mapping[edge]})"
+    return Real(cross)
 
 
 #-------------------------------------------------------------------------------
@@ -2194,6 +3392,14 @@ def lastCrossing(signal, threshold, edge = 'both'):
 #
 #-------------------------------------------------------------------------------
 def random(seed):
+    """Return a random Integer generated using the given seed.
+
+    Args:
+        seed (IntegerVar): The seed for the random generator.
+
+    Returns:
+        Integer: A random integer.
+    """
     checkInstance("seed", seed, IntegerVar)
     return Integer(f'$random({seed})')
 
@@ -2207,6 +3413,16 @@ def random(seed):
 #
 #-------------------------------------------------------------------------------        
 def uDistInt(seed, start, end):
+    """Return a random Integer from a uniform distribution.
+
+    Args:
+        seed (IntegerVar): The seed for the generator.
+        start (Integer, int, or numeric): The start of the range.
+        end (Integer, int, or numeric): The end of the range.
+
+    Returns:
+        Integer: A random integer from the specified range.
+    """
     checkInstance("seed", seed, IntegerVar)
     start = parseInteger("start", start)
     end = parseInteger("end", end)
@@ -2222,6 +3438,16 @@ def uDistInt(seed, start, end):
 #
 #-------------------------------------------------------------------------------       
 def uDistReal(seed, start, end):
+    """Return a random Real from a uniform distribution.
+
+    Args:
+        seed (IntegerVar): The seed for the generator.
+        start (Real, float, or int): The start of the range.
+        end (Real, float, or int): The end of the range.
+
+    Returns:
+        Real: A random real number from the specified range.
+    """
     checkInstance("seed", seed, IntegerVar)
     start = parseReal("start", start)
     end = parseReal("end", end)
@@ -2237,6 +3463,16 @@ def uDistReal(seed, start, end):
 #
 #-------------------------------------------------------------------------------   
 def gaussDistInt(seed, mean, std):
+    """Return a random Integer from a Gaussian distribution.
+
+    Args:
+        seed (IntegerVar): The seed for the generator.
+        mean (Integer, int, or numeric): The mean value.
+        std (Integer, int, or numeric): The standard deviation.
+
+    Returns:
+        Integer: A random integer from the Gaussian distribution.
+    """
     checkInstance("seed", seed, IntegerVar)
     mean = parseInteger("mean", mean)
     std = parseInteger("std", std)
@@ -2252,6 +3488,16 @@ def gaussDistInt(seed, mean, std):
 #
 #------------------------------------------------------------------------------- 
 def gaussDistReal(seed, mean, std):
+    """Return a random Real from a Gaussian distribution.
+
+    Args:
+        seed (IntegerVar): The seed for the generator.
+        mean (Real, float, or int): The mean value.
+        std (Real, float, or int): The standard deviation.
+
+    Returns:
+        Real: A random real number from the Gaussian distribution.
+    """
     checkInstance("seed", seed, IntegerVar)
     mean = parseReal("mean", mean)
     std = parseReal("std", std)
@@ -2265,6 +3511,15 @@ def gaussDistReal(seed, mean, std):
 #
 #-------------------------------------------------------------------------------   
 def expDistInt(seed, mean):
+    """Return a random Integer from an exponential distribution.
+
+    Args:
+        seed (IntegerVar): The seed for the generator.
+        mean (Integer, int, or numeric): The mean value.
+
+    Returns:
+        Integer: A random integer from the exponential distribution.
+    """
     checkInstance("seed", seed, IntegerVar)
     mean = parseInteger("mean", mean)
     return Integer(f'$dist_exponential({seed}, {mean})')
@@ -2278,6 +3533,15 @@ def expDistInt(seed, mean):
 #
 #------------------------------------------------------------------------------- 
 def expDistReal(seed, mean):
+    """Return a random Real from an exponential distribution.
+
+    Args:
+        seed (IntegerVar): The seed for the generator.
+        mean (Real, float, or int): The mean value.
+
+    Returns:
+        Real: A random real number from the exponential distribution.
+    """
     checkInstance("seed", seed, IntegerVar)
     mean = parseReal("mean", mean)
     return Real(f'$rdist_exponential({seed}, {mean})')
@@ -2291,6 +3555,15 @@ def expDistReal(seed, mean):
 #
 #-------------------------------------------------------------------------------  
 def poissonDistInt(seed, mean):
+    """Return a random Integer from a Poisson distribution.
+
+    Args:
+        seed (IntegerVar): The seed for the generator.
+        mean (Integer, int, or numeric): The mean value.
+
+    Returns:
+        Integer: A random integer from the Poisson distribution.
+    """
     checkInstance("seed", seed, IntegerVar)
     mean = parseInteger("mean", mean)
     return Integer(f'$dist_poisson({seed}, {mean})')
@@ -2304,6 +3577,15 @@ def poissonDistInt(seed, mean):
 #
 #-------------------------------------------------------------------------------
 def poissonDistReal(seed, mean):
+    """Return a random Real from a Poisson distribution.
+
+    Args:
+        seed (IntegerVar): The seed for the generator.
+        mean (Real, float, or int): The mean value.
+
+    Returns:
+        Real: A random real number from the Poisson distribution.
+    """
     checkInstance("seed", seed, IntegerVar)
     mean = parseReal("mean", mean)
     return Real(f'$rdist_poisson({seed}, {mean})')
@@ -2325,6 +3607,14 @@ vt = Real("$vt")
 #
 #-------------------------------------------------------------------------------
 def exp(x):
+    """Return a Real expression for the exponential of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing exp(x).
+    """
     x = parseReal("x", x)
     return Real(f"exp({x})")
 
@@ -2336,6 +3626,14 @@ def exp(x):
 #
 #-------------------------------------------------------------------------------
 def limexp(x):
+    """Return a Real expression for the limited exponential function of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing limexp(x).
+    """
     x = parseReal("x", x)
     return Real(f"limexp({x})")
 
@@ -2348,6 +3646,15 @@ def limexp(x):
 #
 #-------------------------------------------------------------------------------
 def absDelay(x, delay):
+    """Return a Real expression for the absolute delay function.
+
+    Args:
+        x (Real, float, or int): The input expression.
+        delay (Real, float, or int): The delay value.
+
+    Returns:
+        Real: An expression representing absdelay(x, delay).
+    """
     x = parseReal("x", x)
     delay = parseReal("delay", delay)
     return Real(f"absdelay({x}, {delay})")
@@ -2363,9 +3670,19 @@ def absDelay(x, delay):
 #
 #-------------------------------------------------------------------------------
 def transition(x, 
-               delay = 0, 
+               delay = 0,
                riseTime = 1e-6, 
                fallTime = 1e-6):
+    """ transition filter
+    Args:
+        x (Real, float, or int): The input value.
+        delay (Real, float, or int, optional): The delay. Defaults to 0.
+        riseTime (Real, float, or int, optional): Defaults to 1e-6.
+        fallTime (Real, float, or int, optional): Defaults to 1e-6.
+
+    Returns:
+        Real: An expression representing the transition filter.
+    """
     x = parseReal("x", x)
     delay = parseReal("delay", delay)
     riseTime = parseReal("riseTime", riseTime)
@@ -2374,12 +3691,12 @@ def transition(x,
 
 
 #-------------------------------------------------------------------------------
-## smooth filter with hiperbolic tangend to avoid discontinuities. It goes from
+## smooth filter with hyperbolic tangent to avoid discontinuities. It goes from
 #         0.0 to 1.0
 #  @param x Real, float or int input
 #  @param delay Real, float or int delay input
-#  @param riseTime delay Real, float or int rise time from 5% to 95%
-#  @param fallTime delay Real, float or int fall time from 5% to 95%
+#  @param riseTime Real, float or int rise time from 5% to 95%
+#  @param fallTime Real, float or int fall time from 5% to 95%
 #  @return Real expressing the smooth filter
 #
 #-------------------------------------------------------------------------------
@@ -2387,6 +3704,19 @@ def smooth(x,
            delay = 0, 
            riseTime = 1e-6, 
            fallTime = 1e-6):
+    """Return a Real expression for a smooth filter using hyperbolic tangent.
+
+    Args:
+        x (Real, float, or int): The input value.
+        delay (Real, float, or int, optional): The delay. Defaults to 0.
+        riseTime (Real, float, or int, optional): The rise time (5%-95%). 
+            Defaults to 1e-6.
+        fallTime (Real, float, or int, optional): The fall time (5%-95%). 
+            Defaults to 1e-6.
+
+    Returns:
+        Real: An expression representing the smooth filter.
+    """
     checkBool("x", x)
     checkReal("delay", delay)
     checkReal("riseTime", riseTime)
@@ -2411,6 +3741,18 @@ def smooth(x,
 #
 #-------------------------------------------------------------------------------
 def slew(x, riseSlope = 10e-6, fallSlope = 10e-6):
+    """Return a Real expression for the slew filter.
+
+    Args:
+        x (Real, float, or int): The input value.
+        riseSlope (Real, float, or int, optional): The rise slope. 
+            Defaults to 10e-6.
+        fallSlope (Real, float, or int, optional): The fall slope. 
+            Defaults to 10e-6.
+
+    Returns:
+        Real: An expression representing the slew filter.
+    """
     x = parseReal("x", x)
     riseSlope = parseReal("riseSlope", riseSlope)
     fallSlope = parseReal("fallSlope", fallSlope)
@@ -2418,12 +3760,20 @@ def slew(x, riseSlope = 10e-6, fallSlope = 10e-6):
 
 
 #-------------------------------------------------------------------------------
-## Diferential function
+## Differential function
 #  @param x Real, float or int input
-#  @return Real expressing the diferential function
+#  @return Real expressing the differential function
 #
 #-------------------------------------------------------------------------------
 def ddt(x):
+    """Return a Real expression representing the differential function of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing ddt(x).
+    """
     x = parseReal("x", x)
     return Real(f"ddt({x})")
  
@@ -2436,6 +3786,16 @@ def ddt(x):
 #
 #-------------------------------------------------------------------------------   
 def idt(x, start = Real(0)):
+    """Return a Real expression representing the integral of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+        start (Real, float, or int, optional): The starting value. 
+            Defaults to Real(0).
+
+    Returns:
+        Real: An expression representing idt(x, start).
+    """
     x = parseReal("x", x)
     start = parseReal("start", start)
     return Real(f"idt({x}, {start})")
@@ -2448,6 +3808,14 @@ def idt(x, start = Real(0)):
 #
 #-------------------------------------------------------------------------------
 def ceil(x):
+    """Return a Real expression representing the ceiling of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing ceil(x).
+    """
     x = parseReal("x", x)
     return Real(f"ceil({x})")
       
@@ -2459,6 +3827,14 @@ def ceil(x):
 #
 #-------------------------------------------------------------------------------  
 def floor(x):
+    """Return a Real expression representing the floor of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing floor(x).
+    """
     x = parseReal("x", x)
     return Real(f"floor({x})")
 
@@ -2470,9 +3846,16 @@ def floor(x):
 #
 #-------------------------------------------------------------------------------
 def ln(x):
+    """Return a Real expression representing the natural logarithm of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing ln(x).
+    """
     x = parseReal("x", x)
     return Real(f"ln({x})")
-
 
 #-------------------------------------------------------------------------------
 ## log function
@@ -2481,6 +3864,14 @@ def ln(x):
 #
 #-------------------------------------------------------------------------------
 def log(x):
+    """Return a Real expression representing the log of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing log(x).
+    """
     x = parseReal("x", x)
     return Real(f"log({x})")
 
@@ -2492,6 +3883,14 @@ def log(x):
 #
 #-------------------------------------------------------------------------------
 def sqrt(x):
+    """Return a Real expression representing the square root of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing sqrt(x).
+    """
     x = parseReal("x", x)
     return Real(f"sqrt({x})")
 
@@ -2503,6 +3902,14 @@ def sqrt(x):
 #
 #-------------------------------------------------------------------------------
 def sin(x):
+    """Return a Real expression representing the sine of x.
+
+    Args:
+        x (Real, float, or int): Angle in radians.
+
+    Returns:
+        Real: An expression representing sin(x).
+    """
     x = parseReal("x", x)
     return Real(f"sin({x})")
 
@@ -2514,6 +3921,14 @@ def sin(x):
 #
 #-------------------------------------------------------------------------------
 def cos(x):
+    """Return a Real expression representing the cosine of x.
+
+    Args:
+        x (Real, float, or int): Angle in radians.
+
+    Returns:
+        Real: An expression representing cos(x).
+    """
     x = parseReal("x", x)
     return Real(f"cos({x})")
 
@@ -2525,6 +3940,14 @@ def cos(x):
 #
 #-------------------------------------------------------------------------------
 def tan(x):
+    """Return a Real expression representing the tangent of x.
+
+    Args:
+        x (Real, float, or int): Angle in radians.
+
+    Returns:
+        Real: An expression representing tan(x).
+    """
     x = parseReal("x", x)
     return Real(f"tan({x})")
 
@@ -2536,6 +3959,14 @@ def tan(x):
 #
 #-------------------------------------------------------------------------------
 def asin(x):
+    """Return a Real expression representing the arcsine of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing asin(x) in radians.
+    """
     x = parseReal("x", x)
     return Real(f"asin({x})")
 
@@ -2547,6 +3978,14 @@ def asin(x):
 #
 #-------------------------------------------------------------------------------
 def acos(x):
+    """Return a Real expression representing the arccosine of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing acos(x) in radians.
+    """
     x = parseReal("x", x)
     return Real(f"acos({x})")
 
@@ -2558,6 +3997,14 @@ def acos(x):
 #
 #-------------------------------------------------------------------------------
 def atan(x):
+    """Return a Real expression representing the arctangent of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing atan(x) in radians.
+    """
     x = parseReal("x", x)
     return Real(f"atan({x})")
 
@@ -2570,6 +4017,15 @@ def atan(x):
 #
 #-------------------------------------------------------------------------------
 def atan2(x, y):
+    """Return a Real expression representing the two-argument arctangent.
+
+    Args:
+        x (Real, float, or int): The numerator.
+        y (Real, float, or int): The denominator.
+
+    Returns:
+        Real: An expression representing atan2(x, y) in radians.
+    """
     x = parseReal("x", x)
     y = parseReal("y", y)
     return Real(f"atan2({x}, {y})")
@@ -2583,6 +4039,15 @@ def atan2(x, y):
 #
 #-------------------------------------------------------------------------------
 def hypot(x, y):
+    """Return a Real expression representing the hypotenuse of x and y.
+
+    Args:
+        x (Real, float, or int): The first value.
+        y (Real, float, or int): The second value.
+
+    Returns:
+        Real: An expression representing hypot(x, y) (i.e. sqrt(x*x + y*y)).
+    """
     x = parseReal("x", x)
     y = parseReal("y", y)
     return Real(f"hypot({x}, {y})")
@@ -2595,6 +4060,14 @@ def hypot(x, y):
 #
 #-------------------------------------------------------------------------------
 def sinh(x):
+    """Return a Real expression representing the hyperbolic sine of x.
+
+    Args:
+        x (Real, float, or int): Angle in radians.
+
+    Returns:
+        Real: An expression representing sinh(x).
+    """
     x = parseReal("x", x)
     return Real(f"sinh({x})")
 
@@ -2606,6 +4079,14 @@ def sinh(x):
 #
 #-------------------------------------------------------------------------------
 def cosh(x):
+    """Return a Real expression representing the hyperbolic cosine of x.
+
+    Args:
+        x (Real, float, or int): Angle in radians.
+
+    Returns:
+        Real: An expression representing cosh(x).
+    """
     x = parseReal("x", x)
     return Real(f"cosh({x})")
 
@@ -2617,6 +4098,14 @@ def cosh(x):
 #
 #-------------------------------------------------------------------------------
 def tanh(x):
+    """Return a Real expression representing the hyperbolic tangent of x.
+
+    Args:
+        x (Real, float, or int): Angle in radians.
+
+    Returns:
+        Real: An expression representing tanh(x).
+    """
     x = parseReal("x", x)
     return Real(f"tanh({x})")
 
@@ -2628,6 +4117,14 @@ def tanh(x):
 #
 #-------------------------------------------------------------------------------
 def asinh(x):
+    """Return a Real expression representing the inverse hyperbolic sine of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing asinh(x) in radians.
+    """
     x = parseReal("x", x)
     return Real(f"asinh({x})")
 
@@ -2639,6 +4136,14 @@ def asinh(x):
 #
 #-------------------------------------------------------------------------------
 def acosh(x):
+    """Return a Real expression representing the inverse hyperbolic cosine of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing acosh(x) in radians.
+    """
     x = parseReal("x", x)
     return Real(f"acosh({x})")
 
@@ -2650,6 +4155,14 @@ def acosh(x):
 #
 #-------------------------------------------------------------------------------
 def atanh(x):
+    """Return a Real expression representing the inverse hyperbolic tangent of x.
+
+    Args:
+        x (Real, float, or int): The input value.
+
+    Returns:
+        Real: An expression representing atanh(x) in radians.
+    """
     x = parseReal("x", x)
     return Real(f"atanh({x})")
 
@@ -2659,6 +4172,7 @@ def atanh(x):
 #
 #-------------------------------------------------------------------------------
 class Electrical():
+    """Class representing an electrical signal with voltage and current."""
 
     #---------------------------------------------------------------------------
     ## constructor
@@ -2667,6 +4181,11 @@ class Electrical():
     # 
     #---------------------------------------------------------------------------
     def __init__(self, name):
+        """Initialize an Electrical signal.
+
+        Args:
+            name (str): The name of the electrical signal.
+        """
         checkType("name", name, str)
         self.name = name
         self.v = Real(f"V({name})") 
@@ -2679,73 +4198,126 @@ class Electrical():
     # 
     #---------------------------------------------------------------------------
     def getName(self):
+        """Return the name of the electrical signal.
+
+        Returns:
+            str: The signal's name.
+        """
         return self.name
 
     #---------------------------------------------------------------------------
     ## Return a command representing voltage contribution
     #  @param self The object pointer.
-    #  @param value Real, float or int representig the value of the contribution
+    #  @param value Real, float or int representing the value of the contribution
     #  @return a Cmd representing the voltage contribution 
     # 
     #---------------------------------------------------------------------------
     def vCont(self, value):
+        """Return a command for a voltage contribution.
+
+        Args:
+            value (Real, float, or int): The contribution value.
+
+        Returns:
+            Cmd: A command representing the voltage contribution.
+        """
         value = parseReal("value", value)
         return Cmd(f'V({self.name}) <+ {value}')
 
     #---------------------------------------------------------------------------
     ## Return a command representing current contribution
     #  @param self The object pointer.
-    #  @param value Real, float or int representig the value of the contribution
+    #  @param value Real, float or int representing the value of the contribution
     #  @return a Cmd representing the current contribution 
     # 
     #---------------------------------------------------------------------------
     def iCont(self, value):
+        """Return a command for a current contribution.
+
+        Args:
+            value (Real, float, or int): The contribution value.
+
+        Returns:
+            Cmd: A command representing the current contribution.
+        """
         value = parseReal("value", value)
         return Cmd(f'I({self.name}) <+ {value}')
 
     #---------------------------------------------------------------------------
     ## Return a command representing voltage attribution
     #  @param self The object pointer.
-    #  @param value Real, float or int representig the value of the attribution
+    #  @param value Real, float or int representing the value of the attribution
     #  @return a Cmd representing the voltage attribution
     # 
     #---------------------------------------------------------------------------
     def vAttr(self, value):
+        """Return a command for a voltage attribution.
+
+        Args:
+            value (Real, float, or int): The attribution value.
+
+        Returns:
+            Cmd: A command representing the voltage attribution.
+        """
         value = parseReal("value", value)
         return Cmd(f'V({self.name}) = {value}')
 
     #---------------------------------------------------------------------------
     ## Return a command representing current attribution
     #  @param self The object pointer.
-    #  @param value Real, float or int representig the value of the attribution
+    #  @param value Real, float or int representing the value of the attribution
     #  @return a Cmd representing the current attribution
     # 
     #---------------------------------------------------------------------------
     def iAttr(self, value):
+        """Return a command for a current attribution.
+
+        Args:
+            value (Real, float, or int): The attribution value.
+
+        Returns:
+            Cmd: A command representing the current attribution.
+        """
         value = parseReal("value", value)
         return Cmd(f'I({self.name}) = {value}')
 
     #---------------------------------------------------------------------------
-    ## Return a command representing voltage indirect assigment (Voltage that
+    ## Return a command representing voltage indirect assignment (Voltage that
     #  makes value true)
     #  @param self The object pointer.
     #  @param value Bool or bool condition
-    #  @return a Cmd representing the voltage indirect assigment 
+    #  @return a Cmd representing the voltage indirect assignment 
     #
     #---------------------------------------------------------------------------
     def vInd(self, value):
+        """Return a command for a voltage indirect assignment.
+
+        Args:
+            value (Bool or bool): The condition for the assignment.
+
+        Returns:
+            Cmd: A command representing the voltage indirect assignment.
+        """
         value = parseBool("value", value)
         return Cmd(f'V({self.name}) : {value}')
 
     #---------------------------------------------------------------------------
-    ## Return a command representing current indirect assigment (Current that
+    ## Return a command representing current indirect assignment (Current that
     #  makes value true)
     #  @param self The object pointer.
     #  @param value Bool or bool condition
-    #  @return a Cmd representing the current indirect assigment 
+    #  @return a Cmd representing the current indirect assignment 
     #
     #---------------------------------------------------------------------------
     def iInd(self, value):
+        """Return a command for a current indirect assignment.
+
+        Args:
+            value (Bool or bool): The condition for the assignment.
+
+        Returns:
+            Cmd: A command representing the current indirect assignment.
+        """
         value = parseBool("value", value)
         return Cmd(f'I({self.name}) : {value}')
  
@@ -2755,6 +4327,7 @@ class Electrical():
 #
 #-------------------------------------------------------------------------------
 class Branch(Electrical):
+    """Class representing a branch connecting two electrical signals."""
 
     #---------------------------------------------------------------------------
     ## constructor
@@ -2764,6 +4337,12 @@ class Branch(Electrical):
     #
     #---------------------------------------------------------------------------
     def __init__(self, node1, node2):
+        """Initialize a Branch instance connecting two nodes.
+
+        Args:
+            node1 (Electrical): The first node.
+            node2 (Electrical): The second node.
+        """
         checkInstance("node1", node1, Electrical)
         checkInstance("node2", node2, Electrical)
         checkNotInstance("node1", node1, Branch)
@@ -2776,6 +4355,7 @@ class Branch(Electrical):
 #
 #-------------------------------------------------------------------------------
 class Module:
+    """Class representing a Verilog-A module."""
 
     #---------------------------------------------------------------------------
     ## constructor
@@ -2786,6 +4366,11 @@ class Module:
     #
     #---------------------------------------------------------------------------
     def __init__(self, moduleName):
+        """Initialize a Module instance.
+
+        Args:
+            moduleName (str): The module's name.
+        """
         checkType("moduleName", moduleName, str)
         self.moduleName = moduleName   
         self.nameCount  = 0
@@ -2805,6 +4390,11 @@ class Module:
     #
     #---------------------------------------------------------------------------
     def getModuleName(self):
+        """Return the module's name.
+
+        Returns:
+            str: The module name.
+        """
         return self.moduleName
 
     #---------------------------------------------------------------------------
@@ -2817,6 +4407,14 @@ class Module:
     #
     #---------------------------------------------------------------------------
     def fixName(self, name):
+        """Fix or generate a unique name in the module's namespace.
+
+        Args:
+            name (str): The proposed name.
+
+        Returns:
+            str: A valid, unique name.
+        """
         checkType("name", name, str)
         if name == "":
             self.nameCount = self.nameCount + 1
@@ -2830,12 +4428,21 @@ class Module:
     #---------------------------------------------------------------------------
     ## Add variable to the module
     #  @param self The object pointer. 
-    #  @param vType it can be Integer Bool or Real
+    #  @param vType it can be Integer, Bool or Real
     #  @param name string representing the name of the variable in the verilogA
     #  @return RealVar, IntegerVar or BoolVar depending on the vType
     #   
     #---------------------------------------------------------------------------
     def var(self, vType = Integer, name = ""):
+        """Add a variable to the module.
+
+        Args:
+            vType (type, optional): The variable type (Integer, Bool, or Real). Defaults to Integer.
+            name (str, optional): The variable's name. Defaults to "".
+
+        Returns:
+            An instance of IntegerVar, BoolVar, or RealVar.
+        """
         name = self.fixName(name)
         if vType == Integer:
             vType = "integer"
@@ -2857,10 +4464,19 @@ class Module:
     #  @param self The object pointer. 
     #  @param value Initial value. It can be Real, Integer, int or float.
     #  @param name string representing the name of the parameter in the verilogA
-    #  @return RealVar or RealVar depending on the initial value
+    #  @return RealVar or IntegerVar depending on the initial value
     #
     #---------------------------------------------------------------------------
     def par(self, value, name):
+        """Add a parameter to the module.
+
+        Args:
+            value (Real, Integer, int, or float): The parameter's initial value.
+            name (str): The parameter's name.
+
+        Returns:
+            RealVar or IntegerVar: The parameter variable.
+        """
         name = self.fixName(name)
         if isinstance(value, Integer) or type(value) == int:
             value = parseInteger("value", value)
@@ -2883,6 +4499,11 @@ class Module:
     #
     #---------------------------------------------------------------------------
     def analog(self, *args):
+        """Add commands to the analog block.
+
+        Args:
+            *args: Variable number of commands.
+        """
         i = 1
         for arg in args:
             assert isinstance(arg, Cmd), \
@@ -2898,6 +4519,11 @@ class Module:
     #
     #---------------------------------------------------------------------------
     def beginningAnalog(self, *args):
+        """Add commands to the beginning of the analog block.
+
+        Args:
+            *args: Variable number of commands.
+        """
         i = 1
         for arg in args:
             assert isinstance(arg, Cmd), \
@@ -2913,6 +4539,11 @@ class Module:
     #
     #---------------------------------------------------------------------------
     def endAnalog(self, *args):
+        """Add commands to the end of the analog block.
+
+        Args:
+            *args: Variable number of commands.
+        """
         i = 1
         for arg in args:
             assert isinstance(arg, Cmd), \
@@ -2926,12 +4557,22 @@ class Module:
     #  @param self The object pointer.
     #  @param name string representing the name of the Electrical signal
     #  @param width int representing the width of the Electrical signal
-    #  @param direction direction of the signal. It can be on the strings 
+    #  @param direction direction of the signal. It can be one of the strings 
     #         "internal", "input", "output", or "inout"
     #  @return string with the name of the node
     #
     #---------------------------------------------------------------------------
     def addNode(self, name, width, direction):
+        """Add a node to the module.
+
+        Args:
+            name (str): The node name.
+            width (int): The node width (must be > 0).
+            direction (str): The node direction ("internal", "input", "output", or "inout").
+
+        Returns:
+            str: The unique node name.
+        """
         checkType("width", width, int)
         assert width > 0, "width must be greather than 0"
         checkType("direction", direction, str)
@@ -2948,13 +4589,23 @@ class Module:
     #  @param self The object pointer.
     #  @param name string representing the name of the Electrical signal
     #  @param width int representing the width of the Electrical signal
-    #  @param direction direction of the signal. It can be on the strings 
+    #  @param direction direction of the signal. It can be one of the strings 
     #         "internal", "input", "output", or "inout"
     #  @return list of Electrical classes or an Electrical class depending on 
     #          the width
     #
     #---------------------------------------------------------------------------
     def electrical(self, name = "", width = 1, direction = "internal"):
+        """Return an Electrical signal or a vector of Electrical signals.
+
+        Args:
+            name (str, optional): The base name for the signal. Defaults to "".
+            width (int, optional): The width of the signal. Defaults to 1.
+            direction (str, optional): The signal direction. Defaults to "internal".
+
+        Returns:
+            Electrical or list[Electrical]: The Electrical signal(s).
+        """
         name = self.addNode(name, width, direction)
         if width == 1:
             return Electrical(name)
@@ -2971,6 +4622,11 @@ class Module:
     #
     #---------------------------------------------------------------------------
     def getVA(self):
+        """Return the complete Verilog-A code for the module.
+
+        Returns:
+            str: The generated Verilog-A code.
+        """
         #-----------------------------------------------------------------------
         # Header
         #-----------------------------------------------------------------------
@@ -3065,5 +4721,4 @@ class Module:
         result = result + "end\nendmodule"
 
         return result
-
-        
+    
