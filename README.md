@@ -22,7 +22,7 @@ The usual workflow is:
 
 1. Create a `HiLevelMod` (for testbenches) or `Module` (for behavioral models).
 2. Declare pins, parameters, and variables.
-3. Describe one or more test sequences with `mod.seq(...)`.
+3. Describe your sequence or model.
 4. Export the generated Verilog-A with `mod.getVA()`.
 
 `HiLevelMod` adds high-level primitives such as voltage/current sources, digital pins, clocks, markers, and sequence compilation. Use `Module` when you only need the lower-level Verilog-A building blocks.
@@ -39,52 +39,47 @@ Suppose a simulation must execute the following sequence:
 - After 10 µs, change `CONFIG_VOUT[3:0]` from 0 to 5.
 - After 20 µs, finish the simulation.
 
-The Python code below generates that stimulus. Note the argument order used by the API: positional names come first, then optional parameters such as `direction`.
+The Python code below generates that stimulus.
 
 ```python
 import vagen as va
 
+#Create a module     
 mod = va.HiLevelMod("DCDC_STML")
 
-VDD = mod.vdc("VDD", 1, direction="inout")
-OUT = mod.idc("OUT", 1, direction="inout")
-CLK = mod.clock(
-    mod.dig(VDD, "CLK", 1, direction="output", rise=100e-12, fall=100e-12)
-)
-RST = mod.dig(
-    VDD, "RST", 1, value=0, direction="output", rise=100e-12, fall=100e-12
-)
-READY = mod.dig(VDD, "READY", 1, direction="input")
-CONFIG_VOUT = mod.dig(
-    VDD,
-    "CONFIG_VOUT",
-    4,
-    value=0,
-    direction="output",
-    rise=100e-12,
-    fall=100e-12,
-)
+#Create pins
+VDD = mod.vdc(name = "VDD", width = 1, direction = "inout")
+OUT = mod.idc(name = "OUT", width = 1, direction = "inout")
+CLK = mod.clock(mod.dig(name = "CLK", domain = VDD, width = 1, direction = "output", rise = 100e-12, fall = 100e-12))
+RST = mod.dig(name = "RST", domain = VDD, width = 1, value = 0, direction = "output", rise = 100e-12, fall = 100e-12)
+READY = mod.dig(name = "READY", domain = VDD, width = 1, direction = "input")
+CONFIG_VOUT = mod.dig(name = "CONFIG_VOUT", domain = VDD, width = 4, value = 0, direction = "output", rise = 100e-12, fall = 100e-12)
 
+#READY positive event
 EVNT_READY = va.Cross(READY.diffHalfDomain, "rising")
 
+#Sequence
 mod.seq(True)(
     VDD.setRiseFall(10e-6, 10e-6),
     VDD.applyV(5.0),
-    va.WaitUs(10),
+    va.WaitUs(10), 
     CLK.on(4e6),
     va.WaitUs(1),
     RST.write(True),
     va.WaitSignal(EVNT_READY),
     OUT.setRiseFall(100e-9, 100e-9),
-    OUT.applyI(100e-3),  # positive current enters the model
+    OUT.applyI(100e-3), #Positive current enters the model
     va.WaitUs(10),
     CONFIG_VOUT.write(5),
     va.WaitUs(20),
-    va.Finish(),
+    va.Finish()
 )
 
-with open("veriloga.va", "w", encoding="utf-8") as file:
-    file.write(mod.getVA())
+#Save veriloga file
+file = open('veriloga.va', 'w')
+file.write(mod.getVA())
+file.close()
+file.write(mod.getVA())
 ```
 
 
@@ -94,7 +89,7 @@ with open("veriloga.va", "w", encoding="utf-8") as file:
 Create a parameter that selects which sequence to run:
 
 ```python
-seqPar = mod.par(0, "testSeq")
+seqPar = mod.par("testSeq", value = 0)
 ```
 
 Then guard each sequence with that parameter:
@@ -118,24 +113,27 @@ vagen can also generate behavioral models. The example below builds a configurab
 ```python
 import vagen as va
 
+#Create a module
 mod = va.HiLevelMod("CONFIG_RES")
 
-VDD = mod.electrical("VDD", 1, direction="inout")
-IN1 = mod.electrical("IN1", 1, direction="inout")
-IN2 = mod.electrical("IN2", 1, direction="inout")
-CONFIG = mod.dig(VDD, "CONFIG", 4, inCap=100e-15, direction="input")
+#Create pins
+VDD = mod.electrical(name = "VDD", width = 1, direction = "inout")
+IN1 = mod.electrical(name = "IN1", width = 1, direction = "inout")
+IN2 = mod.electrical(name = "IN2", width = 1, direction = "inout")
+CONFIG = mod.dig(name = "CONFIG", domain = VDD, width = 4, inCap = 100e-15, direction = "input")
 
-alfa = mod.par(10.0, "alfa")
+#Parameters
+alfa = mod.par(name = "alfa", value = 10.0)
 
-branch = va.Branch(IN1, IN2)
+#Analog block
 mod.analog(
-    branch.vCont(
-        branch.i * (va.Real(CONFIG.read(signed=False)) + 1) * alfa
-    )
+    va.Branch(IN1, IN2).vCont(va.Branch(IN1, IN2).i*(va.Real(CONFIG.read(signed = False)) + 1)*alfa)
 )
 
-with open("veriloga.va", "w", encoding="utf-8") as file:
-    file.write(mod.getVA())
+#Save veriloga file
+file = open('veriloga.va', 'w')
+file.write(mod.getVA())
+file.close()
 ```
 
 ## Sequence limitations
@@ -150,7 +148,7 @@ If you violate these rules, vagen raises `VagenSequenceError`.
 
 ## API reference
 
-`HiLevelMod` extends `Module` with helpers for building transient testbenches. Common pin and source factories:
+`HiLevelMod` extends `Module` with helpers for building transient testbenches. 
 
 | Method | Purpose |
 |--------|---------|
@@ -167,18 +165,12 @@ Shared options on `Module` / `HiLevelMod` constructors and helpers:
 
 - `direction` — `"input"`, `"output"`, `"inout"`, or `"internal"` (also available as `va.PortDirection`)
 - `ignoreHiddenStates=True` — adds the `(*ignore_hidden_state*)` pragma to the module
-- `timeTol` — optional timer tolerance passed to `HiLevelMod` (used by internal timing checks)
-
-Use `va.CrossEdge.RISING`, `va.CrossEdge.FALLING`, or `va.CrossEdge.BOTH` with `Cross()` instead of string literals when you prefer enums over `"rising"` / `"falling"` / `"both"`.
+- `timeTol` — optional timer tolerance passed to `HiLevelMod` (used by internal sequence timing)
 
 ## Exporting Verilog-A
 
-`mod.getVA()` returns the full `.va` source as a string. Optional arguments:
-
-mod.writeVa("veriloga.va", header_date=date(2024, 1, 1))
-```
-
-`mod.writeVa(path, header_date=None)` writes the generated source to a file using UTF-8 by default.
+`mod.getVA()` returns the full `.va` source as a string.
+`mod.writeVa(path)` writes the generated source to a file using UTF-8 by default.
 
 ## Cadence export helpers
 
