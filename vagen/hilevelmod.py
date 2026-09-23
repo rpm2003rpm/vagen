@@ -1,60 +1,67 @@
-## @file hilevelmod.py
-#  Hi level modeling.
-#   
-#  @section license_main License
-#
-#  @author  Rodrigo Pedroso Mendes
-#  @version V1.0
-#  @date    14/02/23 13:37:31
-#    
-#  Copyright (c) 2023 Rodrigo Pedroso Mendes
-#
-#  Permission is hereby granted, free of charge, to any  person   obtaining  a 
-#  copy of this software and associated  documentation files (the "Software"), 
-#  to deal in the Software without restriction, including  without  limitation 
-#  the rights to use, copy, modify,  merge,  publish,  distribute, sublicense, 
-#  and/or sell copies of the Software, and  to  permit  persons  to  whom  the 
-#  Software is furnished to do so, subject to the following conditions:        
-#   
-#  The above copyright notice and this permission notice shall be included  in 
-#  all copies or substantial portions of the Software.                         
-#   
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,  EXPRESS OR 
-#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE  WARRANTIES  OF  MERCHANTABILITY, 
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-#  AUTHORS OR COPYRIGHT HOLDERS BE  LIABLE FOR ANY  CLAIM,  DAMAGES  OR  OTHER 
-#  LIABILITY, WHETHER IN AN ACTION OF  CONTRACT, TORT  OR  OTHERWISE,  ARISING 
-#  FROM, OUT OF OR IN CONNECTION  WITH  THE  SOFTWARE  OR  THE  USE  OR  OTHER  
-#  DEALINGS IN THE SOFTWARE. 
-#    
-################################################################################
+"""High-level Verilog-A testbench and stimulus modeling."""
 
-#-------------------------------------------------------------------------------
-# Imports
-#-------------------------------------------------------------------------------
-from vagen.veriloga import *
+from vagen.functions import (
+    InitialStep,
+    Timer,
+    Event,
+    analysis,
+    abstime,
+    transition,
+    tanh,
+    ddt,
+    smooth
+)
 
+from vagen.commands import (
+    Cmd,
+    CmdList, 
+    If,
+    At,
+    Case,
+    While,
+    Cond,
+    WaitAnalogEvent,
+    RepeatLoop,
+    WhileLoop,
+    ForLoop,
+    CaseClass
+)
 
-#-------------------------------------------------------------------------------
-## Mark command class
-#
-#  This class of commands are responsible for storing the command that marks
-#  an specific event
-#
-#-------------------------------------------------------------------------------
+from vagen.disciplines import (
+    Electrical,
+    Branch
+)
+
+from vagen.module import (
+    Module
+)
+
+from vagen.types import (
+    Integer,
+    Real,
+    Bool
+)
+
+from vagen.exceptions import VagenSequenceError, VagenTypeError, VagenValueError
+
+from vagen.validation import (
+    checkInteger,
+    checkBool,
+    checkReal,
+    checkInstance,
+    checkNotInstance,
+    checkType,
+    parseBool,
+    parseReal,
+    parseNumber
+)
+
 class Mark(Cmd):
     """Mark command class.
     
     This class is used to store a command that marks a specific event.
     """
 
-    #---------------------------------------------------------------------------
-    ## Construtor
-    #
-    #  @param self The object pointer.
-    #  @param cmd Command to be added to the marker.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, cmd):
         """Initialize a Mark instance.
 
@@ -64,13 +71,6 @@ class Mark(Cmd):
         checkInstance("cmd", cmd, Cmd)
         self.cmd = cmd
 
-    #---------------------------------------------------------------------------
-    ## Return the command
-    #
-    #  @param self The object pointer.
-    #  @return Command passed to the constructor.
-    #
-    #---------------------------------------------------------------------------
     def getCmd(self):
         """Return the stored command.
 
@@ -79,36 +79,17 @@ class Mark(Cmd):
         """
         return self.cmd
 
-    #---------------------------------------------------------------------------
-    ## Dummy method.
-    #  Raise exception when runned.
-    #
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------        
     def __str__(self):
-        #TODO: Find a better way to fix this
-        raise Exception("Mark doesn't have string representation")
+        raise VagenSequenceError(
+            "Mark cannot be emitted outside mod.seq(...); use it only directly inside a sequence"
+        )
 
-    #---------------------------------------------------------------------------
-    ## Dummy method.
-    #  Raise exception when runned.
-    #
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------        
     def getVA(self, padding):
-        #TODO: Find a better way to fix this
-        raise Exception("Mark can't be outside seq")
+        raise VagenSequenceError(
+            "Mark cannot be emitted outside mod.seq(...); use it only directly inside a sequence"
+        )
 
 
-#-------------------------------------------------------------------------------
-## Marker class. 
-#
-#  Responsible for flipping the state of one variable to mark events and 
-#  generates cadence equations that calculate the time of the events
-#
-#-------------------------------------------------------------------------------
 class Marker():
     """Marker class.
 
@@ -116,15 +97,6 @@ class Marker():
     that compute the event times.
     """
 
-    #---------------------------------------------------------------------------
-    ## Construtor.
-    # 
-    # @param self The object pointer.
-    # @param hiLeveMod  Hi level model in which the analog command will be added
-    # @param name Name of the marker.
-    # @param riseFall Rise and fall times of the marker pin.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, riseFall):
         """Initialize a Marker.
 
@@ -145,13 +117,6 @@ class Marker():
             self.markerPin.vCont(smooth(self.markSt, 0, riseFall, riseFall))
         )
         
-    #---------------------------------------------------------------------------
-    ## Return the  name of the Marker.
-    # 
-    #  @param self The object pointer.
-    #  @return Name of the Marker.
-    #
-    #---------------------------------------------------------------------------
     def getName(self):
         """Return the marker's name.
 
@@ -160,14 +125,6 @@ class Marker():
         """
         return self.name
         
-    #---------------------------------------------------------------------------
-    ## Mark a particular event by flipping the internal variable.
-    # 
-    #  @param self The object pointer.
-    #  @param name Name of the event.
-    #  @return The Mark command.
-    #
-    #---------------------------------------------------------------------------
     def mark(self, name):
         """Mark an event by toggling the internal variable.
 
@@ -181,17 +138,6 @@ class Marker():
         self.markList.append(name)
         return Mark(self.markSt.toggle())
 
-    #---------------------------------------------------------------------------
-    ## Force the internal variable low. 
-    #
-    #  You shouldn't use because it will break the synchronism between the 
-    #  cadence equations and the events. 
-    #  It was implemented for usage in specific power down conditions only.
-    # 
-    #  @param self The object pointer.
-    #  @return The Mark command.
-    #
-    #---------------------------------------------------------------------------
     def low(self):
         """Force the internal variable low.
 
@@ -200,17 +146,6 @@ class Marker():
         """
         return Mark(self.markSt.eq(False))
 
-    #---------------------------------------------------------------------------
-    ## Force the internal variable high. 
-    #
-    #  You shouldn't use because it will break the synchronism between the 
-    #  cadence equations and the events. 
-    #  It was implemented for usage in specific power down conditions only.
-    # 
-    #  @param self The object pointer.
-    #  @return The Mark command.
-    #
-    #---------------------------------------------------------------------------
     def high(self):
         """Force the internal variable high.
 
@@ -219,13 +154,6 @@ class Marker():
         """
         return Mark(self.markSt.eq(True))
 
-    #---------------------------------------------------------------------------
-    ## Return a dictionay with the cadence equations for the marker     
-    # 
-    #  @param self The object pointer.
-    #  @return The dictionary with the cadence equations.
-    #
-    #---------------------------------------------------------------------------
     def getEqs(self):
         """Return a dictionary containing the cadence equations for each marked event.
 
@@ -240,26 +168,12 @@ class Marker():
         return ans
         
 
-#-------------------------------------------------------------------------------
-## WaitSignal command class
-# 
-#  This class of commands are responsible for wating a specific Event before
-#  allowing a test sequence to continue 
-#
-#-------------------------------------------------------------------------------
 class WaitSignal(Cmd):
     """WaitSignal command class.
 
     This class is used to wait for a specific event before continuing a test sequence.
     """
 
-    #---------------------------------------------------------------------------
-    ## Construtor.
-    # 
-    #  @param self The object pointer.
-    #  @param evnt Event to be waited for.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, evnt):
         """Initialize a WaitSignal instance.
 
@@ -270,13 +184,6 @@ class WaitSignal(Cmd):
         self.evnt = evnt
         super(WaitSignal, self).__init__("")
 
-    #---------------------------------------------------------------------------
-    ## Return the event that triggers the next state.
-    #
-    #  @param self The object pointer.
-    #  @return Event passed to the constructor.
-    #
-    #---------------------------------------------------------------------------
     def getEvnt(self):
         """Return the event that triggers the next state.
 
@@ -285,49 +192,23 @@ class WaitSignal(Cmd):
         """
         return self.evnt
         
-    #---------------------------------------------------------------------------
-    ## Dummy method.
-    #  Raise exception when runned.
-    #
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------         
     def __str__(self):
-        #TODO: Find a better way to fix this
-        raise Exception("Wait doesn't have string representation")
+        raise VagenSequenceError(
+            "Mark cannot be emitted outside mod.seq(...); use it only directly inside a sequence"
+        )
 
-    #---------------------------------------------------------------------------
-    ## Dummy method.
-    #  Raise exception when runned.
-    #
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------      
     def getVA(self, padding):
-        #TODO: Find a better way to fix this
-        raise Exception("Wait can't be outside seq")
+        raise VagenSequenceError(
+            "Mark cannot be emitted outside mod.seq(...); use it only directly inside a sequence"
+        )
 
 
-#-------------------------------------------------------------------------------
-## WaitUs command class.
-# 
-#  This class of commands are responsible for wating a specific delay before
-#  allowing a test sequence to continue.
-#
-#-------------------------------------------------------------------------------
 class WaitUs(Cmd):
     """WaitUs command class.
 
     This command waits for a specific delay (in microseconds) before continuing.
     """
 
-    #---------------------------------------------------------------------------
-    ## Construtor.
-    # 
-    #  @param self The object pointer.
-    #  @param delay Delay to be waited for.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, delay):
         """Initialize a WaitUs instance.
 
@@ -338,13 +219,6 @@ class WaitUs(Cmd):
         self.delay = delay
         super(WaitUs, self).__init__("")
 
-    #---------------------------------------------------------------------------
-    ## Return the delay that triggers the next state.
-    #
-    #  @param self The object pointer.
-    #  @return Delay passed to the constructor.
-    #
-    #---------------------------------------------------------------------------
     def getDelay(self):
         """Return the delay value.
 
@@ -353,36 +227,16 @@ class WaitUs(Cmd):
         """
         return self.delay
         
-    #---------------------------------------------------------------------------
-    ## Dummy method.
-    #  Raise exception when runned.
-    #
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------       
     def __str__(self):
-        #TODO: Find a better way to fix this
-        raise Exception("Wait doesn't have string representation")
+        raise VagenSequenceError(
+            "Mark cannot be emitted outside mod.seq(...); use it only directly inside a sequence"
+        )
 
-    #---------------------------------------------------------------------------
-    ## Dummy method.
-    #  Raise exception when runned.
-    #
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------      
     def getVA(self, padding):
-        #TODO: Find a better way to fix this
-        raise Exception("Wait can't be outside seq")
+        raise VagenSequenceError(
+            "Mark cannot be emitted outside mod.seq(...); use it only directly inside a sequence"
+        )
 
-
-#-------------------------------------------------------------------------------
-## Bus class. Child of a list. 
-#  It implements aditional methods to deal with read and write operations to 
-#  a bus. It also overrides the slice method, so it works similar to a slice 
-#  of a bus in verilog.
-#
-#-------------------------------------------------------------------------------
 class Bus(list):
     """Bus class.
 
@@ -390,14 +244,6 @@ class Bus(list):
     custom slicing similar to a Verilog bus.
     """
 
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #
-    #  @param self The object pointer.
-    #  @param Type Type of the bus elements
-    #  @param busType Type of the bus
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, Type, busType):
         """Initialize a Bus instance.
 
@@ -408,15 +254,7 @@ class Bus(list):
         super(Bus, self).__init__()
         self.Type = Type
         self.busType = busType
-    
-    #---------------------------------------------------------------------------
-    ## Slice override.
-    #  Override the slice operator, so it will be in the format  [msb:lsb:step]
-    #  @param self The object pointer.
-    #  @param key Key can be an slice or index
-    #  @return Another bus or an element.
-    #
-    #---------------------------------------------------------------------------
+
     def __getitem__(self, key):
         """Override slicing to return a bus slice in the format [msb:lsb:step].
 
@@ -432,11 +270,16 @@ class Bus(list):
             i = key.step
             if i is None:
                 i = 1
-            assert lsb != None, "lsb Index can't be empty" 
-            assert msb != None, "msb Index can't be empty" 
-            assert lsb >= 0 and lsb < len(self), "lsb Index is out of range" 
-            assert msb >= 0 and msb < len(self), "msb Index is out of range" 
-            assert i > 0, "step must be greather than 0" 
+            if lsb is None:
+                raise VagenValueError("lsb index can't be empty")
+            if msb is None:
+                raise VagenValueError("msb index can't be empty")
+            if lsb < 0 or lsb >= len(self):
+                raise VagenValueError("lsb index is out of range")
+            if msb < 0 or msb >= len(self):
+                raise VagenValueError("msb index is out of range")
+            if i <= 0:
+                raise VagenValueError("step must be greater than 0")
             vBus = self.busType()
             if lsb > msb:
                 i = -i  
@@ -446,12 +289,6 @@ class Bus(list):
             return vBus    
         return super(Bus, self).__getitem__(key)
 
-    #---------------------------------------------------------------------------
-    ## Append override
-    #  @param self The object pointer.
-    #  @param item Item to be appended to the bus
-    #
-    #---------------------------------------------------------------------------
     def append(self, item):
         """Append an item to the bus with type checking.
 
@@ -461,30 +298,12 @@ class Bus(list):
         checkInstance("item", item, self.Type)
         super(Bus, self).append(item)
         
-        
-#-------------------------------------------------------------------------------
-## Vdc class. 
-#  Child of Electrical implementing aditional features in order to work as a 
-#  voltage source.
-#
-#-------------------------------------------------------------------------------
 class Vdc(Electrical):
     """Vdc class.
 
     A subclass of Electrical that implements extra features for a voltage source.
     """
 
-    #---------------------------------------------------------------------------
-    ## Construtor.
-    #  @param self The object pointer.
-    #  @param hiLeveMod Hi level model in which the analog command will be added.
-    #  @param name Name of the voltage source electrical pin.
-    #  @param value Real expression holding the initial voltage.
-    #  @param gnd Electrical representing the ground reference.
-    #  @param rise Real expression holding the initial rise time.
-    #  @param fall Real expression holding the initial fall time.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, value, gnd, rise, fall):
         """Initialize a Vdc instance.
 
@@ -521,16 +340,6 @@ class Vdc(Electrical):
             )
         ) 
     
-    #---------------------------------------------------------------------------
-    ## Set the rise and the fall times for changes in the voltage.
-    #  @param self The object pointer.
-    #  @param rise Real expression holding the rise time for changes in the 
-    #         voltage.
-    #  @param fall Real expression holding the fall time for changes in the 
-    #         voltage.
-    #  @return The commands to change the rise and fall times.
-    #
-    #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         """Set the rise and fall times for voltage changes.
 
@@ -548,13 +357,6 @@ class Vdc(Electrical):
             self.fall.eq(fall)
         )
 
-    #---------------------------------------------------------------------------
-    ## Change the value of the voltage source.
-    #  @param self The object pointer.
-    #  @param value Real expression holding the voltage.
-    #  @return The commands to change the voltage.
-    #  
-    #---------------------------------------------------------------------------
     def applyV(self, value):
         """Change the voltage value of the source.
 
@@ -567,39 +369,16 @@ class Vdc(Electrical):
         checkReal("value", value)
         return self.volt.eq(value)
 
-
-#-------------------------------------------------------------------------------
-## VdcBus class. Child of a list. 
-#  It implements aditional methods to deal with read and write operations to 
-#  a bus. It also overrides the slice method, so it works similar to a slice 
-#  of a bus in verilog.
-#
-#-------------------------------------------------------------------------------
 class VdcBus(Bus):
     """VdcBus class.
 
     A bus of Vdc elements with additional methods for handling voltage source operations.
     """
 
-    #---------------------------------------------------------------------------
-    ## Constructor.
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self):
         """Initialize a VdcBus instance."""
         super(VdcBus, self).__init__(Vdc, VdcBus)
         
-    #---------------------------------------------------------------------------
-    ## Set the rise and the fall times for changes in the voltage.
-    #  @param self The object pointer.
-    #  @param rise Real expression holding the rise time for changes in the 
-    #         voltage.
-    #  @param fall Real expression holding the fall time for changes in the 
-    #         voltage.
-    #  @return The commands to change the rise and fall times.
-    #
-    #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         """Set the rise and fall times for all Vdc elements in the bus.
 
@@ -617,13 +396,6 @@ class VdcBus(Bus):
             ans.append(pin.setRiseFall(rise, fall))
         return ans
 
-    #---------------------------------------------------------------------------
-    ## Change the value of the voltage source.
-    #  @param self The object pointer.
-    #  @param value Real expression holding the voltage.
-    #  @return The commands to change the voltage.
-    #  
-    #---------------------------------------------------------------------------
     def applyV(self, value):
         """Change the voltage value for all Vdc elements in the bus.
 
@@ -639,30 +411,12 @@ class VdcBus(Bus):
             ans.append(pin.applyV(value))
         return ans
         
-        
-#-------------------------------------------------------------------------------
-## Idc class. 
-#  Child of Electrical implementing aditional features in order to work as a 
-#  current source.
-#
-#-------------------------------------------------------------------------------
 class Idc(Electrical):
     """Idc class.
 
     A subclass of Electrical that implements features for a current source.
     """
 
-    #---------------------------------------------------------------------------
-    ## Construtor.
-    #  @param self The object pointer.
-    #  @param hiLeveMod Hi level model in which the analog command will be added.
-    #  @param name Name of the current source electrical pin.
-    #  @param value Real expression holding the initial voltage.
-    #  @param gnd Electrical representing the ground reference.
-    #  @param rise Real expression holding the initial rise time.
-    #  @param fall Real expression holding the initial fall time.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, value, gnd, rise, fall):
         """Initialize an Idc instance.
 
@@ -699,16 +453,6 @@ class Idc(Electrical):
             )
         ) 
     
-    #---------------------------------------------------------------------------
-    ## Set the rise and the fall times for changes in the voltage.
-    #  @param self The object pointer.
-    #  @param rise Real expression holding the rise time for changes in the 
-    #         current.
-    #  @param fall Real expression holding the fall time for changes in the 
-    #         current.
-    #  @return The commands to change the rise and fall times.
-    #
-    #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         """Set the rise and fall times for current changes.
 
@@ -726,13 +470,6 @@ class Idc(Electrical):
             self.fall.eq(fall)
         )
 
-    #---------------------------------------------------------------------------
-    ## Change the value of the current source.
-    #  @param self The object pointer.
-    #  @param value Teal expression holding the current.
-    #  @return The commands to change the current.
-    #  
-    #---------------------------------------------------------------------------
     def applyI(self, value):
         """Change the current value of the source.
 
@@ -745,14 +482,6 @@ class Idc(Electrical):
         checkReal("value", value)
         return self.cur.eq(value)
 
-
-#-------------------------------------------------------------------------------
-## IdcBus class. Child of a list. 
-#  It implements aditional methods to deal with read and write operations to 
-#  a bus. It also overrides the slice method, so it works similar to a slice 
-#  of a bus in verilog.
-#
-#-------------------------------------------------------------------------------
 class IdcBus(Bus):
     """IdcBus class.
 
@@ -760,25 +489,10 @@ class IdcBus(Bus):
     including custom slicing similar to a Verilog bus.
     """
 
-    #---------------------------------------------------------------------------
-    ## Constructor.
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self):
         """Initialize an IdcBus instance."""
         super(IdcBus, self).__init__(Idc, IdcBus)
         
-    #---------------------------------------------------------------------------
-    ## Set the rise and the fall times for changes in the current.
-    #  @param self The object pointer.
-    #  @param rise Real expression holding the rise time for changes in the 
-    #         current.
-    #  @param fall Real expression holding the fall time for changes in the 
-    #         current.
-    #  @return The commands to change the rise and fall times.
-    #
-    #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         """Set the rise and fall times for all Idc elements in the bus.
 
@@ -796,13 +510,6 @@ class IdcBus(Bus):
             ans.append(pin.setRiseFall(rise, fall))
         return ans
 
-    #---------------------------------------------------------------------------
-    ## Change the value of the current source.
-    #  @param self The object pointer.
-    #  @param value Real expression holding the current.
-    #  @return The commands to change the current.
-    #  
-    #---------------------------------------------------------------------------
     def applyI(self, value):
         """Change the current value for all Idc elements in the bus.
 
@@ -818,12 +525,6 @@ class IdcBus(Bus):
             ans.append(pin.applyI(value))
         return ans
         
-
-#-------------------------------------------------------------------------------
-## Smu class. Child of Electrical implementing aditional features in order to 
-#  work as a Source Measure Unit
-#
-#-------------------------------------------------------------------------------
 class Smu(Electrical):
     """Smu class.
 
@@ -831,18 +532,6 @@ class Smu(Electrical):
     Source Measure Unit (SMU).
     """
 
-    #---------------------------------------------------------------------------
-    ## Construtor.
-    #  @param self The object pointer.
-    #  @param hiLeveMod Hi level model in which the analog command will be added.
-    #  @param name Name of the smu electrical pin.
-    #  @param volt Real expression holding the initial voltage.
-    #  @param minCur Real expression holding the initial minimum current.
-    #  @param maxCur Real expression holding the initial maximum current.
-    #  @param res Real expression holding the resistance.
-    #  @param gnd Electrical representing the ground reference.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, volt, minCur, maxCur, res, gnd): 
 
         """Initialize a Smu instance.
@@ -924,16 +613,7 @@ class Smu(Electrical):
             out.iCont(out.v/resTran),
             out.iCont(1e-12*ddt(out.v))
         ) 
-    
-    #---------------------------------------------------------------------------
-    ## Configure the smu as current limited voltage source and apply the desired
-    #  voltage.
-    #  @param self The object pointer.
-    #  @param value Real expression holding the voltage to be applied.
-    #  @param limit Real expression holding the current limit.
-    #  @return The commands to configure the Smu in voltage mode.
-    #
-    #---------------------------------------------------------------------------
+
     def applyV(self, value, limit):
         """Configure the SMU as a current-limited voltage source and apply a voltage.
 
@@ -956,17 +636,6 @@ class Smu(Electrical):
             self.rDelay.eq(100e-9),
         )
 
-    #---------------------------------------------------------------------------
-    ## Configure the smu as voltage limited current source and apply the desired
-    # current. Positive currents are sink current sources. The limit corresponds 
-    # to the upper voltage when value < 0 and to the lower voltage when value > 
-    # 0.
-    #  @param self The object pointer.
-    #  @param value Real expression holding the current to be applied.
-    #  @param limit Real expression holding the voltage limit.
-    #  @return The commands to configure the Smu in current mode.
-    # 
-    #---------------------------------------------------------------------------
     def applyI(self, value, limit):
         """Configure the SMU as a voltage-limited current source and apply a current.
 
@@ -989,13 +658,6 @@ class Smu(Electrical):
             self.rDelay.eq(0),
         )
 
-    #---------------------------------------------------------------------------
-    ## Configure the resistive load.
-    #  @param self The object pointer.
-    #  @param value Real expression holding the value of the resistor.
-    #  @return The commands to configure the Smu in resistance mode.
-    # 
-    #---------------------------------------------------------------------------
     def applyR(self, value):
         """Configure the SMU as a resistive load.
 
@@ -1016,41 +678,16 @@ class Smu(Electrical):
             self.rDelay.eq(0),
         )
 
-
-#-------------------------------------------------------------------------------
-## SmuBus class. Child of a list. 
-#  It implements additional methods to deal with read and write operations to 
-#  a bus. It also overrides the slice method, so it works similar to a slice 
-#  of a bus in verilog.
-#
-#-------------------------------------------------------------------------------
 class SmuBus(Bus):
     """SmuBus class.
 
     A bus of Smu elements with additional methods for handling SMU operations.
     """
-
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self):
         """Initialize a SmuBus instance."""
         super(SmuBus, self).__init__(Smu, SmuBus)
       
 
-    #---------------------------------------------------------------------------
-    ## Configure the smu as voltage limited current source and apply the desired
-    # current. Positive currents are sink current sources. The limit corresponds 
-    # to the uppper voltage when value < 0 and to the lower voltage when value > 
-    # 0.
-    #  @param self The object pointer.
-    #  @param value Real expression holding the current to be applied.
-    #  @param limit Real expression holding the voltage limit.
-    #  @return The commands to configure the Smu in current mode.
-    # 
-    #---------------------------------------------------------------------------
     def applyI(self, value, limit):
         """Apply a current command to all SMU elements in the bus.
 
@@ -1067,16 +704,7 @@ class SmuBus(Bus):
         for pin in self:
             ans.append(pin.applyI(value, limit))
         return ans
-        
-    #---------------------------------------------------------------------------
-    ## Configure the smu as current limited voltage source and apply the desired
-    #  voltage.
-    #  @param self The object pointer.
-    #  @param value Real expression holding the voltage to be applied.
-    #  @param limit Real expression holding the current limit.
-    #  @return The commands to configure the Smu in voltage mode.
-    #
-    #---------------------------------------------------------------------------
+
     def applyV(self, value, limit):
         """Apply a voltage command to all SMU elements in the bus.
 
@@ -1093,14 +721,7 @@ class SmuBus(Bus):
         for pin in self:
             ans.append(pin.applyV(value, limit))
         return ans
-        
-    #---------------------------------------------------------------------------
-    ## Configure the resistive load.
-    #  @param self The object pointer.
-    #  @param value Real expression holding the value of the resistor.
-    #  @return The commands to configure the Smu in resistance mode.
-    # 
-    #---------------------------------------------------------------------------
+
     def applyR(self, value):
         """Apply a resistive load command to all SMU elements in the bus.
 
@@ -1116,37 +737,12 @@ class SmuBus(Bus):
             ans.append(pin.applyR(value))
         return ans
          
-                
-#-------------------------------------------------------------------------------
-## DigOut class. Child of Electrical implementing additional features in order to 
-#  work as a digital output pin.
-#
-#-------------------------------------------------------------------------------
 class DigOut(Electrical):
     """DigOut class.
 
     A subclass of Electrical that represents a digital output pin.
     """
 
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #  @param self The object pointer.
-    #  @param hiLeveMod Hi level model in which the analog command will be added.
-    #  @param name Name of the electrical pin.
-    #  @param state Boolean expression holding the initial state of the digital 
-    #         pin.
-    #  @param domain Electrical pin. The voltage across the digital pins will be
-    #         equal to the domain when the logical state is 1.
-    #  @param inCap Dummy parameter for consistency.  
-    #  @param serRes Real expression holding the value of the series resistance.
-    #         This value will be set at the beginning of the simulation and 
-    #         can't be changed afterwards.
-    #  @param gnd Electrical representing the ground reference.
-    #  @param delay Real expression holding the initial delay time.
-    #  @param rise Real expression holding the initial rise time.
-    #  @param fall Real expression holding the initial fall time.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, gnd, 
                  delay, rise, fall): 
         """Initialize a DigOut instance.
@@ -1202,13 +798,6 @@ class DigOut(Electrical):
             out.vCont(out.i*self.serRes)
         ) 
 
-    #---------------------------------------------------------------------------
-    ## Set the delay times of the digital output pin.
-    #  @param self The object pointer.
-    #  @param delay Real expression holding the delay time.
-    #  @return The commands to change the delay.
-    #
-    #---------------------------------------------------------------------------
     def setDelay(self, delay):
         """Set the delay for the digital output pin.
 
@@ -1220,15 +809,7 @@ class DigOut(Electrical):
         """
         checkReal("delay", delay)
         return self.delay.eq(delay)
-           
-    #---------------------------------------------------------------------------
-    ## Set the rise and the fall times of the digital output pin.
-    #  @param self The object pointer.
-    #  @param Rise Real expression holding the rise time.
-    #  @param Fall Real expression holding the fall time.
-    #  @return The commands to change the rise and fall times.
-    #
-    #---------------------------------------------------------------------------
+
     def setRiseFall(self, rise, fall):
         """Set the rise and fall times for the digital output pin.
 
@@ -1246,13 +827,6 @@ class DigOut(Electrical):
             self.fall.eq(fall)
         )
 
-    #---------------------------------------------------------------------------
-    ## Write a state to the digital output.
-    #  @param self The object pointer.
-    #  @param value Boolean expression representing the state to be written.
-    #  @return The commands to change the state of the digital pin.
-    #
-    #---------------------------------------------------------------------------
     def write(self, value):
         """Write a new state to the digital output pin.
 
@@ -1264,13 +838,7 @@ class DigOut(Electrical):
         """
         checkBool("value", value)
         return self.st.eq(value)
-        
-    #---------------------------------------------------------------------------
-    ## Return the state of the digital output.
-    #  @param self The object pointer.
-    #  @return The commands to change the state of a digital pin.
-    #
-    #---------------------------------------------------------------------------
+
     def getST(self):
         """Return the current state of the digital output pin.
 
@@ -1279,12 +847,6 @@ class DigOut(Electrical):
         """
         return self.st
 
-    #---------------------------------------------------------------------------
-    ## Toggle the state of the digital output.
-    #  @param self The object pointer.
-    #  @return The commands to change the state of a digital pin.
-    #
-    #---------------------------------------------------------------------------
     def toggle(self):
         """Toggle the state of the digital output pin.
 
@@ -1294,36 +856,12 @@ class DigOut(Electrical):
         return self.st.toggle()
 
 
-
-#-------------------------------------------------------------------------------
-## DigIn class. Child of Electrical implementing additional features in order to 
-#  work as a digital input pin
-#
-#-------------------------------------------------------------------------------
 class DigIn(Electrical):
     """DigIn class.
 
     A subclass of Electrical representing a digital input pin.
     """
 
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #  @param self The object pointer.
-    #  @param hiLeveMod Hi level model in which the analog command will be added.
-    #  @param name Name of the electrical pin.
-    #  @param state Dummy parameter for consistency.
-    #  @param domain Electrical pin. The voltage across the domain will be equal
-    #         the voltage in the digial pins when the logical state is 1.
-    #  @param inCap Real expression holding the value of the input capacitance. 
-    #         This value will be set at the beggining of the simulation and can't 
-    #         be changed afterwards.
-    #  @param serRes Dummy parameter for consistency.
-    #  @param gnd Electrical representing the ground reference.
-    #  @param delay Dummy parameter for consistency.
-    #  @param rise Dummy parameter for consistency.
-    #  @param fall Dummy parameter for consistency.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, gnd, 
                  delay, rise, fall): 
         """Initialize a DigIn instance.
@@ -1363,12 +901,6 @@ class DigIn(Electrical):
             out.iCont(ddt(out.v)*self.inCap)
         ) 
  
-    #---------------------------------------------------------------------------
-    ## Read a state from the digital input.
-    #  @param self The object pointer.
-    #  @return The commands to read the stare of a digital pin.
-    #
-    #---------------------------------------------------------------------------   
     def read(self):
         """Read the digital input state.
 
@@ -1377,39 +909,12 @@ class DigIn(Electrical):
         """
         return self.diffHalfDomain > 0
 
-
-#-------------------------------------------------------------------------------
-## DigInOut class. Child of Electrical implementing additional features in order 
-#  to work as a digital input/output pin
-#
-#-------------------------------------------------------------------------------
 class DigInOut(DigIn, DigOut):
     """DigInOut class.
 
     A subclass that combines digital input and output functionalities.
     """
 
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #  @param self The object pointer.
-    #  @param hiLeveMod Hi level model in which the analog command will be added.
-    #  @param name Name of the electrical pin.
-    #  @param state Boolean expression holding the initial state of the digital 
-    #         pin.
-    #  @param domain Electrical pin. The voltage across the digital pins will be
-    #         equal to the domain when the logical state is 1.
-    #  @param inCap Real expression holding the value of the input capacitance. 
-    #         This value will be set at the beggining of the simulation and can't 
-    #         be changed afterwards.
-    #  @param serRes Real expression holding the value of the series resistance.
-    #         This value will be set at the beggining of the simulation and 
-    #         can't be changed afterwards.
-    #  @param gnd Electrical representing the ground reference.
-    #  @param delay Real expression holding the initial delay time.
-    #  @param rise Real expression holding the initial rise time.
-    #  @param fall Real expression holding the initial fall time.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, name, state, domain, inCap, serRes, gnd, 
                  delay, rise, fall): 
         """Initialize a DigInOut instance.
@@ -1475,12 +980,6 @@ class DigInOut(DigIn, DigOut):
             out.iCont(ddt(out.v)*self.inCap)
         ) 
 
-    #---------------------------------------------------------------------------
-    ## Set the pin at hiZ in order to use the read function.
-    #  @param self The object pointer.
-    #  @return The commands to change the inOut pin to hiZ (input).
-    #
-    #---------------------------------------------------------------------------
     def hiZ(self):
         """Set the pin to high impedance (hiZ) for input mode.
 
@@ -1489,12 +988,6 @@ class DigInOut(DigIn, DigOut):
         """
         return self.res.eq(1e12)
 
-    #---------------------------------------------------------------------------
-    ## Set the pin to low impedance in order to use the write function
-    #  @param self The object pointer.
-    #  @return The commands to change the inOut pin to lowZ (output).
-    #
-    #---------------------------------------------------------------------------
     def lowZ(self):
         """Set the pin to low impedance (lowZ) for output mode.
 
@@ -1503,13 +996,6 @@ class DigInOut(DigIn, DigOut):
         """
         return self.res.eq(self.serRes)
 
-               
-#-------------------------------------------------------------------------------
-## DigBusOut class. Child of a list. It implements aditional methods to deal with
-#  read and write operations to a bus. It also overrides the slice method, so
-#  it works similar to a slice of a bus in verilog
-#
-#-------------------------------------------------------------------------------
 class DigBusOut(Bus):
     """DigBusOut class.
     
@@ -1517,23 +1003,10 @@ class DigBusOut(Bus):
     and custom slicing similar to a Verilog bus.
     """
 
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self):
         """Initialize a DigBusOut instance."""
         super(DigBusOut, self).__init__(DigOut, DigBusOut)
  
- 
-    #---------------------------------------------------------------------------
-    ## Set the delay times for all digital output pin.
-    #  @param self The object pointer.
-    #  @param delay Real expression holding the delay time.
-    #  @return The commands to change the delay times.
-    #
-    #---------------------------------------------------------------------------
     def setDelay(self, delay):
         """Set the delay time for all digital output pins in the bus.
 
@@ -1548,15 +1021,7 @@ class DigBusOut(Bus):
         for pin in self:
             ans.append(pin.setDelay(delay))
         return ans
-       
-    #---------------------------------------------------------------------------
-    ## Set the rise and the fall times of all digital output pin.
-    #  @param self The object pointer.
-    #  @param Rise Real expression holding the rise time.
-    #  @param Fall Real expression holding the fall time.
-    #  @return The commands to change the rise and fall times.
-    #
-    #---------------------------------------------------------------------------
+
     def setRiseFall(self, rise, fall):
         """Set the rise and fall times for all digital output pins in the bus.
 
@@ -1574,13 +1039,6 @@ class DigBusOut(Bus):
             ans.append(pin.setRiseFall(rise, fall))
         return ans
 
-    #---------------------------------------------------------------------------
-    ## Write a binary to the digital output bus.
-    #  @param self The object pointer.
-    #  @param value Integer expression representing the value to be written.
-    #  @return The commands to write to a digital bus.
-    #
-    #---------------------------------------------------------------------------
     def write(self, value):
         """Write a binary value to the digital output bus.
 
@@ -1591,8 +1049,11 @@ class DigBusOut(Bus):
             CmdList: A list of commands that write the binary value to the bus.
         """
         checkInteger("value", value)
-        assert len(self) <= 32 or not isinstance(value, Integer), \
-               "Can't write an instance of integer to a bus wider than 32 bit"
+        if len(self) > 32 and isinstance(value, Integer):
+            raise VagenValueError(
+                "Can't write a dynamic integer value to a bus wider than 32 bits; "
+                "use a plain int literal instead"
+            )
         ans = CmdList()
         i = 1
         for pin in self:
@@ -1600,12 +1061,6 @@ class DigBusOut(Bus):
             i = i << 1
         return ans
 
-    #---------------------------------------------------------------------------
-    ## Toggle all the states of a digital bus
-    #  @param self The object pointer.
-    #  @return The commands to change the state of a digital pin.
-    #
-    #---------------------------------------------------------------------------
     def toggle(self):
         """Toggle the state of all digital output pins in the bus.
 
@@ -1616,13 +1071,7 @@ class DigBusOut(Bus):
         for pin in self:
             ans.append(pin.toggle())
         return ans
-        
-#-------------------------------------------------------------------------------
-## DigBusIn class. Child of a list. It implements aditional methods to deal with
-#  read and write operations to a bus. It also overrides the slice method, so
-#  it works similar to a slice of a bus in verilog
-#
-#-------------------------------------------------------------------------------
+
 class DigBusIn(Bus):
     """DigBusIn class.
     
@@ -1630,26 +1079,15 @@ class DigBusIn(Bus):
     similar to a Verilog bus.
     """
 
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------
     def __init__(self):  
         """Initialize a DigBusIn instance."""
         super(DigBusIn, self).__init__(DigIn, DigBusIn)
-            
-    #---------------------------------------------------------------------------
-    ## Read a binary from the digital input bus.
-    #  @param self The object pointer.
-    #  @param signed Read as signed if True and unsigned otherwise.
-    #  @return The commands to read a digital bus as binary.
-    #
-    #---------------------------------------------------------------------------   
+
     def read(self, signed = False):
-        assert len(self) <= 32, "Can't read a bus wider than 32 bit"
-        assert len(self) <= 31 or signed, \
-               "Can't read a bus wider than 31 bit as unsigned"
+        if len(self) > 32:
+            raise VagenValueError("Can't read a bus wider than 32 bits")
+        if len(self) > 31 and not signed:
+            raise VagenValueError("Can't read a bus wider than 31 bits as unsigned")
         ans = Integer(self[0].read())
         i = 2
         for j in range(1, len(self) - 1):
@@ -1662,35 +1100,17 @@ class DigBusIn(Bus):
                 ans = ans + Integer(self[len(self)-1].read())*i
         return ans        
 
-
-#-------------------------------------------------------------------------------
-## DigBusInOut class. Child of a list. It implements aditional methods to deal 
-#  with read and write operations to a bus. It also overrides the slice method, 
-#  so it works similar to a slice of a bus in verilog
-#
-#-------------------------------------------------------------------------------
 class DigBusInOut(DigBusIn, DigBusOut):
     """DigBusInOut class.
     
     A bus of digital input/output pins with methods to set pins to high impedance
     (hiZ) or low impedance (lowZ) for input/output operations.
     """
- 
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------
+
     def __init__(self):   
         """Initialize a DigBusInOut instance."""
         super(DigBusOut, self).__init__(DigInOut, DigBusInOut)
 
-    #---------------------------------------------------------------------------
-    ## Set the pins at hiZ in order to use the read function.
-    #  @param self The object pointer.
-    #  @return The commands to change the inOut pin to hiZ (input).
-    #
-    #---------------------------------------------------------------------------
     def hiZ(self):
         """Set all digital I/O pins to high impedance (hiZ) for input mode.
 
@@ -1702,12 +1122,6 @@ class DigBusInOut(DigBusIn, DigBusOut):
             ans.append(pin.hiZ())
         return ans
 
-    #---------------------------------------------------------------------------
-    ## Set the pins to low impedance in order to use the write function
-    #  @param self The object pointer.
-    #  @return The commands to change the inOut pin to lowZ (output).
-    #
-    #---------------------------------------------------------------------------
     def lowZ(self):
         """Set all digital I/O pins to low impedance (lowZ) for output mode.
 
@@ -1719,11 +1133,6 @@ class DigBusInOut(DigBusIn, DigBusOut):
             ans.append(pin.lowZ())
         return ans
 
-
-#-------------------------------------------------------------------------------
-## Sw class. Switch between two nodes. 
-#
-#-------------------------------------------------------------------------------
 class Sw():
     """Sw class.
     
@@ -1731,19 +1140,6 @@ class Sw():
     a transition function.
     """
     
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #  @param self The object pointer.
-    #  @param hiLeveMod Hi level model in which the analog command will be added.
-    #  @param pin1 First node
-    #  @param pin2 Second node
-    #  @param cond Real expression representing the initial switch conductance
-    #  @param rise Real expression representing the rise time for changes in the 
-    #         conductance
-    #  @param fall Real expression representing the fall time for changes in the 
-    #         conductance
-    #
-    #---------------------------------------------------------------------------
     def __init__(self, hiLevelMod, pin1, pin2, cond, rise, fall):
         """Initialize a Sw instance representing a switch between two nodes.
 
@@ -1778,14 +1174,6 @@ class Sw():
             )
         )
 
-    #---------------------------------------------------------------------------
-    ## Set the rise and the fall times of the switch.
-    #  @param self The object pointer.
-    #  @param Rise Real expression holding the rise time.
-    #  @param Fall Real expression holding the fall time.
-    #  @return The commands to change the rise and fall times.
-    #
-    #---------------------------------------------------------------------------
     def setRiseFall(self, rise, fall):
         """Set the rise and fall times for the switch.
 
@@ -1803,13 +1191,6 @@ class Sw():
             self.fall.eq(fall)
         )
 
-    #---------------------------------------------------------------------------
-    ## Set the conductance
-    #  @param self The object pointer.
-    #  @param cond Real expression holding the conductance value.
-    #  @return The commands to change the conductance.
-    #
-    #---------------------------------------------------------------------------
     def setCond(self, cond):
         """Set the conductance value of the switch.
 
@@ -1822,24 +1203,12 @@ class Sw():
         checkReal("cond", cond)
         return self.cond.eq(cond)
 
-
-#-------------------------------------------------------------------------------
-## Clock class.
-# 
-#-------------------------------------------------------------------------------
 class Clock():
     """Clock class.
     
     Represents a clock generator that toggles a digital output pin at a specified frequency.
     """
-    
-    #---------------------------------------------------------------------------
-    ## Constructor
-    #  @param self The object pointer.
-    #  @param hiLeveMod Hi level model in which the analog command will be added.
-    #  @param pin DigIn or DigInOut
-    #
-    #---------------------------------------------------------------------------
+
     def __init__(self, hiLevelMod, pin):
         """Initialize a Clock instance.
 
@@ -1868,12 +1237,6 @@ class Clock():
             )
         )
 
-    #---------------------------------------------------------------------------
-    ## Turn the clock generator on
-    #  @param self The object pointer.
-    #  @param frequency frequency of the clock generator.
-    #
-    #---------------------------------------------------------------------------
     def on(self, frequency):
         """Turn on the clock generator.
 
@@ -1891,11 +1254,6 @@ class Clock():
             self.time.eq(abstime + self.halfPeriod)
         )
 
-    #---------------------------------------------------------------------------
-    ## Turn the clock generator off
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------
     def off(self):
         """Turn off the clock generator.
 
@@ -1904,28 +1262,13 @@ class Clock():
         """
         return self.isOn.eq(False)
 
-
-#-------------------------------------------------------------------------------
-## HiLevelMod class. Child of the module class in the veriloA module. It 
-#  provides aditional methods for dealing with digital bus, current sources, 
-#  voltage sources, clocks and switches
-#
-#-------------------------------------------------------------------------------
 class HiLevelMod(Module):
     """
     HiLevelMod class extends the Module class in Verilog-A. 
     It provides additional methods for handling digital buses, 
     current sources, voltage sources, clocks, and switches.
     """
-  
-    #---------------------------------------------------------------------------
-    ## Constructor 
-    #  @param self The object pointer.
-    #  @param tbName Name of the test bench.
-    #  @param timeTol Time tolerances for the timer.
-    #  @param ignoreHiddenState ignore hiddel state pragma will be added if True
-    #
-    #---------------------------------------------------------------------------
+
     def __init__(self, tbName, timeTol = None, ignoreHiddenStates = False):
         """
         Initializes the HiLevelMod instance.
@@ -1933,7 +1276,7 @@ class HiLevelMod(Module):
         Args:
             tbName (str): Name of the test bench.
             timeTol (float, optional): Time tolerance for the timer.
-            ignoreHiddenState (bool): Pragma will be added if True
+            ignoreHiddenStates (bool): Pragma will be added if True.
         """
         
         super(HiLevelMod, self).__init__(
@@ -1972,18 +1315,7 @@ class HiLevelMod(Module):
         self.analog(
             self.testSeqs
         )
-                    
-    #---------------------------------------------------------------------------
-    ## Add variable to the module. Also, the intial value of the variable will 
-    #  be set during the static analysis and the initial step of transient.
-    #  The type of the variable will be compatible with the type of the initial
-    #  value.
-    #  @param self The object pointer.
-    #  @param name Name of the variable.
-    #  @param value Initial value. Default is 0.
-    #  @return a variable class.
-    #
-    #---------------------------------------------------------------------------
+
     def var(self, value = 0, name = ""):
         """
         Adds a variable to the module.
@@ -2001,14 +1333,6 @@ class HiLevelMod(Module):
         self.dcCmdList.append(ans.eq(value))
         return ans
 
-    #---------------------------------------------------------------------------
-    ## Return a marker object.
-    #  @param self The object pointer.
-    #  @param name Name of the marker.
-    #  @param riseFall Rise and fall times of the marker pin. Default is 100ps.
-    #  @return Marker class.
-    #
-    #---------------------------------------------------------------------------
     def marker(self, name, riseFall = 50e-12):
         """
         Returns a marker object.
@@ -2024,31 +1348,6 @@ class HiLevelMod(Module):
         self.markers.append(markerObj)
         return markerObj
         
-    #---------------------------------------------------------------------------
-    ## Return a DigIn, DigOut, or DigInOut object. A DigBusIn, DigBusOut or
-    #  DigBusInOut will be returned if width > 0.
-    #  @param self The object pointer.
-    #  @param domain electrical pin. The voltage across the digial pins will be
-    #         equal to the domain when the logical state is 1.
-    #  @param name Name of the electrical pin.
-    #  @param value Integer expression holding the intial value of the digital 
-    #         pin.
-    #  @param width If width is greather than 1, It returns a bus.
-    #  @param direction It can be internal, input, output, or inout.
-    #  @param inCap Real expression holding the value of the input capacitance. 
-    #         This value will be set at the beggining of the simulation and 
-    #         can't be changed afterwards.
-    #  @param serRes Real expression holding the value of the series resistance. 
-    #         This value will be set at the beggining of the simulation and 
-    #         can't be changed afterwards.
-    #  @param gnd Electrical representing the ground reference.
-    #  @param delay Real expression holding the initial delay time.    
-    #  @param rise Real expression holding the initial rise time.
-    #  @param fall Real expression holding the initial fall time.
-    #  @return DigIn, DigOut, or DigInOut object. A DigBusIn, DigBusOut or
-    #          DigBusInOut will be returned if width > 0.
-    #
-    #---------------------------------------------------------------------------
     def dig(self, 
             domain, 
             name = "", 
@@ -2127,17 +1426,6 @@ class HiLevelMod(Module):
                 j = j << 1
             return bus
 
-    #---------------------------------------------------------------------------
-    ## switch
-    #  @param self The object pointer.
-    #  @param pin1 First node (Electrical)
-    #  @param pin2 Second node (Electrical)
-    #  @param cond Initial switch conductance. Default is 0S.
-    #  @param rise Rise time for changes in the conductance. Default is 1us.
-    #  @param fall Fall time for changes in the conductance. Default is 1us.
-    #  @return a Sw class.
-    #
-    #---------------------------------------------------------------------------
     def sw(self, pin1, pin2, cond = 0.0, rise = 1e-6, fall = 1e-6):
         checkInstance("pin1", pin1, Electrical)
         checkInstance("pin2", pin2, Electrical)
@@ -2145,14 +1433,7 @@ class HiLevelMod(Module):
         checkReal("rise", rise)
         checkReal("fall", fall)
         return Sw(self, pin1, pin2, cond, rise, fall)
-        
-    #---------------------------------------------------------------------------
-    ## Build a clock model using a digital pin
-    #  @param self The object pointer.
-    #  @param pin DigIn or DigInOut.
-    #  @return a Clock class.
-    #
-    #---------------------------------------------------------------------------
+
     def clock(self, pin):
         """
         Builds a clock model using a digital pin.
@@ -2166,20 +1447,6 @@ class HiLevelMod(Module):
         checkInstance("pin", pin, DigOut)
         return Clock(self, pin)
 
-    #---------------------------------------------------------------------------
-    ## Return a Smu object or a SmuBus object if width > 1.
-    #  @param self The object pointer.
-    #  @param name Name of the smu electrical pin.
-    #  @param width If width is greather than 1, It returns a SmuBus.
-    #  @param direction It can be internal, input, output, or inout.
-    #  @param volt Real expression holding the inital voltage.
-    #  @param minCur Real expression holding the inital minimum current.
-    #  @param maxCur Real expression holding the inital maximum current.
-    #  @param res Real expression holding the resitance.
-    #  @return Smu or SmuBus depending on the width. 
-    #  @param gnd Electrical representing the ground reference. 
-    #
-    #---------------------------------------------------------------------------
     def smu(self, 
             name = "", 
             width = 1, 
@@ -2226,20 +1493,7 @@ class HiLevelMod(Module):
                     )
                 )
             return vector
-        
-    #---------------------------------------------------------------------------
-    ## Return a Vdc object or a VdcBus object if width > 1.
-    #  @param self The object pointer.
-    #  @param name Name of the voltage source.
-    #  @param width If width is greather than 1, It returns a list.
-    #  @param direction It can be internal, input, output, or inout.
-    #  @param value Real expression holding the inital value.
-    #  @param gnd Electrical representing the ground reference.
-    #  @param rise Real expression holding the initial rise time.
-    #  @param fall Real expression holding the initial fall time.
-    #  @return Vdc or VdcBus depending on the width. 
-    #
-    #---------------------------------------------------------------------------
+
     def vdc(self, 
             name = "", 
             width = 1, 
@@ -2283,19 +1537,6 @@ class HiLevelMod(Module):
                 )
             return vBus
 
-    #---------------------------------------------------------------------------
-    ## Return a Idc object or a IdcBus object if width > 1.
-    #  @param self The object pointer.
-    #  @param name Name of the voltage source.
-    #  @param width If width is greather than 1, It returns a list.
-    #  @param direction It can be internal, input, output, or inout.
-    #  @param value Real expression holding the inital value.
-    #  @param gnd Electrical representing the ground reference.
-    #  @param rise Real expression holding the initial rise time.
-    #  @param fall Real expression holding the initial fall time.
-    #  @return Idc or IdcBus depending on the width. 
-    #
-    #---------------------------------------------------------------------------
     def idc(self, 
             name = "", 
             width = 1, 
@@ -2339,12 +1580,6 @@ class HiLevelMod(Module):
                 )
             return iBus
 
-    #---------------------------------------------------------------------------
-    ## Sequence. Do not use it! Use Seq instead.
-    #  @param cmdsIn list of commands to be processed.
-    #  @return The list of remaining commands to be processed.
-    #
-    #---------------------------------------------------------------------------
     def seqNested(self, cmdsIn):
         """
         Sequence. Do not use it! Use Seq instead.
@@ -2542,12 +1777,14 @@ class HiLevelMod(Module):
                 
             #Found a case
             elif isinstance(cmd, CaseClass):
-                raise Exception("You can't have a Case inside a seq")
+                raise VagenSequenceError("You can't have a Case inside a seq")
                                                        
             #Found a case
             elif isinstance(cmd, Mark):
-                raise Exception( ("You can't have conditional executed mark"
-                                  "or marks inside command lists") )
+                raise VagenSequenceError(
+                    "You can't have conditionally executed marks or marks "
+                    "inside command lists"
+                )
 
             #The commands doesn't require special handling. Add it to the list.
             else:
@@ -2555,13 +1792,6 @@ class HiLevelMod(Module):
                 
         return cmds
 
-    #---------------------------------------------------------------------------
-    ## Sequence
-    #  @param cond condition to run the sequence.
-    #  @return function that accepts variable number of commands to be added to
-    #  the sequence.
-    #
-    #---------------------------------------------------------------------------
     def seq(self, cond):
         """
         Sequence
@@ -2598,12 +1828,14 @@ class HiLevelMod(Module):
             )
             cmds = CmdList()
             i = 1
-            assert len(args) > 0, "Sequence can be empty"
+            if len(args) == 0:
+                raise VagenValueError("Sequence can't be empty")
             for cmd in args:
-                assert isinstance(cmd, Cmd) and \
-                       not isinstance(cmd, WaitAnalogEvent), (f"Command {i}"
-                       " must be an instance of Cmd and can't be and instance "
-                       "of WaitAnalogEvent")
+                if not isinstance(cmd, Cmd) or isinstance(cmd, WaitAnalogEvent):
+                    raise VagenTypeError(
+                        f"Command {i} must be an instance of Cmd and can't be "
+                        "an instance of WaitAnalogEvent"
+                    )
                 i = i + 1
                 if isinstance(cmd, Mark):
                     cmds.append(cmd.getCmd())
@@ -2618,12 +1850,7 @@ class HiLevelMod(Module):
             #Go to the next sequence
             self.nSeq = self.nSeq + 1
         return func
-            
-    #---------------------------------------------------------------------------
-    ## Return the equations in a format that can be imported by the maestro view
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------
+
     def getEqs(self):
         """
         Return the equations in a format that can be imported by the maestro view.
@@ -2639,12 +1866,6 @@ class HiLevelMod(Module):
                 ans.append(f"{name},{name}_{key},expr,{eqs[key]},t,,")
         return "\n".join(ans) 
             
-
-    #---------------------------------------------------------------------------
-    ## Return a ocean script that add equations to the opened session of adexl
-    #  @param self The object pointer.
-    #
-    #---------------------------------------------------------------------------
     def getOcn(self):
         """
         Return an ocean script that adds equations to the opened session of adexl.

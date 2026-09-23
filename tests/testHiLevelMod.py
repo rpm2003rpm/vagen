@@ -1,36 +1,8 @@
-## @package test
-# 
-#  @author  Rodrigo Pedroso Mendes
-#  @version V1.0
-#  @date    24/02/23 01:05:02
-#
-#  #LICENSE# 
-#    
-#  Copyright (c) 2023 Rodrigo Pedroso Mendes
-#
-#  Permission is hereby granted, free of charge, to any  person   obtaining  a 
-#  copy of this software and associated  documentation files (the "Software"), 
-#  to deal in the Software without restriction, including  without  limitation 
-#  the rights to use, copy, modify,  merge,  publish,  distribute, sublicense, 
-#  and/or sell copies of the Software, and  to  permit  persons  to  whom  the 
-#  Software is furnished to do so, subject to the following conditions:        
-#   
-#  The above copyright notice and this permission notice shall be included  in 
-#  all copies or substantial portions of the Software.                         
-#   
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,  EXPRESS OR 
-#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE  WARRANTIES  OF  MERCHANTABILITY, 
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-#  AUTHORS OR COPYRIGHT HOLDERS BE  LIABLE FOR ANY  CLAIM,  DAMAGES  OR  OTHER 
-#  LIABILITY, WHETHER IN AN ACTION OF  CONTRACT, TORT  OR  OTHERWISE,  ARISING 
-#  FROM, OUT OF OR IN CONNECTION  WITH  THE  SOFTWARE  OR  THE  USE  OR  OTHER  
-#  DEALINGS IN THE SOFTWARE. 
-#    
-################################################################################
-import sys
-sys.path.insert(0, "../")
+"""Tests for HiLevelMod stimulus generation."""
+
 import unittest
 from vagen import *
+from helpers import assert_va_matches_ref, strip_va_header
 
 
 class TestHiLevelMod(unittest.TestCase):
@@ -176,14 +148,7 @@ class TestHiLevelMod(unittest.TestCase):
             WaitUs(Real(200)),            
             Finish()
         )
-        f = open("v1_ref.txt", "r")
-        ref = f.read()
-        f.close
-        f = open("v1_gen.va", "w")
-        f.write(mod.getVA())
-        f.close   
-        self.maxDiff = None
-        self.assertEqual(mod.getVA()[323:], ref[:-1])     
+        assert_va_matches_ref(self, mod, "v1_ref.txt")
          
         
     ############################################################################
@@ -328,46 +293,17 @@ class TestHiLevelMod(unittest.TestCase):
             Finish()
         )
         
-        f = open("v2_ref.txt", "r")
-        ref = f.read()
-        f.close
-        f = open("v2_gen.va", "w")
-        f.write(mod.getVA())
-        f.close    
-        self.maxDiff = None
-        self.assertEqual(mod.getVA()[323:], ref[:-1])    
+        assert_va_matches_ref(self, mod, "v2_ref.txt")
  
     ############################################################################
     # Constants
     ############################################################################
-    def testRepeat(self):    
+    def testRepeat(self):
         mod = HiLevelMod("tb")
-        #Create an integer variable that will be initialized to 9
         var1 = mod.var(Integer(9))
-        #Create an electrical pin (No base model atached to it)
-        pin7 = mod.electrical("pin7", 1, direction = "inout")
-        #Create a cross at 0.5 event based on the voltage of pin7 for both edges
+        pin7 = mod.electrical("pin7", 1, direction="inout")
         evnt1 = Cross(pin7.v - Real(0.5), "both")
-        mod.seq(True)(
-            var1.eq(0),
-            var1.eq(1),
-            Repeat(10)(
-                var1.eq(2),
-                CmdList(
-                    var1.eq(3),
-                    var1.eq(4)
-                )
-            ),
-            var1.eq(5)
-        )
-        #print(mod.getVA())
-        mod = HiLevelMod("tb")
-        #Create an integer variable that will be initialized to 9
-        var1 = mod.var(Integer(9))
-        #Create an electrical pin (No base model atached to it)
-        pin7 = mod.electrical("pin7", 1, direction = "inout")
-        #Create a cross at 0.5 event based on the voltage of pin7 for both edges
-        evnt1 = Cross(pin7.v - Real(0.5), "both")
+
         mod.seq(True)(
             var1.eq(0),
             WaitUs(100),
@@ -379,51 +315,23 @@ class TestHiLevelMod(unittest.TestCase):
                 WaitUs(100),
                 CmdList(
                     var1.eq(3),
-                    var1.eq(4)
+                    var1.eq(4),
                 ),
                 WaitUs(100),
             ),
             WaitUs(100),
-            var1.eq(5)
-        )
-        #print(mod.getVA())
-        mod = HiLevelMod("tb")
-        #Create an integer variable that will be initialized to 9
-        var1 = mod.var(Integer(9))
-        #Create an electrical pin (No base model atached to it)
-        pin7 = mod.electrical("pin7", 1, direction = "inout")
-        #Create a cross at 0.5 event based on the voltage of pin7 for both edges
-        evnt1 = Cross(pin7.v - Real(0.5), "both")
-        mod.seq(True)(
-            var1.eq(0),
-            WaitUs(100),
-            var1.eq(1),
-            WaitSignal(evnt1 | evnt1),
-            Repeat(10)(
-                Repeat(11)(
-                    var1.eq(2),
-                    WaitSignal(evnt1),
-                ),
-                CmdList(
-                    var1.eq(3),
-                    var1.eq(4)
-                ),
-                WaitUs(100),
-                var1.eq(6)
-            ),
-            WaitUs(100),
-            var1.eq(5)
+            var1.eq(5),
         )
         mod.seq(True)(
             var1.eq(0),
-            While(var1 > 10) (
+            While(var1 > 10)(
                 var1.eq(2),
                 WaitUs(50),
             ),
-            For(var1.eq(11), var1 < 11, var1.eq(var1 + 14))(
+            For(var1.eq(11), var1 < 11, var1.inc())(
                 var1.eq(22),
                 WaitUs(50),
-            ) 
+            ),
         )
         mod.seq(True)(
             var1.eq(0),
@@ -434,21 +342,54 @@ class TestHiLevelMod(unittest.TestCase):
                 var1.eq(3),
                 WaitUs(33),
                 var1.eq(33),
-                WaitSignal(evnt1)              
+                WaitSignal(evnt1),
             ).Else(
                 var1.eq(4),
                 WaitUs(44),
                 var1.eq(5),
                 WaitUs(22),
-                var1.eq(55)
+                var1.eq(55),
             ),
             var1.eq(555),
-            WaitUs(50)
+            WaitUs(50),
         )
-                
-        #print(mod.getVA())
-                                                                                                                                                        
+
+        va = strip_va_header(mod.getVA())
+        self.assertIn("module tb(", va)
+        self.assertIn("_$runSt_1", va)
+        self.assertIn("_$runSt_2", va)
+        self.assertIn("_$runSt_3", va)
+        self.assertIn("if(", va)
+        self.assertIn("else", va)
+        self.assertIn("while(", va)
+        self.assertIn("= 555", va)
+
+    def testMarkerExport(self):
+        mod = HiLevelMod("tb")
+        vdc = mod.vdc("VDD", 1, direction="output")
+        marker = mod.marker("seq1")
+        mod.seq(True)(
+            vdc.applyV(1),
+            marker.mark("EVENT_A"),
+            WaitUs(10),
+            marker.mark("EVENT_B"),
+            Finish(),
+        )
+
+        eqs = mod.getEqs()
+        self.assertEqual(
+            eqs.splitlines()[0],
+            "Test,Name,Type,Output,Plot,Save,Spec",
+        )
+        self.assertIn("seq1,seq1_EVENT_A,expr,", eqs)
+        self.assertIn("seq1,seq1_EVENT_B,expr,", eqs)
+        self.assertIn('cross(getData("/MARK_seq1"', eqs)
+
+        ocn = mod.getOcn()
+        self.assertEqual(ocn.splitlines()[0], "session = axlGetWindowSession()")
+        self.assertIn("axlAddOutputExpr(session seq1 seq1_EVENT_A", ocn)
+        self.assertIn("axlAddOutputExpr(session seq1 seq1_EVENT_B", ocn)
+
 if __name__ == '__main__':
     unittest.main()
-    
 

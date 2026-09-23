@@ -1,36 +1,10 @@
-## @package test
-# 
-#  @author  Rodrigo Pedroso Mendes
-#  @version V1.0
-#  @date    24/02/23 01:05:02
-#
-#  #LICENSE# 
-#    
-#  Copyright (c) 2023 Rodrigo Pedroso Mendes
-#
-#  Permission is hereby granted, free of charge, to any  person   obtaining  a 
-#  copy of this software and associated  documentation files (the "Software"), 
-#  to deal in the Software without restriction, including  without  limitation 
-#  the rights to use, copy, modify,  merge,  publish,  distribute, sublicense, 
-#  and/or sell copies of the Software, and  to  permit  persons  to  whom  the 
-#  Software is furnished to do so, subject to the following conditions:        
-#   
-#  The above copyright notice and this permission notice shall be included  in 
-#  all copies or substantial portions of the Software.                         
-#   
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,  EXPRESS OR 
-#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE  WARRANTIES  OF  MERCHANTABILITY, 
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-#  AUTHORS OR COPYRIGHT HOLDERS BE  LIABLE FOR ANY  CLAIM,  DAMAGES  OR  OTHER 
-#  LIABILITY, WHETHER IN AN ACTION OF  CONTRACT, TORT  OR  OTHERWISE,  ARISING 
-#  FROM, OUT OF OR IN CONNECTION  WITH  THE  SOFTWARE  OR  THE  USE  OR  OTHER  
-#  DEALINGS IN THE SOFTWARE. 
-#    
-################################################################################
-import sys
-sys.path.insert(0, "../")
+"""Tests for vagen type, command, and function code generation."""
+
 import unittest
-from vagen.veriloga import *
+from vagen import *
+from vagen.commands import block, Block
+from vagen.types import BoolVar, IntegerVar, RealVar
+from helpers import assert_va_matches_ref
 
 
 class TestVA(unittest.TestCase):
@@ -491,8 +465,8 @@ class TestVA(unittest.TestCase):
         self.assertEqual(str(b&a), '( b )&&( a )')
         self.assertEqual(str(b&True), 'b')
         self.assertEqual(str(True&a), 'a')
-        self.assertEqual(b&False, False)
-        self.assertEqual(False&a, False)
+        self.assertEqual(str(b&False), 'False')
+        self.assertEqual(str(False&a), 'False')
                 
     def testBoolOr(self):
         a = Bool('a')
@@ -505,8 +479,8 @@ class TestVA(unittest.TestCase):
         self.assertEqual(type(False|a), Bool)
         self.assertEqual(str(a|b), '( a )||( b )')
         self.assertEqual(str(b|a), '( b )||( a )')
-        self.assertEqual(b|True, True)
-        self.assertEqual(True|a, True)
+        self.assertEqual(str(b|True), 'True')
+        self.assertEqual(str(True|a), 'True')
         self.assertEqual(str(b|False), 'b')
         self.assertEqual(str(False|a), 'a')
         
@@ -1130,60 +1104,8 @@ class TestVA(unittest.TestCase):
         el2 = mod.electrical(direction="input")
         mod.endAnalog(var.eq(4), var.eq(44))
         mod.analog(var.eq(3), var.eq(33))
-        mod.beginningAnalog(var.eq(2), var.eq(22))              
-        ref = '''`include "constants.vams"
-`include "disciplines.vams"
-
-/******************************************************************************
- *                             Module declaration                             * 
- ******************************************************************************/
-module teste(_$3);
-
-/******************************************************************************
- *                                   Ports                                    * 
- ******************************************************************************/
-input _$3;
-
-/******************************************************************************
- *                                 Disciplines                                * 
- ******************************************************************************/
-electrical _$2;
-electrical _$3;
-
-/******************************************************************************
- *                             Build-in functions                             * 
- ******************************************************************************/
-analog function integer _rtoi;
-input in;
-real in;
-begin
-    _rtoi = floor(in + 0.5);
-end
-endfunction
-
-/******************************************************************************
- *                                 Parameters                                 * 
- ******************************************************************************/
-parameter integer par1 = 2;
-
-/******************************************************************************
- *                                 Variables                                  * 
- ******************************************************************************/
-integer _$1;
-
-/******************************************************************************
- *                                Analog block                                * 
- ******************************************************************************/
-analog begin
-    _$1 = 2;
-    _$1 = 22;
-    _$1 = 3;
-    _$1 = 33;
-    _$1 = 4;
-    _$1 = 44;
-end
-endmodule'''
-        self.assertEqual(mod.getVA()[323:], ref)
+        mod.beginningAnalog(var.eq(2), var.eq(22))
+        assert_va_matches_ref(self, mod, "test_get_va_func_ref.txt")
                                                                                                                                                      
 if __name__ == '__main__':
     unittest.main()

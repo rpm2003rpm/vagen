@@ -1,67 +1,203 @@
-## @package vagen
-#  VerilogA generator
-#
+"""VerilogA generator package.
 
-##
-#  @mainpage  VAGEN - VerilogA generator
-#
-#  @section description_main Description
-#  vagen is a verilogA  generator that can be used for  transient verification
-#  and modeling of complex analog IPs. It provides a   wide range   of   basic 
-#  models with voltage sources, current sources,  digital  interfaces, clocks, 
-#  switches, and source measure units that you  can  use  to  build your model 
-#  upon.
-#
-#  @section license_main License
-#     
-#  @author  Rodrigo Pedroso Mendes
-#  @version V1.0
-#  @date    14/02/23 13:37:31
-#    
-#  Copyright (c) 2023 Rodrigo Pedroso Mendes
-#
-#  Permission is hereby granted, free of charge, to any  person   obtaining  a 
-#  copy of this software and associated  documentation files (the "Software"), 
-#  to deal in the Software without restriction, including  without  limitation 
-#  the rights to use, copy, modify,  merge,  publish,  distribute, sublicense, 
-#  and/or sell copies of the Software, and  to  permit  persons  to  whom  the 
-#  Software is furnished to do so, subject to the following conditions:        
-#   
-#  The above copyright notice and this permission notice shall be included  in 
-#  all copies or substantial portions of the Software.                         
-#   
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,  EXPRESS OR 
-#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE  WARRANTIES  OF  MERCHANTABILITY, 
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-#  AUTHORS OR COPYRIGHT HOLDERS BE  LIABLE FOR ANY  CLAIM,  DAMAGES  OR  OTHER 
-#  LIABILITY, WHETHER IN AN ACTION OF  CONTRACT, TORT  OR  OTHERWISE,  ARISING 
-#  FROM, OUT OF OR IN CONNECTION  WITH  THE  SOFTWARE  OR  THE  USE  OR  OTHER  
-#  DEALINGS IN THE SOFTWARE. 
-#    
-################################################################################
+Provides high-level modeling and Verilog-A code generation for transient verification
+and modeling of complex analog IPs.
+"""
 
-#-------------------------------------------------------------------------------
-# Imports
-#-------------------------------------------------------------------------------
-from vagen.hilevelmod import HiLevelMod, Module, Branch, Cmd, CmdList, Electrical, \
-                     Real, Integer, Bool,\
-                     RealVar, IntegerVar, Vdc, Smu, DigIn, DigOut, DigInOut, \
-                     DigBusIn, DigBusOut, DigBusInOut, \
-                     If, For, While, Case, Repeat, At, \
-                     Cross, Above, Timer, InitialStep, FinalStep, \
-                     temp, vt, abstime, \
-                     random, uDistReal, uDistInt, uDistInt, \
-                     gaussDistInt, gaussDistReal, expDistInt, expDistReal, \
-                     poissonDistInt, poissonDistReal, \
-                     lastCrossing, analysis, acStim, \
-                     absDelay, transition, slew, ternary, \
-                     limexp, exp, ddt, idt, ceil, floor, ln, log, sqrt, \
-                     sin, cos, tan, asin, acos, atan, atan2, hypot, \
-                     sinh, cosh, tanh, asinh, acosh, atanh, \
-                     Strobe, Write, Discontinuity, BoundStep, \
-                     Fopen, Fwrite, Fstrobe, Fclose, \
-                     Finish, Error, Fatal, WaitUs, WaitSignal
-            
-            
+__version__ = "2.0.0"
 
+from vagen.hilevelmod import (
+    HiLevelMod,
+    Mark,
+    Marker,
+    WaitSignal,
+    WaitUs,
+)
 
+from vagen.functions import (
+    Above,
+    Cross,
+    InitialStep,
+    FinalStep,
+    Timer,
+    Event,
+    absDelay,
+    abstime,
+    acStim,
+    analysis,
+    asin,
+    asinh,
+    atan,
+    atan2,
+    atanh,
+    ceil,
+    acos,
+    cos,
+    cosh,
+    acosh,
+    ddt,
+    exp,
+    expDistInt,
+    expDistReal,
+    floor,
+    gaussDistInt,
+    gaussDistReal,
+    hypot,
+    idt,
+    lastCrossing,
+    limexp,
+    ln,
+    log,
+    poissonDistInt,
+    poissonDistReal,
+    random,
+    sin,
+    sinh,
+    slew,
+    smooth,
+    sqrt,
+    tan,
+    tanh,
+    temp,
+    ternary,
+    transition,
+    uDistInt,
+    uDistReal,
+    vt
+)
+
+from vagen.commands import (
+    At,
+    BoundStep,
+    Case,
+    Cmd,
+    CmdList, 
+    Error,
+    Fatal,
+    Finish,
+    For,
+    Fclose,
+    Fopen,
+    Fstrobe,
+    Fwrite,
+    If,
+    Strobe,
+    While,
+    Repeat,
+    Write,
+    Discontinuity
+)
+
+from vagen.disciplines import (
+    Electrical,
+    Branch
+)
+
+from vagen.enums import CrossEdge, PortDirection
+
+from vagen.exceptions import (
+    VagenError,
+    VagenNameError,
+    VagenSequenceError,
+    VagenTypeError,
+    VagenValueError,
+)
+
+from vagen.module import (
+    Module
+)
+from vagen.types import (
+    Integer,
+    Real,
+    Bool
+)
+
+__all__ = [
+    "Above",
+    "At",
+    "Bool",
+    "BoundStep",
+    "Branch",
+    "Event",
+    "Case",
+    "Cmd",
+    "CmdList",
+    "Cross",
+    "CrossEdge",
+    "Discontinuity",
+    "Electrical",
+    "Error",
+    "Fatal",
+    "Finish",
+    "For",
+    "Fclose",
+    "Fopen",
+    "Fstrobe",
+    "Fwrite",
+    "HiLevelMod",
+    "If",
+    "InitialStep",
+    "FinalStep",
+    "Integer",
+    "Mark",
+    "Marker",
+    "Module",
+    "Real",
+    "Repeat",
+    "Strobe",
+    "Timer",
+    "WaitSignal",
+    "WaitUs",
+    "While",
+    "Write",
+    "__version__",
+    "absDelay",
+    "abstime",
+    "acStim",
+    "analysis",
+    "asin",
+    "asinh",
+    "atan",
+    "atan2",
+    "atanh",
+    "ceil",
+    "acos",
+    "cos",
+    "cosh",
+    "acosh",
+    "ddt",
+    "exp",
+    "expDistInt",
+    "expDistReal",
+    "floor",
+    "gaussDistInt",
+    "gaussDistReal",
+    "hypot",
+    "idt",
+    "lastCrossing",
+    "limexp",
+    "ln",
+    "log",
+    "poissonDistInt",
+    "poissonDistReal",
+    "PortDirection",
+    "random",
+    "sin",
+    "sinh",
+    "slew",
+    "smooth",
+    "sqrt",
+    "tan",
+    "tanh",
+    "temp",
+    "ternary",
+    "transition",
+    "uDistInt",
+    "uDistReal",
+    "VagenError",
+    "VagenNameError",
+    "VagenSequenceError",
+    "VagenTypeError",
+    "VagenValueError",
+    "vt",
+]

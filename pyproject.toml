@@ -1,20 +1,54 @@
 [build-system]
-requires=["setuptools >= 58.0"]
+requires = ["setuptools >= 58.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "vagen"
-version = "1.0.0"
-authors = [{name="Rodrigo Pedroso Mendes", email="roedroso@gmail.com"}]
+dynamic = ["version"]
+authors = [{ name = "Rodrigo Pedroso Mendes", email = "roedroso@gmail.com" }]
 description = "Generates verilogA testbench for verification of analog IPs (VLSI design)"
 readme = "README.md"
-requires-python = ">=3.7"
-dependencies = ["regex>=2023.6.3", "datetime>=5.2"]
+license = "MIT"
+requires-python = ">=3.6"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/rpm2003rpm/vagen"
+
+[project.optional-dependencies]
+dev = ["coverage[toml]>=7.0", "mypy>=1.8", "ruff>=0.4"]
+
+[tool.setuptools.dynamic]
+version = { attr = "vagen.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py36"
+
+[tool.ruff.lint]
+select = ["E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F403", "F405", "F841"]
+"examples/*" = ["F403", "F405", "F841"]
+
+[tool.coverage.run]
+source = ["vagen"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+fail_under = 70
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+files = ["vagen"]
