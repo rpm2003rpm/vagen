@@ -4,7 +4,7 @@ Provides high-level modeling and Verilog-A code generation for transient verific
 and modeling of complex analog IPs.
 """
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 from vagen.hilevelmod import (
     HiLevelMod,
